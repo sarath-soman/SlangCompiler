@@ -10,6 +10,10 @@ public enum Token {
     DIV,
     MUL,
     NUM,
+
+    OPAR,
+    CPAR,
+
     UNKNOWN
 
 }

@@ -47,6 +47,36 @@ public class Lexer {
                 case '\n':
                     index ++;
                     break ;
+                case '+':
+                    previousToken = currentToken;
+                    currentToken = Token.ADD;
+                    index++;
+                    break moduleStream;
+                case '-':
+                    previousToken = currentToken;
+                    currentToken = Token.SUB;
+                    index++;
+                    break moduleStream;
+                case '/':
+                    previousToken = currentToken;
+                    currentToken = Token.DIV;
+                    index++;
+                    break moduleStream;
+                case '*':
+                    previousToken = currentToken;
+                    currentToken = Token.MUL;
+                    index++;
+                    break moduleStream;
+                case '(':
+                    previousToken = currentToken;
+                    currentToken = Token.OPAR;
+                    index++;
+                    break moduleStream;
+                case ')':
+                    previousToken = currentToken;
+                    currentToken = Token.CPAR;
+                    index++;
+                    break moduleStream;
             }
         }
 

@@ -14,10 +14,35 @@ public class LexerTest {
         Lexer lexer = new Lexer("123");
         lexer.eat();
         Token token = lexer.getCurrentToken();
-        System.out.println(token);
         Assert.assertTrue(Token.NUM.equals(token));
-        System.out.println(lexer.getNum());
         Assert.assertTrue(123 == lexer.getNum());
+    }
+
+    @Test
+    public void testADD_SUB_DIV_MUL() {
+        Lexer lexer = new Lexer("+ - / *");
+        lexer.eat();
+        Assert.assertTrue(Token.ADD.equals(lexer.getCurrentToken()));
+
+        lexer.eat();
+        Assert.assertTrue(Token.SUB.equals(lexer.getCurrentToken()));
+
+        lexer.eat();
+        Assert.assertTrue(Token.DIV.equals(lexer.getCurrentToken()));
+
+        lexer.eat();
+        Assert.assertTrue(Token.MUL.equals(lexer.getCurrentToken()));
+    }
+
+    @Test
+    public void testOPAR_CPAR() {
+        Lexer lexer = new Lexer("()");
+        lexer.eat();
+        Assert.assertTrue(Token.OPAR.equals(lexer.getCurrentToken()));
+
+        lexer.eat();
+        Assert.assertTrue(Token.CPAR.equals(lexer.getCurrentToken()));
+
     }
 
 }
