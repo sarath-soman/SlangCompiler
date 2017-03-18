@@ -1,9 +1,6 @@
 package com.slang.parser;
 
-import com.slang.ast.Expression;
-import com.slang.ast.NumericExpression;
-import com.slang.ast.Token;
-import com.slang.ast.UnaryExpression;
+import com.slang.ast.*;
 import com.slang.lexer.Lexer;
 
 /**
@@ -18,11 +15,27 @@ public class Parser {
     }
 
     public Expression parseExpression() {
-        return parseTerm();
+        Expression expression = parseTerm();
+        Token token = lexer.getCurrentToken();
+        while (Token.ADD == token || Token.SUB == token) {
+            Expression rightExp = parseTerm();
+            expression = new BinaryExpression(expression, rightExp, token);
+            token = lexer.getCurrentToken();
+        }
+        return expression;
     }
 
     public Expression parseTerm() {
-        return parseFactor();
+        Expression expression = parseFactor();
+        lexer.eat();
+        Token token = lexer.getCurrentToken();
+        while (Token.MUL == token || Token.DIV == token) {
+            Expression rightExp = parseFactor();
+            expression = new BinaryExpression(expression, rightExp, token);
+            lexer.eat();
+            token = lexer.getCurrentToken();
+        }
+        return expression;
     }
 
     public Expression parseFactor() {
