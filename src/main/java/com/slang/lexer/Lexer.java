@@ -78,10 +78,11 @@ public class Lexer {
                     index++;
                     break moduleStream;
                 case ';':
-                    previousToken = currentToken;
-                    currentToken = Token.SEMICLN;
+//                    previousToken = currentToken;
+//                    currentToken = Token.SEMICLN;
                     index++;
-                    break moduleStream;
+                    break ;
+//                    break moduleStream;
                 default:
                     String keyword = readKeyWord();
                     previousToken = currentToken;
