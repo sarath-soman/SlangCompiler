@@ -26,7 +26,8 @@ public class Lexer {
             currentToken = Token.UNKNOWN;
         }
 
-        while(isNotEndOfModule()) {
+        moduleStream:
+        while (isNotEndOfModule()) {
             switch (module.charAt(index)) {
                 case '0':
                 case '1':
@@ -41,13 +42,64 @@ public class Lexer {
                     num = readNum();
                     previousToken = currentToken;
                     currentToken = Token.NUM;
+                    break moduleStream;
+                case ' ':
+                case '\n':
+                    index ++;
+                    break ;
             }
         }
 
     }
 
     private double readNum() {
-        return 0;
+        boolean foundDot = false;
+        StringBuilder numberBuilder = new StringBuilder();
+        //Iterating till end of module
+        while (isNotEndOfModule()) {
+            char c = module.charAt(index);
+
+            if(isNotNumeric(c)) {
+                break;
+            }
+
+            if (foundDot) {
+                throw new RuntimeException("Found '.' more than two times in the number");
+            }
+
+            if ('.' == num) {
+                foundDot = true;
+            }
+
+            numberBuilder.append(c);
+            index++;
+
+        }
+        return Double.valueOf(numberBuilder.toString());
+    }
+
+    private boolean isNumeric(char c) {
+        switch (c) {
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+            case '.':
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
+    private boolean isNotNumeric(char c) {
+        return !isNumeric(c);
     }
 
     public boolean isEndOfModule() {
