@@ -16,6 +16,7 @@ public enum Token {
 
     PRINT,
     PRINTLN,
+    SEMICLN,
 
     UNKNOWN
 

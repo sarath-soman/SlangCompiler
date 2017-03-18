@@ -39,7 +39,7 @@ public class Interpretter implements IVisitor {
 
     public void visit(PrintStatement printStatement) {
         NumericExpression expression = (NumericExpression) printStatement.getExpression().accept(this);
-        System.out.println(expression.getValue());
+        System.out.print(expression.getValue());
     }
 
     public void visit(PrintlnStatement printlnStatement) {

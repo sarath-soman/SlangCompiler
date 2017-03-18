@@ -14,6 +14,23 @@ public class Parser {
         this.lexer = lexer;
     }
 
+    public Statement parseStatement() {
+        lexer.eat();
+        Token token = lexer.getCurrentToken();
+        if(Token.PRINT == token) {
+            Expression expression = parseExpression();
+            return new PrintStatement(expression);
+        }
+
+        if(Token.PRINTLN == token) {
+            Expression expression = parseExpression();
+            return new PrintlnStatement(expression);
+        }
+
+        throw new RuntimeException("Expected PRINT or PRINTLN");
+
+    }
+
     public Expression parseExpression() {
         Expression expression = parseTerm();
         Token token = lexer.getCurrentToken();

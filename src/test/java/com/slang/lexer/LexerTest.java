@@ -80,4 +80,15 @@ public class LexerTest {
         lexer.expect(Token.CPAR);
     }
 
+    @Test
+    public void testPRINT_PRINTLN() {
+        Lexer lexer = new Lexer("print  ");
+        lexer.eat();
+        Assert.assertTrue(Token.PRINT.equals(lexer.getCurrentToken()));
+
+        lexer = new Lexer("println  ");
+        lexer.eat();
+        Assert.assertTrue(Token.PRINTLN.equals(lexer.getCurrentToken()));
+    }
+
 }

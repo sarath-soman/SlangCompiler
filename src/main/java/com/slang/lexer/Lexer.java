@@ -77,12 +77,36 @@ public class Lexer {
                     currentToken = Token.CPAR;
                     index++;
                     break moduleStream;
+                case ';':
+                    previousToken = currentToken;
+                    currentToken = Token.SEMICLN;
+                    index++;
+                    break moduleStream;
+                default:
+                    String keyword = readKeyWord();
+                    previousToken = currentToken;
+                    currentToken = TokenLookup.getToken(keyword);
+                    break moduleStream;
             }
 
-            //HERE
-            //TODO Implement lexer for Print and Printline
         }
 
+    }
+
+    private String readKeyWord() {
+        StringBuilder keyWordBuilder = new StringBuilder();
+        //Iterating till end of module
+        while (isNotEndOfModule()) {
+            char c = module.charAt(index);
+
+            if(c == ' ' || c == '\n') {
+                break;
+            }
+
+            keyWordBuilder.append(c);
+            index++;
+        }
+        return keyWordBuilder.toString();
     }
 
     private double readNum() {

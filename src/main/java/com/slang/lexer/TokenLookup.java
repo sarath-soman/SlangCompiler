@@ -18,6 +18,7 @@ public class TokenLookup {
     }
 
     public static Token getToken(String keyword) {
-        return  tokenMap.get(keyword);
+        Token token = tokenMap.get(keyword);
+        return  null == token ? Token.UNKNOWN : token;
     }
 }

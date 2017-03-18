@@ -1,9 +1,6 @@
 package com.slang.parser;
 
-import com.slang.ast.BinaryExpression;
-import com.slang.ast.Expression;
-import com.slang.ast.NumericExpression;
-import com.slang.ast.UnaryExpression;
+import com.slang.ast.*;
 import com.slang.lexer.Lexer;
 import com.slang.visitor.IVisitor;
 import com.slang.visitor.Interpretter;
@@ -86,5 +83,20 @@ public class ParserTest {
         visitor = new Interpretter();
         Assert.assertTrue(12.533333333333331 ==((NumericExpression)expression.accept(visitor)).getValue());
 
+    }
+
+    @Test
+    public void testPrintAndPrintlnProduction() {
+        Lexer lexer = new Lexer("print 20 + 30");
+        Parser parser = new Parser(lexer);
+        Statement statement = parser.parseStatement();
+        IVisitor visitor = new Interpretter();
+        statement.accept(visitor);
+
+        lexer = new Lexer("println 20 + 30");
+        parser = new Parser(lexer);
+        statement = parser.parseStatement();
+        visitor = new Interpretter();
+        statement.accept(visitor);
     }
 }
