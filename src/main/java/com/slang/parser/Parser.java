@@ -53,7 +53,6 @@ public class Parser {
                         lexer.getPreviousToken());
             case OPAR:
                 Expression expression = parseExpression();
-                lexer.eat();
                 lexer.expect(Token.CPAR);
                 return expression;
 

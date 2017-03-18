@@ -43,5 +43,48 @@ public class ParserTest {
         Expression expression = parser.parseExpression();
         IVisitor visitor = new Interpretter();
         Assert.assertTrue(12.0 ==((NumericExpression)expression.accept(visitor)).getValue());
+
+        lexer = new Lexer("20+3*4-1");
+        parser = new Parser(lexer);
+        expression = parser.parseExpression();
+        visitor = new Interpretter();
+        Assert.assertTrue(31 ==((NumericExpression)expression.accept(visitor)).getValue());
+
+        lexer = new Lexer("20+3/-4-1   ");
+        parser = new Parser(lexer);
+        expression = parser.parseExpression();
+        visitor = new Interpretter();
+        Assert.assertTrue(18.25 ==((NumericExpression)expression.accept(visitor)).getValue());
+
+        lexer = new Lexer("20+3/+4-1      ");
+        parser = new Parser(lexer);
+        expression = parser.parseExpression();
+        visitor = new Interpretter();
+        Assert.assertTrue(19.75 ==((NumericExpression)expression.accept(visitor)).getValue());
+
+        lexer = new Lexer("2 + (10 / -5) * (-1)   ");
+        parser = new Parser(lexer);
+        expression = parser.parseExpression();
+        visitor = new Interpretter();
+        Assert.assertTrue(4 ==((NumericExpression)expression.accept(visitor)).getValue());
+
+        lexer = new Lexer("(10 / -5) * (-1) + 2  ");
+        parser = new Parser(lexer);
+        expression = parser.parseExpression();
+        visitor = new Interpretter();
+        Assert.assertTrue(4 ==((NumericExpression)expression.accept(visitor)).getValue());
+
+        lexer = new Lexer("56/43*5+45-67");
+        parser = new Parser(lexer);
+        expression = parser.parseExpression();
+        visitor = new Interpretter();
+        Assert.assertTrue(-15.488372093023258 ==((NumericExpression)expression.accept(visitor)).getValue());
+
+        lexer = new Lexer("23/90*6+65-54");
+        parser = new Parser(lexer);
+        expression = parser.parseExpression();
+        visitor = new Interpretter();
+        Assert.assertTrue(12.533333333333331 ==((NumericExpression)expression.accept(visitor)).getValue());
+
     }
 }
