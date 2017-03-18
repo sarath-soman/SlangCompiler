@@ -19,16 +19,8 @@ public class UnaryExpression extends Expression {
         return leftExpression;
     }
 
-    public void setLeftExpression(Expression leftExpression) {
-        this.leftExpression = leftExpression;
-    }
-
     public Token getOperator() {
         return operator;
-    }
-
-    public void setOperator(Token operator) {
-        this.operator = operator;
     }
 
     public Expression accept(IVisitor visitor) {

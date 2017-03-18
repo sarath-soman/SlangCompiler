@@ -14,6 +14,9 @@ public enum Token {
     OPAR,
     CPAR,
 
+    PRINT,
+    PRINTLN,
+
     UNKNOWN
 
 }

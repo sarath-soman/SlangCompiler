@@ -36,4 +36,14 @@ public class Interpretter implements IVisitor {
                 throw new RuntimeException("Unexpected Operator: " + token);
         }
     }
+
+    public void visit(PrintStatement printStatement) {
+        NumericExpression expression = (NumericExpression) printStatement.getExpression().accept(this);
+        System.out.println(expression.getValue());
+    }
+
+    public void visit(PrintlnStatement printlnStatement) {
+        NumericExpression expression = (NumericExpression) printlnStatement.getExpression().accept(this);
+        System.out.println(expression.getValue());
+    }
 }

@@ -21,24 +21,12 @@ public class BinaryExpression extends Expression {
         return leftExpression;
     }
 
-    public void setLeftExpression(Expression leftExpression) {
-        this.leftExpression = leftExpression;
-    }
-
     public Expression getRightExpression() {
         return rightExpression;
     }
 
-    public void setRightExpression(Expression rightExpression) {
-        this.rightExpression = rightExpression;
-    }
-
     public Token getOperator() {
         return operator;
-    }
-
-    public void setOperator(Token operator) {
-        this.operator = operator;
     }
 
     public Expression accept(IVisitor visitor) {

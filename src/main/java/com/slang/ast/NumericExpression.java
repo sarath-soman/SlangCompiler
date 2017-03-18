@@ -17,10 +17,6 @@ public class NumericExpression extends Expression {
         return value;
     }
 
-    public void setValue(double value) {
-        this.value = value;
-    }
-
     public Expression accept(IVisitor visitor) {
         return visitor.visit(this);
     }

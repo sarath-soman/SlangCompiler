@@ -78,6 +78,8 @@ public class Lexer {
                     index++;
                     break moduleStream;
             }
+
+            //HERE
         }
 
     }
