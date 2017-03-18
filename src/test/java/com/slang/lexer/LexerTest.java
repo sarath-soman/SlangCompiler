@@ -2,12 +2,17 @@ package com.slang.lexer;
 
 import com.slang.ast.Token;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * Created by sarath on 18/3/17.
  */
 public class LexerTest {
+
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
 
     @Test
     public void testNum() {
@@ -16,6 +21,18 @@ public class LexerTest {
         Token token = lexer.getCurrentToken();
         Assert.assertTrue(Token.NUM.equals(token));
         Assert.assertTrue(123 == lexer.getNum());
+
+        lexer = new Lexer("123.3456");
+        lexer.eat();
+        token = lexer.getCurrentToken();
+        Assert.assertTrue(Token.NUM.equals(token));
+        Assert.assertTrue(123.3456 == lexer.getNum());
+
+        lexer = new Lexer("123.3456.344");
+        exception.expect(RuntimeException.class);
+        lexer.eat();
+
+
     }
 
     @Test
@@ -43,6 +60,24 @@ public class LexerTest {
         lexer.eat();
         Assert.assertTrue(Token.CPAR.equals(lexer.getCurrentToken()));
 
+    }
+
+    @Test
+    public void testExpect() {
+        Lexer lexer = new Lexer("(");
+        lexer.eat();
+        Assert.assertTrue(Token.OPAR.equals(lexer.getCurrentToken()));
+
+        lexer.eat();
+        exception.expect(RuntimeException.class);
+        lexer.expect(Token.CPAR);
+
+        lexer = new Lexer("()");
+        lexer.eat();
+        Assert.assertTrue(Token.OPAR.equals(lexer.getCurrentToken()));
+
+        lexer.eat();
+        lexer.expect(Token.CPAR);
     }
 
 }
