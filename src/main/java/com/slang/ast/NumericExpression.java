@@ -1,5 +1,7 @@
 package com.slang.ast;
 
+import com.slang.visitor.IVisitor;
+
 /**
  * Created by sarath on 16/3/17.
  */
@@ -17,5 +19,9 @@ public class NumericExpression extends Expression {
 
     public void setValue(double value) {
         this.value = value;
+    }
+
+    public Expression accept(IVisitor visitor) {
+        return visitor.visit(this);
     }
 }

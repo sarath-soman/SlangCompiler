@@ -1,5 +1,7 @@
 package com.slang.ast;
 
+import com.slang.visitor.IVisitor;
+
 /**
  * Created by sarath on 16/3/17.
  */
@@ -37,5 +39,9 @@ public class BinaryExpression extends Expression {
 
     public void setOperator(Token operator) {
         this.operator = operator;
+    }
+
+    public Expression accept(IVisitor visitor) {
+        return visitor.visit(this);
     }
 }
