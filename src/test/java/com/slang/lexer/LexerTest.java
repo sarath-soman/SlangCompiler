@@ -91,4 +91,18 @@ public class LexerTest {
         Assert.assertTrue(Token.PRINTLN.equals(lexer.getCurrentToken()));
     }
 
+    @Test
+    public void testStringLiteral() {
+        Lexer lexer = new Lexer("\"sdasda\"");
+        lexer.eat();
+        Assert.assertTrue(Token.STRLTRL.equals(lexer.getCurrentToken()));
+        Assert.assertTrue("sdasda".equals(lexer.getStringLiteral()));
+
+        lexer = new Lexer("\"sdasda");
+        exception.expect(RuntimeException.class);
+        lexer.eat();
+        Assert.assertTrue(Token.STRLTRL.equals(lexer.getCurrentToken()));
+        Assert.assertTrue("sdasda".equals(lexer.getStringLiteral()));
+    }
+
 }

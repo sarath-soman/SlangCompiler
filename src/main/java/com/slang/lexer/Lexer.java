@@ -13,6 +13,7 @@ public class Lexer {
     private final int moduleLen;
     private int index;
     private double num;
+    private String stringLiteral;
 
     public Lexer(String module) {
         this.module = module;
@@ -83,6 +84,11 @@ public class Lexer {
                     index++;
                     break ;
 //                    break moduleStream;
+                case '"':
+                    stringLiteral  = readString();
+                    previousToken = currentToken;
+                    currentToken = Token.STRLTRL;
+                    break moduleStream;
                 default:
                     String keyword = readKeyWord();
                     previousToken = currentToken;
@@ -107,6 +113,31 @@ public class Lexer {
             keyWordBuilder.append(c);
             index++;
         }
+        return keyWordBuilder.toString();
+    }
+
+    private String readString() {
+        StringBuilder keyWordBuilder = new StringBuilder();
+        //Iterating till end of module
+        index++;
+        boolean closeQuotesFound = false;
+        while (isNotEndOfModule()) {
+            char c = module.charAt(index);
+
+            if(c == '"') {
+                closeQuotesFound = true;
+                index++;
+                break;
+            }
+
+            keyWordBuilder.append(c);
+            index++;
+        }
+
+        if(!closeQuotesFound) {
+            throw new RuntimeException("Closing quotes not found for the string literal");
+        }
+
         return keyWordBuilder.toString();
     }
 
@@ -200,6 +231,10 @@ public class Lexer {
 
     public double getNum() {
         return num;
+    }
+
+    public String getStringLiteral() {
+        return stringLiteral;
     }
 
     public void expect(Token num) {

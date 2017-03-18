@@ -18,6 +18,8 @@ public enum Token {
     PRINTLN,
     SEMICLN,
 
+    STRLTRL,
+
     UNKNOWN
 
 }
