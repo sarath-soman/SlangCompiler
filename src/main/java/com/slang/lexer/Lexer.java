@@ -173,4 +173,10 @@ public class Lexer {
     public double getNum() {
         return num;
     }
+
+    public void expect(Token num) {
+        if(num != currentToken) {
+            throw new RuntimeException("Error Token found is "+ currentToken+", Expected token :" + num);
+        }
+    }
 }
