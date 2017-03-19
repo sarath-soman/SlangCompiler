@@ -72,6 +72,8 @@ public class Parser {
                 Expression expression = parseExpression();
                 lexer.expect(Token.CPAR);
                 return expression;
+            case STRLTRL:
+                return new StringLiteral(lexer.getStringLiteral());
 
             default:
                 throw new RuntimeException("Un expected token at leaf : " + token);

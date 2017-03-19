@@ -83,6 +83,12 @@ public class ParserTest {
         visitor = new Interpretter();
         Assert.assertTrue(12.533333333333331 ==expression.accept(visitor).getDoubleValue());
 
+        lexer = new Lexer("\"23/90*6+65-54\"");
+        parser = new Parser(lexer);
+        expression = parser.parseExpression();
+        visitor = new Interpretter();
+        Assert.assertTrue("23/90*6+65-54".equals(expression.accept(visitor).getStringValue()));
+
     }
 
     @Test
@@ -94,6 +100,12 @@ public class ParserTest {
         statement.accept(visitor);
 
         lexer = new Lexer("println 20 + 30");
+        parser = new Parser(lexer);
+        statement = parser.parseStatement();
+        visitor = new Interpretter();
+        statement.accept(visitor);
+
+        lexer = new Lexer("println \"Hello, World\"");
         parser = new Parser(lexer);
         statement = parser.parseStatement();
         visitor = new Interpretter();

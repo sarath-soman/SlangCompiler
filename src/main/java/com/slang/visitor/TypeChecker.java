@@ -6,7 +6,7 @@ import com.slang.ast.*;
 /**
  * Created by sarath on 18/3/17.
  */
-public class Interpretter implements IVisitor {
+public class TypeChecker implements IVisitor {
 
     public ValueInfo visit(NumericExpression expression) {
         return new ValueInfo(expression.getValue());
@@ -39,38 +39,18 @@ public class Interpretter implements IVisitor {
     }
 
     public ValueInfo visit(StringLiteral stringLiteral) {
-        return new ValueInfo(stringLiteral.getStringLiteral());
+        return null;
     }
 
     public ValueInfo visit(PrintStatement printStatement) {
         ValueInfo exp = printStatement.getExpression().accept(this);
-        switch (exp.getDataType()) {
-            case DOUBLE:
-                System.out.print(exp.getDoubleValue());
-                break;
-            case STRING:
-                System.out.print(exp.getStringValue());
-                break;
-
-            default:
-                throw new RuntimeException("Unknown Data Type");
-        }
+        System.out.print(exp.getDoubleValue());
         return null;
     }
 
     public ValueInfo visit(PrintlnStatement printlnStatement) {
         ValueInfo exp = printlnStatement.getExpression().accept(this);
-        switch (exp.getDataType()) {
-            case DOUBLE:
-                System.out.println(exp.getDoubleValue());
-                break;
-            case STRING:
-                System.out.println(exp.getStringValue());
-                break;
-
-            default:
-                throw new RuntimeException("Unknown Data Type");
-        }
+        System.out.println(exp.getDoubleValue());
         return null;
     }
 }

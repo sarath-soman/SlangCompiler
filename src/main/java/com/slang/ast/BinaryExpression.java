@@ -1,6 +1,6 @@
 package com.slang.ast;
 
-import com.slang.Value;
+import com.slang.ValueInfo;
 import com.slang.visitor.IVisitor;
 
 /**
@@ -30,7 +30,7 @@ public class BinaryExpression extends Expression {
         return operator;
     }
 
-    public Value accept(IVisitor visitor) {
+    public ValueInfo accept(IVisitor visitor) {
         return visitor.visit(this);
     }
 }

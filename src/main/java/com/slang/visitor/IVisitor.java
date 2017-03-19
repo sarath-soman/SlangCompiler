@@ -1,17 +1,17 @@
 package com.slang.visitor;
 
-import com.slang.Value;
+import com.slang.ValueInfo;
 import com.slang.ast.*;
 
 /**
  * Created by sarath on 18/3/17.
  */
 public interface IVisitor {
-    Value visit(NumericExpression expression);
-    Value visit(UnaryExpression expression);
-    Value visit(BinaryExpression expression);
-    Value visit(StringLiteral stringLiteral);
-    Value visit(PrintStatement printStatement);
-    Value visit(PrintlnStatement printlnStatement);
+    ValueInfo visit(NumericExpression expression);
+    ValueInfo visit(UnaryExpression expression);
+    ValueInfo visit(BinaryExpression expression);
+    ValueInfo visit(StringLiteral stringLiteral);
+    ValueInfo visit(PrintStatement printStatement);
+    ValueInfo visit(PrintlnStatement printlnStatement);
 
 }

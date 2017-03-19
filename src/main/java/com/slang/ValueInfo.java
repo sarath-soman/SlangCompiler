@@ -3,24 +3,24 @@ package com.slang;
 /**
  * Created by sarath on 19/3/17.
  */
-public class Value {
+public class ValueInfo {
 
     private String stringValue;
     private Double doubleValue;
     private Integer integerValue;
     private Type dataType;
 
-    public Value(String stringValue) {
+    public ValueInfo(String stringValue) {
         this.stringValue = stringValue;
         dataType = Type.STRING;
     }
 
-    public Value(Double doubleValue) {
+    public ValueInfo(Double doubleValue) {
         this.doubleValue = doubleValue;
         dataType = Type.DOUBLE;
     }
 
-    public Value(Integer integerValue) {
+    public ValueInfo(Integer integerValue) {
         this.integerValue = integerValue;
         dataType = Type.INTEGER;
     }

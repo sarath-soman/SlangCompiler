@@ -1,6 +1,6 @@
 package com.slang.ast;
 
-import com.slang.Value;
+import com.slang.ValueInfo;
 import com.slang.visitor.IVisitor;
 
 /**
@@ -10,8 +10,15 @@ public class StringLiteral extends Expression {
 
     private String stringLiteral;
 
-    public Value accept(IVisitor visitor) {
-        visitor.visit(this);
-        return null;
+    public StringLiteral(String stringLiteral) {
+        this.stringLiteral = stringLiteral;
+    }
+
+    public ValueInfo accept(IVisitor visitor) {
+        return visitor.visit(this);
+    }
+
+    public String getStringLiteral() {
+        return stringLiteral;
     }
 }
