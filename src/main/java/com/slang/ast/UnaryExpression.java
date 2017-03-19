@@ -1,5 +1,6 @@
 package com.slang.ast;
 
+import com.slang.Value;
 import com.slang.visitor.IVisitor;
 
 /**
@@ -23,7 +24,7 @@ public class UnaryExpression extends Expression {
         return operator;
     }
 
-    public Expression accept(IVisitor visitor) {
+    public Value accept(IVisitor visitor) {
         return visitor.visit(this);
     }
 }

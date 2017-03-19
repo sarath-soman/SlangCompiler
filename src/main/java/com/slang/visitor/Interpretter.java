@@ -1,5 +1,6 @@
 package com.slang.visitor;
 
+import com.slang.Value;
 import com.slang.ast.*;
 
 /**
@@ -7,43 +8,49 @@ import com.slang.ast.*;
  */
 public class Interpretter implements IVisitor {
 
-    public NumericExpression visit(NumericExpression expression) {
-        return expression;
+    public Value visit(NumericExpression expression) {
+        return new Value(expression.getValue());
     }
 
-    public NumericExpression visit(UnaryExpression expression) {
-        NumericExpression leftExp = (NumericExpression) expression.getLeftExpression().accept(this);
+    public Value visit(UnaryExpression expression) {
+        Value leftExpVal = expression.getLeftExpression().accept(this);
         if(Token.SUB == expression.getOperator()) {
-            return new NumericExpression(leftExp.getValue() * -1);
+            return new Value(leftExpVal.getDoubleValue()* -1);
         }
-        return leftExp;
+        return leftExpVal;
     }
 
-    public NumericExpression visit(BinaryExpression expression) {
-        NumericExpression leftExp = (NumericExpression) expression.getLeftExpression().accept(this);
-        NumericExpression rightExp = (NumericExpression) expression.getRightExpression().accept(this);
+    public Value visit(BinaryExpression expression) {
+        Value leftExpVal = expression.getLeftExpression().accept(this);
+        Value rightExpVal = expression.getRightExpression().accept(this);
         Token token = expression.getOperator();
         switch (token) {
             case ADD:
-                return new NumericExpression(leftExp.getValue() + rightExp.getValue());
+                return new Value(leftExpVal.getDoubleValue() + rightExpVal.getDoubleValue());
             case SUB:
-                return new NumericExpression(leftExp.getValue() - rightExp.getValue());
+                return new Value(leftExpVal.getDoubleValue() - rightExpVal.getDoubleValue());
             case DIV:
-                return new NumericExpression(leftExp.getValue() / rightExp.getValue());
+                return new Value(leftExpVal.getDoubleValue() / rightExpVal.getDoubleValue());
             case MUL:
-                return new NumericExpression(leftExp.getValue() * rightExp.getValue());
+                return new Value(leftExpVal.getDoubleValue() * rightExpVal.getDoubleValue());
             default:
                 throw new RuntimeException("Unexpected Operator: " + token);
         }
     }
 
-    public void visit(PrintStatement printStatement) {
-        NumericExpression expression = (NumericExpression) printStatement.getExpression().accept(this);
-        System.out.print(expression.getValue());
+    public Value visit(StringLiteral stringLiteral) {
+        return null;
     }
 
-    public void visit(PrintlnStatement printlnStatement) {
-        NumericExpression expression = (NumericExpression) printlnStatement.getExpression().accept(this);
-        System.out.println(expression.getValue());
+    public Value visit(PrintStatement printStatement) {
+        Value exp = printStatement.getExpression().accept(this);
+        System.out.print(exp.getDoubleValue());
+        return null;
+    }
+
+    public Value visit(PrintlnStatement printlnStatement) {
+        Value exp = printlnStatement.getExpression().accept(this);
+        System.out.println(exp.getDoubleValue());
+        return null;
     }
 }

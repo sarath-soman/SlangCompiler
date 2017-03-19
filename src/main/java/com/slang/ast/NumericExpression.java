@@ -1,5 +1,6 @@
 package com.slang.ast;
 
+import com.slang.Value;
 import com.slang.visitor.IVisitor;
 
 /**
@@ -17,7 +18,7 @@ public class NumericExpression extends Expression {
         return value;
     }
 
-    public Expression accept(IVisitor visitor) {
+    public Value accept(IVisitor visitor) {
         return visitor.visit(this);
     }
 }
