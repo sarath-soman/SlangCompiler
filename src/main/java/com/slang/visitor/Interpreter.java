@@ -7,7 +7,7 @@ import com.slang.ast.*;
 /**
  * Created by sarath on 18/3/17.
  */
-public class Interpretter implements IVisitor {
+public class Interpreter implements IVisitor {
 
     public SymbolInfo visit(NumericExpression expression, Context context) {
         return new SymbolInfo(expression.getValue());

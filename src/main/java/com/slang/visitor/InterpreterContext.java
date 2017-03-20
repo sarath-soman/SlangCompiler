@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Created by sarath on 20/3/17.
  */
-public class InterpretterContext extends Context {
+public class InterpreterContext extends Context {
 
     public static enum Scope {
         CURRENT,
@@ -19,7 +19,7 @@ public class InterpretterContext extends Context {
 
     private Context parentContext = null;
 
-    public InterpretterContext(Context parentContext) {
+    public InterpreterContext(Context parentContext) {
         this.parentContext = parentContext;
     }
 
