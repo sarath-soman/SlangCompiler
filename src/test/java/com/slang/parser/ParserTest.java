@@ -223,5 +223,15 @@ public class ParserTest {
                     statement.accept(visitor, context);
                 });
         Assert.assertTrue(context.getSymbolInfo("x").getDoubleValue() == 10);
+
+        lexer = new Lexer("var y = 23/90*6+65-54;");
+        parser = new Parser(lexer);
+        statements = parser.parseStatements();
+        IVisitor visitor2 = new Interpreter();
+        statements.stream()
+                .forEach(statement -> {
+                    statement.accept(visitor2, context);
+                });
+        Assert.assertTrue(context.getSymbolInfo("y").getDoubleValue() == 12.533333333333331);
     }
 }
