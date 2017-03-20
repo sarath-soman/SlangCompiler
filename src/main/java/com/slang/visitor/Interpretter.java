@@ -25,6 +25,8 @@ public class Interpretter implements IVisitor {
         SymbolInfo leftExpVal = expression.getLeftExpression().accept(this, context);
         SymbolInfo rightExpVal = expression.getRightExpression().accept(this, context);
         Token token = expression.getOperator();
+        System.out.println(leftExpVal);
+        System.out.println(rightExpVal);
         switch (token) {
             case ADD:
                 return new SymbolInfo(leftExpVal.getDoubleValue() + rightExpVal.getDoubleValue());
@@ -151,6 +153,12 @@ public class Interpretter implements IVisitor {
         }
         //if lhs is just declared and rhs is also just declared then do nothing
         return lhsInfo;
+    }
+
+    @Override
+    public SymbolInfo visit(VariableDeclAndAssignStatement variableDeclAndAssignStatement, Context context) {
+        variableDeclAndAssignStatement.getVariableDeclarationStatement().accept(this, context);
+        return variableDeclAndAssignStatement.getVariableAssignmentStatement().accept(this, context);
     }
 
 }

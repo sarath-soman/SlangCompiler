@@ -121,7 +121,12 @@ public class Lexer {
         while (isNotEndOfModule()) {
             char c = module.charAt(index);
 
-            if(c == ' ' || c == '\n' || c == ';') {
+            if(c == ' ' || c == '\n' || c == ';' ) {
+                break;
+            }
+
+            if(c == '/' || c == '*' || c == '-'
+                    || c == '+' || c == '(' || c == ')') {
                 break;
             }
 
@@ -179,6 +184,7 @@ public class Lexer {
             index++;
 
         }
+
         return Double.valueOf(numberBuilder.toString());
     }
 

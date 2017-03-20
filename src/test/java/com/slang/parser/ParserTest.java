@@ -7,7 +7,9 @@ import com.slang.visitor.IVisitor;
 import com.slang.visitor.Interpretter;
 import com.slang.visitor.InterpretterContext;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.List;
 
@@ -15,6 +17,9 @@ import java.util.List;
  * Created by sarath on 18/3/17.
  */
 public class ParserTest {
+
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
 
     @Test
     public void testParseFactor() {
@@ -130,6 +135,7 @@ public class ParserTest {
         statement = parser.parseStatement();
         visitor = new Interpretter();
         statement.accept(visitor, context);
+
     }
 
     @Test
@@ -154,9 +160,68 @@ public class ParserTest {
         IVisitor visitor = new Interpretter();
         statements.stream()
                 .forEach(statement -> {
-                    System.out.println(statement);
                     statement.accept(visitor, context);
                 });
-        System.out.println(context.getSymbolInfo("x"));
+    }
+
+    @Test
+    public void testParseStatements2() {
+        Context context = new InterpretterContext(null);
+
+        Lexer lexer = new Lexer("var x; x = 10; var y; y = x / (2 * x) - 100 ;");
+        Parser parser = new Parser(lexer);
+        List<Statement> statements = parser.parseStatements();
+        IVisitor visitor = new Interpretter();
+        statements.stream()
+                .forEach(statement -> {
+                    statement.accept(visitor, context);
+                });
+
+        lexer = new Lexer("var z; z = 100; println z;");
+        parser = new Parser(lexer);
+        statements = parser.parseStatements();
+        statements.stream()
+                .forEach(statement -> {
+                    statement.accept(visitor, context);
+                });
+
+        lexer = new Lexer("var str1; var val; val = 10; str1 = \"sadasd\"; str1 = val;");
+        parser = new Parser(lexer);
+        statements = parser.parseStatements();
+        exception.expect(RuntimeException.class);
+        statements.stream()
+                .forEach(statement -> {
+                    statement.accept(visitor, context);
+                });
+    }
+
+    @Test
+    public void testExpInterpretting() {
+        Context context = new InterpretterContext(null);
+
+        Lexer lexer = new Lexer("var x; var y; var z; var a; var b; x = 23; y = 90; z = 6; a = 65; b = 54; var val; val = x/y*z+a-b;");
+        Parser parser = new Parser(lexer);
+        List<Statement> statements = parser.parseStatements();
+        IVisitor visitor = new Interpretter();
+        statements.stream()
+                .forEach(statement -> {
+                    statement.accept(visitor, context);
+                });
+        Assert.assertTrue(context.getSymbolInfo("val").getDoubleValue().equals(12.533333333333331));
+    }
+
+    @Test
+    public void testVarDecAndAssign() {
+        Context context = new InterpretterContext(null);
+
+        Lexer lexer = new Lexer("var x = 10;");
+        Parser parser = new Parser(lexer);
+        List<Statement> statements = parser.parseStatements();
+        IVisitor visitor = new Interpretter();
+        statements.stream()
+                .forEach(statement -> {
+                    statement.accept(visitor, context);
+                });
+        Assert.assertTrue(context.getSymbolInfo("x").getDoubleValue() == 10);
     }
 }

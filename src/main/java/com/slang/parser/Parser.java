@@ -52,9 +52,17 @@ public class Parser {
         if(Token.VAR == token) {
             Expression expression = parseExpression();
             VariableExpression variableExpression = (VariableExpression) expression;
-            lexer.expect(Token.SEMICLN);
-            lexer.eat();
-            return new VariableDeclarationStatement(variableExpression);
+
+            if(Token.SEMICLN == lexer.getCurrentToken()) {
+                lexer.eat();
+                return new VariableDeclarationStatement(variableExpression);
+            } else if(Token.EQ == lexer.getCurrentToken()) {
+                Expression rhsExp = parseExpression();
+                lexer.expect(Token.SEMICLN);
+                lexer.eat();
+                return new VariableDeclAndAssignStatement(new VariableDeclarationStatement(variableExpression),
+                        new VariableAssignmentStatement(variableExpression.getVariableName(), rhsExp));
+            }
 
         }
 
