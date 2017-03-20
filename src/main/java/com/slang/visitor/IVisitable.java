@@ -1,12 +1,12 @@
 package com.slang.visitor;
 
-import com.slang.ValueInfo;
+import com.slang.SymbolInfo;
 
 /**
  * Created by sarath on 18/3/17.
  */
 public interface IVisitable {
 
-    ValueInfo accept(IVisitor visitor);
+    SymbolInfo accept(IVisitor visitor);
 
 }

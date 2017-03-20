@@ -1,7 +1,11 @@
 package com.slang.parser;
 
+import com.slang.SymbolInfo;
 import com.slang.ast.*;
 import com.slang.lexer.Lexer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by sarath on 16/3/17.
@@ -14,18 +18,48 @@ public class Parser {
         this.lexer = lexer;
     }
 
+    public List<Statement> parseStatements() {
+        Token token = null;
+        List<Statement> statements = new ArrayList<>();
+        do {
+            statements.add(parseStatement());
+            token = lexer.getCurrentToken();
+        } while (Token.UNKNOWN != token);
+        return statements;
+    }
+
     public Statement parseStatement() {
-        lexer.eat();
+        //First call to parseStatement require eat and once parsing has started we should not call eat() and it will
+        //skip a token
+        if (null == lexer.getPreviousToken()) {
+            lexer.eat();
+        }
         Token token = lexer.getCurrentToken();
         if(Token.PRINT == token) {
             Expression expression = parseExpression();
+            lexer.expect(Token.SEMICLN);
+            lexer.eat();
             return new PrintStatement(expression);
         }
 
         if(Token.PRINTLN == token) {
             Expression expression = parseExpression();
+            lexer.expect(Token.SEMICLN);
+            lexer.eat();
             return new PrintlnStatement(expression);
         }
+
+        if(Token.VAR == token) {
+            Expression expression = parseExpression();
+            String varName = StringLiteral.class.cast(expression).getStringLiteral();
+            SymbolInfo symbolInfo = new SymbolInfo(null, varName);
+            lexer.expect(Token.SEMICLN);
+            lexer.eat();
+            return new VariableDeclarationStatement(symbolInfo);
+
+        }
+
+        System.out.println(token);
 
         throw new RuntimeException("Expected PRINT or PRINTLN");
 
@@ -74,6 +108,13 @@ public class Parser {
                 return expression;
             case STRLTRL:
                 return new StringLiteral(lexer.getStringLiteral());
+            case VAR_NAME:
+            case STRING:
+                return new StringLiteral(lexer.getVariableName());
+            case TRUE:
+                return new BooleanExpression(true);
+            case FALSE:
+                return new BooleanExpression(false);
 
             default:
                 throw new RuntimeException("Un expected token at leaf : " + token);

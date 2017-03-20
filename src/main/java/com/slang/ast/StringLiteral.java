@@ -1,6 +1,6 @@
 package com.slang.ast;
 
-import com.slang.ValueInfo;
+import com.slang.SymbolInfo;
 import com.slang.visitor.IVisitor;
 
 /**
@@ -14,7 +14,7 @@ public class StringLiteral extends Expression {
         this.stringLiteral = stringLiteral;
     }
 
-    public ValueInfo accept(IVisitor visitor) {
+    public SymbolInfo accept(IVisitor visitor) {
         return visitor.visit(this);
     }
 

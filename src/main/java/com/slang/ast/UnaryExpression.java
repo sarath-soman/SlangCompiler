@@ -1,6 +1,6 @@
 package com.slang.ast;
 
-import com.slang.ValueInfo;
+import com.slang.SymbolInfo;
 import com.slang.visitor.IVisitor;
 
 /**
@@ -24,7 +24,7 @@ public class UnaryExpression extends Expression {
         return operator;
     }
 
-    public ValueInfo accept(IVisitor visitor) {
+    public SymbolInfo accept(IVisitor visitor) {
         return visitor.visit(this);
     }
 }

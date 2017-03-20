@@ -14,6 +14,7 @@ public class Lexer {
     private int index;
     private double num;
     private String stringLiteral;
+    private String variableName;
 
     public Lexer(String module) {
         this.module = module;
@@ -79,11 +80,10 @@ public class Lexer {
                     index++;
                     break moduleStream;
                 case ';':
-//                    previousToken = currentToken;
-//                    currentToken = Token.SEMICLN;
+                    previousToken = currentToken;
+                    currentToken = Token.SEMICLN;
                     index++;
-                    break ;
-//                    break moduleStream;
+                    break moduleStream;
                 case '"':
                     stringLiteral  = readString();
                     previousToken = currentToken;
@@ -92,7 +92,17 @@ public class Lexer {
                 default:
                     String keyword = readKeyWord();
                     previousToken = currentToken;
-                    currentToken = TokenLookup.getToken(keyword);
+                    Token tempToken = TokenLookup.getToken(keyword);
+                    if(Token.UNKNOWN == tempToken) {
+                        variableName = keyword;
+                        currentToken = Token.VAR_NAME;
+                    } else if(Token.VAR == tempToken) {
+                        //Handling reserved type on variable name
+                        variableName = keyword;
+                        currentToken = Token.VAR;
+                    } else {
+                        currentToken = tempToken;
+                    }
                     break moduleStream;
             }
 
@@ -106,7 +116,7 @@ public class Lexer {
         while (isNotEndOfModule()) {
             char c = module.charAt(index);
 
-            if(c == ' ' || c == '\n') {
+            if(c == ' ' || c == '\n' || c == ';') {
                 break;
             }
 
@@ -203,6 +213,12 @@ public class Lexer {
         return !isEndOfModule();
     }
 
+    public void expect(Token num) {
+        if(num != currentToken) {
+            throw new RuntimeException("Error Token found is "+ currentToken+", Expected token :" + num);
+        }
+    }
+
     public Token getPreviousToken() {
         return previousToken;
     }
@@ -237,9 +253,8 @@ public class Lexer {
         return stringLiteral;
     }
 
-    public void expect(Token num) {
-        if(num != currentToken) {
-            throw new RuntimeException("Error Token found is "+ currentToken+", Expected token :" + num);
-        }
+    public String getVariableName() {
+        return variableName;
     }
+
 }

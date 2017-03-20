@@ -4,21 +4,21 @@ import com.slang.SymbolInfo;
 import com.slang.visitor.IVisitor;
 
 /**
- * Created by sarath on 16/3/17.
+ * Created by sarath on 20/3/17.
  */
-public class NumericExpression extends Expression {
+public class BooleanExpression extends Expression {
 
-    private double value;
+    private Boolean value;
 
-    public NumericExpression(double value) {
+    public BooleanExpression(Boolean value) {
         this.value = value;
-    }
-
-    public double getValue() {
-        return value;
     }
 
     public SymbolInfo accept(IVisitor visitor) {
         return visitor.visit(this);
+    }
+
+    public Boolean getValue() {
+        return value;
     }
 }

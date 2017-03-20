@@ -3,26 +3,41 @@ package com.slang;
 /**
  * Created by sarath on 19/3/17.
  */
-public class ValueInfo {
+public class SymbolInfo {
 
+    private String variableName;
     private String stringValue;
     private Double doubleValue;
     private Integer integerValue;
+    private Boolean boolValue;
     private Type dataType;
 
-    public ValueInfo(String stringValue) {
+    public SymbolInfo(String stringValue) {
         this.stringValue = stringValue;
         dataType = Type.STRING;
     }
 
-    public ValueInfo(Double doubleValue) {
+    public SymbolInfo(Double doubleValue) {
         this.doubleValue = doubleValue;
         dataType = Type.DOUBLE;
     }
 
-    public ValueInfo(Integer integerValue) {
+    public SymbolInfo(Integer integerValue) {
         this.integerValue = integerValue;
         dataType = Type.INTEGER;
+    }
+
+    public SymbolInfo(Object o, String varName) {
+        variableName = varName;
+    }
+
+    public SymbolInfo(Boolean boolValue) {
+        this.boolValue = boolValue;
+        dataType = Type.BOOL;
+    }
+
+    public String getVariableName() {
+        return variableName;
     }
 
     public String getStringValue() {
@@ -35,6 +50,10 @@ public class ValueInfo {
 
     public Integer getIntegerValue() {
         return integerValue;
+    }
+
+    public Boolean getBoolValue() {
+        return boolValue;
     }
 
     public Type getDataType() {

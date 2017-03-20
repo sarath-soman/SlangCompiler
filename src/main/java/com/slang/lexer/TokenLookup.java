@@ -15,6 +15,13 @@ public class TokenLookup {
     static  {
         tokenMap.put("print", Token.PRINT);
         tokenMap.put("println", Token.PRINTLN);
+        tokenMap.put("int", Token.INT);
+        tokenMap.put("float", Token.FLOAT);
+        tokenMap.put("bool", Token.BOOL);
+        tokenMap.put("string", Token.STRING);
+        tokenMap.put("var", Token.VAR);
+        tokenMap.put("true", Token.TRUE);
+        tokenMap.put("false", Token.FALSE);
     }
 
     public static Token getToken(String keyword) {

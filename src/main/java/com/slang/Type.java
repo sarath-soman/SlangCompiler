@@ -7,6 +7,8 @@ public enum  Type {
 
     STRING,
     FLOAT,
-    INTEGER, DOUBLE,
+    INTEGER,
+    DOUBLE,
+    BOOL,
 
 }

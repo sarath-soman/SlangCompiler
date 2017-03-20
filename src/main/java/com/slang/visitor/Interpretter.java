@@ -1,6 +1,6 @@
 package com.slang.visitor;
 
-import com.slang.ValueInfo;
+import com.slang.SymbolInfo;
 import com.slang.ast.*;
 
 /**
@@ -8,42 +8,46 @@ import com.slang.ast.*;
  */
 public class Interpretter implements IVisitor {
 
-    public ValueInfo visit(NumericExpression expression) {
-        return new ValueInfo(expression.getValue());
+    public SymbolInfo visit(NumericExpression expression) {
+        return new SymbolInfo(expression.getValue());
     }
 
-    public ValueInfo visit(UnaryExpression expression) {
-        ValueInfo leftExpVal = expression.getLeftExpression().accept(this);
+    public SymbolInfo visit(UnaryExpression expression) {
+        SymbolInfo leftExpVal = expression.getLeftExpression().accept(this);
         if(Token.SUB == expression.getOperator()) {
-            return new ValueInfo(leftExpVal.getDoubleValue()* -1);
+            return new SymbolInfo(leftExpVal.getDoubleValue()* -1);
         }
         return leftExpVal;
     }
 
-    public ValueInfo visit(BinaryExpression expression) {
-        ValueInfo leftExpVal = expression.getLeftExpression().accept(this);
-        ValueInfo rightExpVal = expression.getRightExpression().accept(this);
+    public SymbolInfo visit(BinaryExpression expression) {
+        SymbolInfo leftExpVal = expression.getLeftExpression().accept(this);
+        SymbolInfo rightExpVal = expression.getRightExpression().accept(this);
         Token token = expression.getOperator();
         switch (token) {
             case ADD:
-                return new ValueInfo(leftExpVal.getDoubleValue() + rightExpVal.getDoubleValue());
+                return new SymbolInfo(leftExpVal.getDoubleValue() + rightExpVal.getDoubleValue());
             case SUB:
-                return new ValueInfo(leftExpVal.getDoubleValue() - rightExpVal.getDoubleValue());
+                return new SymbolInfo(leftExpVal.getDoubleValue() - rightExpVal.getDoubleValue());
             case DIV:
-                return new ValueInfo(leftExpVal.getDoubleValue() / rightExpVal.getDoubleValue());
+                return new SymbolInfo(leftExpVal.getDoubleValue() / rightExpVal.getDoubleValue());
             case MUL:
-                return new ValueInfo(leftExpVal.getDoubleValue() * rightExpVal.getDoubleValue());
+                return new SymbolInfo(leftExpVal.getDoubleValue() * rightExpVal.getDoubleValue());
             default:
                 throw new RuntimeException("Unexpected Operator: " + token);
         }
     }
 
-    public ValueInfo visit(StringLiteral stringLiteral) {
-        return new ValueInfo(stringLiteral.getStringLiteral());
+    public SymbolInfo visit(StringLiteral stringLiteral) {
+        return new SymbolInfo(stringLiteral.getStringLiteral());
     }
 
-    public ValueInfo visit(PrintStatement printStatement) {
-        ValueInfo exp = printStatement.getExpression().accept(this);
+    public SymbolInfo visit(BooleanExpression booleanExpression) {
+        return new SymbolInfo(booleanExpression.getValue());
+    }
+
+    public SymbolInfo visit(PrintStatement printStatement) {
+        SymbolInfo exp = printStatement.getExpression().accept(this);
         switch (exp.getDataType()) {
             case DOUBLE:
                 System.out.print(exp.getDoubleValue());
@@ -51,6 +55,9 @@ public class Interpretter implements IVisitor {
             case STRING:
                 System.out.print(exp.getStringValue());
                 break;
+            case BOOL:
+                System.out.print(exp.getBoolValue());
+                break;
 
             default:
                 throw new RuntimeException("Unknown Data Type");
@@ -58,8 +65,8 @@ public class Interpretter implements IVisitor {
         return null;
     }
 
-    public ValueInfo visit(PrintlnStatement printlnStatement) {
-        ValueInfo exp = printlnStatement.getExpression().accept(this);
+    public SymbolInfo visit(PrintlnStatement printlnStatement) {
+        SymbolInfo exp = printlnStatement.getExpression().accept(this);
         switch (exp.getDataType()) {
             case DOUBLE:
                 System.out.println(exp.getDoubleValue());
@@ -67,10 +74,19 @@ public class Interpretter implements IVisitor {
             case STRING:
                 System.out.println(exp.getStringValue());
                 break;
+            case BOOL:
+                System.out.println(exp.getBoolValue());
+                break;
 
             default:
                 throw new RuntimeException("Unknown Data Type");
         }
         return null;
     }
+
+    public SymbolInfo visit(VariableDeclarationStatement variableDeclarationStatement) {
+        System.out.println(variableDeclarationStatement.getVariableInfo());
+        return variableDeclarationStatement.getVariableInfo();
+    }
+
 }

@@ -20,6 +20,17 @@ public enum Token {
 
     STRLTRL,
 
+    INT,
+    FLOAT,
+    BOOL,
+    STRING,
+    VAR,
+
+    TRUE,
+    FALSE,
+
+    VAR_NAME,
+
     UNKNOWN
 
 }

@@ -7,6 +7,8 @@ import com.slang.visitor.Interpretter;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.List;
+
 /**
  * Created by sarath on 18/3/17.
  */
@@ -93,22 +95,44 @@ public class ParserTest {
 
     @Test
     public void testPrintAndPrintlnProduction() {
-        Lexer lexer = new Lexer("print 20 + 30");
+        Lexer lexer = new Lexer("print 20 + 30;");
         Parser parser = new Parser(lexer);
         Statement statement = parser.parseStatement();
         IVisitor visitor = new Interpretter();
         statement.accept(visitor);
 
-        lexer = new Lexer("println 20 + 30");
+        lexer = new Lexer("println 20 + 30;");
         parser = new Parser(lexer);
         statement = parser.parseStatement();
         visitor = new Interpretter();
         statement.accept(visitor);
 
-        lexer = new Lexer("println \"Hello, World\"");
+        lexer = new Lexer("println \"Hello, World\";");
         parser = new Parser(lexer);
         statement = parser.parseStatement();
         visitor = new Interpretter();
         statement.accept(visitor);
+
+        lexer = new Lexer("println true;");
+        parser = new Parser(lexer);
+        statement = parser.parseStatement();
+        visitor = new Interpretter();
+        statement.accept(visitor);
+
+        lexer = new Lexer("println false;");
+        parser = new Parser(lexer);
+        statement = parser.parseStatement();
+        visitor = new Interpretter();
+        statement.accept(visitor);
+    }
+
+    @Test
+    public void testParseStatements() {
+        Lexer lexer = new Lexer("var x; var y;");
+        Parser parser = new Parser(lexer);
+        List<Statement> statements = parser.parseStatements();
+        IVisitor visitor = new Interpretter();
+        statements.stream()
+                .forEach(statement -> statement.accept(visitor));
     }
 }
