@@ -14,6 +14,16 @@ public class UnaryExpression extends Expression {
 
     public UnaryExpression(Expression leftExpression, Token operator) {
         this.leftExpression = leftExpression;
+
+        switch (operator) {
+            case SUB:
+            case ADD:
+                break;
+
+            default:
+                throw new RuntimeException("UnaryExp supports only " + Token.ADD + " & " + Token.SUB);
+        }
+
         this.operator = operator;
     }
 

@@ -15,10 +15,33 @@ public class Interpreter implements IVisitor {
 
     public SymbolInfo visit(UnaryExpression expression, Context context) {
         SymbolInfo leftExpVal = expression.getLeftExpression().accept(this, context);
-        if(Token.SUB == expression.getOperator()) {
-            return new SymbolInfo(leftExpVal.getDoubleValue()* -1);
+        if(Token.SUB != expression.getOperator()) {
+            switch (leftExpVal.getDataType()) {
+                case DOUBLE:
+                case FLOAT:
+                case LONG:
+                case INTEGER:
+                    break;
+                default:
+                    throw new RuntimeException("Unsupported data type : " + leftExpVal.getDataType());
+            }
+            return leftExpVal;
         }
-        return leftExpVal;
+
+        //When oper is SUB
+        switch (leftExpVal.getDataType()) {
+            case DOUBLE:
+                return new SymbolInfo(leftExpVal.getDoubleValue() * -1);
+            case FLOAT:
+                return new SymbolInfo(leftExpVal.getFloatValue() * -1);
+            case LONG:
+                return new SymbolInfo(leftExpVal.getLongValue() * -1);
+            case INTEGER:
+                return new SymbolInfo(leftExpVal.getIntegerValue() * -1);
+
+            default:
+                throw new RuntimeException("Unsupported data type : " + leftExpVal.getDataType());
+        }
     }
 
     public SymbolInfo visit(BinaryExpression expression, Context context) {
@@ -27,18 +50,7 @@ public class Interpreter implements IVisitor {
         Token token = expression.getOperator();
         System.out.println(leftExpVal);
         System.out.println(rightExpVal);
-        switch (token) {
-            case ADD:
-                return new SymbolInfo(leftExpVal.getDoubleValue() + rightExpVal.getDoubleValue());
-            case SUB:
-                return new SymbolInfo(leftExpVal.getDoubleValue() - rightExpVal.getDoubleValue());
-            case DIV:
-                return new SymbolInfo(leftExpVal.getDoubleValue() / rightExpVal.getDoubleValue());
-            case MUL:
-                return new SymbolInfo(leftExpVal.getDoubleValue() * rightExpVal.getDoubleValue());
-            default:
-                throw new RuntimeException("Unexpected Operator: " + token);
-        }
+        return typeCheckAndApplyBinaryOperator(leftExpVal, rightExpVal, token);
     }
 
     public SymbolInfo visit(StringLiteral stringLiteral, Context context) {
@@ -59,6 +71,15 @@ public class Interpreter implements IVisitor {
             case DOUBLE:
                 System.out.print(exp.getDoubleValue());
                 break;
+            case INTEGER:
+                System.out.print(exp.getIntegerValue());
+                break;
+            case LONG:
+                System.out.print(exp.getLongValue());
+                break;
+            case FLOAT:
+                System.out.print(exp.getFloatValue());
+                break;
             case STRING:
                 System.out.print(exp.getStringValue());
                 break;
@@ -77,6 +98,15 @@ public class Interpreter implements IVisitor {
         switch (exp.getDataType()) {
             case DOUBLE:
                 System.out.println(exp.getDoubleValue());
+                break;
+            case INTEGER:
+                System.out.println(exp.getIntegerValue());
+                break;
+            case LONG:
+                System.out.println(exp.getLongValue());
+                break;
+            case FLOAT:
+                System.out.println(exp.getFloatValue());
                 break;
             case STRING:
                 System.out.println(exp.getStringValue());
@@ -121,8 +151,17 @@ public class Interpreter implements IVisitor {
         if(null == lhsType && null != rhsType) {
             //when lhs is declared and rhs has value
             switch (rhsInfo.getDataType()) {
+                case FLOAT:
+                    lhsInfo.setFloatValue(rhsInfo.getFloatValue());
+                    break;
                 case DOUBLE:
                     lhsInfo.setDoubleValue(rhsInfo.getDoubleValue());
+                    break;
+                case INTEGER:
+                    lhsInfo.setIntegerValue(rhsInfo.getIntegerValue());
+                    break;
+                case LONG:
+                    lhsInfo.setLongValue(rhsInfo.getLongValue());
                     break;
                 case STRING:
                     lhsInfo.setStringValue(rhsInfo.getStringValue());
@@ -138,8 +177,22 @@ public class Interpreter implements IVisitor {
             //mutating lhs with value of rhs
             if(lhsType == Type.DOUBLE && rhsType == Type.DOUBLE) {
                 lhsInfo.setDoubleValue(rhsInfo.getDoubleValue());
+            } else if(lhsType == Type.DOUBLE && rhsType == Type.FLOAT) {
+                lhsInfo.setDoubleValue(Double.valueOf(rhsInfo.getFloatValue()));
             } else if(lhsType == Type.DOUBLE && rhsType == Type.INTEGER) {
                 lhsInfo.setDoubleValue(Double.valueOf(rhsInfo.getIntegerValue()));
+            } else if(lhsType == Type.DOUBLE && rhsType == Type.LONG) {
+                lhsInfo.setDoubleValue(Double.valueOf(rhsInfo.getLongValue()));
+            } else if(lhsType == Type.FLOAT && rhsType == Type.FLOAT) {
+                lhsInfo.setFloatValue(rhsInfo.getFloatValue());
+            } else if(lhsType == Type.FLOAT && rhsType == Type.LONG) {
+                lhsInfo.setFloatValue(Float.valueOf(rhsInfo.getLongValue()));
+            } else if(lhsType == Type.FLOAT && rhsType == Type.INTEGER) {
+                lhsInfo.setFloatValue(Float.valueOf(rhsInfo.getIntegerValue()));
+            } else if(lhsType == Type.LONG && rhsType == Type.LONG) {
+                lhsInfo.setLongValue(rhsInfo.getLongValue());
+            } else if(lhsType == Type.LONG && rhsType == Type.INTEGER) {
+                lhsInfo.setLongValue(Long.valueOf(rhsInfo.getIntegerValue()));
             } else if(lhsType == Type.INTEGER && rhsType == Type.INTEGER) {
                 lhsInfo.setIntegerValue(rhsInfo.getIntegerValue());
             } else if(lhsType == Type.BOOL && rhsType == Type.BOOL) {
@@ -159,6 +212,160 @@ public class Interpreter implements IVisitor {
     public SymbolInfo visit(VariableDeclAndAssignStatement variableDeclAndAssignStatement, Context context) {
         variableDeclAndAssignStatement.getVariableDeclarationStatement().accept(this, context);
         return variableDeclAndAssignStatement.getVariableAssignmentStatement().accept(this, context);
+    }
+
+    //Type check helpers
+    private SymbolInfo typeCheckAndApplyBinaryOperator(SymbolInfo leftExpVal, SymbolInfo rightExpVal, Token operator) {
+        switch (operator) {
+            case ADD:
+                if(leftExpVal.getDataType() == Type.DOUBLE && rightExpVal.getDataType() == Type.DOUBLE) {
+                    return new SymbolInfo(leftExpVal.getDoubleValue() + rightExpVal.getDoubleValue());
+                } else if(leftExpVal.getDataType() == Type.DOUBLE && rightExpVal.getDataType() == Type.FLOAT) {
+                    return new SymbolInfo(leftExpVal.getDoubleValue() + rightExpVal.getFloatValue());
+                } else if(leftExpVal.getDataType() == Type.DOUBLE && rightExpVal.getDataType() == Type.INTEGER) {
+                    return new SymbolInfo(leftExpVal.getDoubleValue() + rightExpVal.getIntegerValue());
+                } else if(leftExpVal.getDataType() == Type.DOUBLE && rightExpVal.getDataType() == Type.LONG) {
+                    return new SymbolInfo(leftExpVal.getDoubleValue() + rightExpVal.getLongValue());
+                } else if(leftExpVal.getDataType() == Type.FLOAT && rightExpVal.getDataType() == Type.FLOAT) {
+                    return new SymbolInfo(leftExpVal.getFloatValue() + rightExpVal.getFloatValue());
+                } else if(leftExpVal.getDataType() == Type.FLOAT && rightExpVal.getDataType() == Type.DOUBLE) {
+                    return new SymbolInfo(leftExpVal.getFloatValue() + rightExpVal.getDoubleValue());
+                } else if(leftExpVal.getDataType() == Type.FLOAT && rightExpVal.getDataType() == Type.LONG) {
+                    return new SymbolInfo(leftExpVal.getFloatValue() + rightExpVal.getLongValue());
+                } else if(leftExpVal.getDataType() == Type.FLOAT && rightExpVal.getDataType() == Type.INTEGER) {
+                    return new SymbolInfo(leftExpVal.getFloatValue() + rightExpVal.getIntegerValue());
+                } else if(leftExpVal.getDataType() == Type.LONG && rightExpVal.getDataType() == Type.FLOAT) {
+                    return new SymbolInfo(leftExpVal.getLongValue() + rightExpVal.getFloatValue());
+                } else if(leftExpVal.getDataType() == Type.LONG && rightExpVal.getDataType() == Type.DOUBLE) {
+                    return new SymbolInfo(leftExpVal.getLongValue() + rightExpVal.getDoubleValue());
+                } else if(leftExpVal.getDataType() == Type.LONG && rightExpVal.getDataType() == Type.LONG) {
+                    return new SymbolInfo(leftExpVal.getLongValue() + rightExpVal.getLongValue());
+                } else if(leftExpVal.getDataType() == Type.LONG && rightExpVal.getDataType() == Type.INTEGER) {
+                    return new SymbolInfo(leftExpVal.getLongValue() + rightExpVal.getIntegerValue());
+                } else if(leftExpVal.getDataType() == Type.INTEGER && rightExpVal.getDataType() == Type.FLOAT) {
+                    return new SymbolInfo(leftExpVal.getIntegerValue() + rightExpVal.getFloatValue());
+                } else if(leftExpVal.getDataType() == Type.INTEGER && rightExpVal.getDataType() == Type.DOUBLE) {
+                    return new SymbolInfo(leftExpVal.getIntegerValue() + rightExpVal.getDoubleValue());
+                } else if(leftExpVal.getDataType() == Type.INTEGER && rightExpVal.getDataType() == Type.LONG) {
+                    return new SymbolInfo(leftExpVal.getIntegerValue() + rightExpVal.getLongValue());
+                } else if(leftExpVal.getDataType() == Type.INTEGER && rightExpVal.getDataType() == Type.INTEGER) {
+                    return new SymbolInfo(leftExpVal.getIntegerValue() + rightExpVal.getIntegerValue());
+                } else if(leftExpVal.getDataType() == Type.STRING && rightExpVal.getDataType() == Type.STRING) {
+                    return new SymbolInfo(leftExpVal.getStringValue() + rightExpVal.getStringValue());
+                } else {
+                    throw new RuntimeException("Unsupported types lhs : " + leftExpVal.getDataType() + ", rhs : " + rightExpVal.getDataType());
+                }
+            case SUB:
+                if(leftExpVal.getDataType() == Type.DOUBLE && rightExpVal.getDataType() == Type.DOUBLE) {
+                    return new SymbolInfo(leftExpVal.getDoubleValue() - rightExpVal.getDoubleValue());
+                } else if(leftExpVal.getDataType() == Type.DOUBLE && rightExpVal.getDataType() == Type.FLOAT) {
+                    return new SymbolInfo(leftExpVal.getDoubleValue() - rightExpVal.getFloatValue());
+                } else if(leftExpVal.getDataType() == Type.DOUBLE && rightExpVal.getDataType() == Type.INTEGER) {
+                    return new SymbolInfo(leftExpVal.getDoubleValue() - rightExpVal.getIntegerValue());
+                } else if(leftExpVal.getDataType() == Type.DOUBLE && rightExpVal.getDataType() == Type.LONG) {
+                    return new SymbolInfo(leftExpVal.getDoubleValue() - rightExpVal.getLongValue());
+                } else if(leftExpVal.getDataType() == Type.FLOAT && rightExpVal.getDataType() == Type.FLOAT) {
+                    return new SymbolInfo(leftExpVal.getFloatValue() - rightExpVal.getFloatValue());
+                } else if(leftExpVal.getDataType() == Type.FLOAT && rightExpVal.getDataType() == Type.DOUBLE) {
+                    return new SymbolInfo(leftExpVal.getFloatValue() - rightExpVal.getDoubleValue());
+                } else if(leftExpVal.getDataType() == Type.FLOAT && rightExpVal.getDataType() == Type.LONG) {
+                    return new SymbolInfo(leftExpVal.getFloatValue() - rightExpVal.getLongValue());
+                } else if(leftExpVal.getDataType() == Type.FLOAT && rightExpVal.getDataType() == Type.INTEGER) {
+                    return new SymbolInfo(leftExpVal.getFloatValue() - rightExpVal.getIntegerValue());
+                } else if(leftExpVal.getDataType() == Type.LONG && rightExpVal.getDataType() == Type.FLOAT) {
+                    return new SymbolInfo(leftExpVal.getLongValue() - rightExpVal.getFloatValue());
+                } else if(leftExpVal.getDataType() == Type.LONG && rightExpVal.getDataType() == Type.DOUBLE) {
+                    return new SymbolInfo(leftExpVal.getLongValue() - rightExpVal.getDoubleValue());
+                } else if(leftExpVal.getDataType() == Type.LONG && rightExpVal.getDataType() == Type.LONG) {
+                    return new SymbolInfo(leftExpVal.getLongValue() - rightExpVal.getLongValue());
+                } else if(leftExpVal.getDataType() == Type.LONG && rightExpVal.getDataType() == Type.INTEGER) {
+                    return new SymbolInfo(leftExpVal.getLongValue() - rightExpVal.getIntegerValue());
+                } else if(leftExpVal.getDataType() == Type.INTEGER && rightExpVal.getDataType() == Type.FLOAT) {
+                    return new SymbolInfo(leftExpVal.getIntegerValue() - rightExpVal.getFloatValue());
+                } else if(leftExpVal.getDataType() == Type.INTEGER && rightExpVal.getDataType() == Type.DOUBLE) {
+                    return new SymbolInfo(leftExpVal.getIntegerValue() - rightExpVal.getDoubleValue());
+                } else if(leftExpVal.getDataType() == Type.INTEGER && rightExpVal.getDataType() == Type.LONG) {
+                    return new SymbolInfo(leftExpVal.getIntegerValue() - rightExpVal.getLongValue());
+                } else if(leftExpVal.getDataType() == Type.INTEGER && rightExpVal.getDataType() == Type.INTEGER) {
+                    return new SymbolInfo(leftExpVal.getIntegerValue() - rightExpVal.getIntegerValue());
+                } else {
+                    throw new RuntimeException("Unsupported types lhs : " + leftExpVal.getDataType() + ", rhs : " + rightExpVal.getDataType());
+                }
+            case DIV:
+                if(leftExpVal.getDataType() == Type.DOUBLE && rightExpVal.getDataType() == Type.DOUBLE) {
+                    return new SymbolInfo(leftExpVal.getDoubleValue() / rightExpVal.getDoubleValue());
+                } else if(leftExpVal.getDataType() == Type.DOUBLE && rightExpVal.getDataType() == Type.FLOAT) {
+                    return new SymbolInfo(leftExpVal.getDoubleValue() / rightExpVal.getFloatValue());
+                } else if(leftExpVal.getDataType() == Type.DOUBLE && rightExpVal.getDataType() == Type.INTEGER) {
+                    return new SymbolInfo(leftExpVal.getDoubleValue() / rightExpVal.getIntegerValue());
+                } else if(leftExpVal.getDataType() == Type.DOUBLE && rightExpVal.getDataType() == Type.LONG) {
+                    return new SymbolInfo(leftExpVal.getDoubleValue() / rightExpVal.getLongValue());
+                } else if(leftExpVal.getDataType() == Type.FLOAT && rightExpVal.getDataType() == Type.FLOAT) {
+                    return new SymbolInfo(leftExpVal.getFloatValue() / rightExpVal.getFloatValue());
+                } else if(leftExpVal.getDataType() == Type.FLOAT && rightExpVal.getDataType() == Type.DOUBLE) {
+                    return new SymbolInfo(leftExpVal.getFloatValue() / rightExpVal.getDoubleValue());
+                } else if(leftExpVal.getDataType() == Type.FLOAT && rightExpVal.getDataType() == Type.LONG) {
+                    return new SymbolInfo(leftExpVal.getFloatValue() / rightExpVal.getLongValue());
+                } else if(leftExpVal.getDataType() == Type.FLOAT && rightExpVal.getDataType() == Type.INTEGER) {
+                    return new SymbolInfo(leftExpVal.getFloatValue() / rightExpVal.getIntegerValue());
+                } else if(leftExpVal.getDataType() == Type.LONG && rightExpVal.getDataType() == Type.FLOAT) {
+                    return new SymbolInfo(leftExpVal.getLongValue() / rightExpVal.getFloatValue());
+                } else if(leftExpVal.getDataType() == Type.LONG && rightExpVal.getDataType() == Type.DOUBLE) {
+                    return new SymbolInfo(leftExpVal.getLongValue() / rightExpVal.getDoubleValue());
+                } else if(leftExpVal.getDataType() == Type.LONG && rightExpVal.getDataType() == Type.LONG) {
+                    return new SymbolInfo(leftExpVal.getLongValue() / rightExpVal.getLongValue());
+                } else if(leftExpVal.getDataType() == Type.LONG && rightExpVal.getDataType() == Type.INTEGER) {
+                    return new SymbolInfo(leftExpVal.getLongValue() / rightExpVal.getIntegerValue());
+                } else if(leftExpVal.getDataType() == Type.INTEGER && rightExpVal.getDataType() == Type.FLOAT) {
+                    return new SymbolInfo(leftExpVal.getIntegerValue() / rightExpVal.getFloatValue());
+                } else if(leftExpVal.getDataType() == Type.INTEGER && rightExpVal.getDataType() == Type.DOUBLE) {
+                    return new SymbolInfo(leftExpVal.getIntegerValue() / rightExpVal.getDoubleValue());
+                } else if(leftExpVal.getDataType() == Type.INTEGER && rightExpVal.getDataType() == Type.LONG) {
+                    return new SymbolInfo(leftExpVal.getIntegerValue() / rightExpVal.getLongValue());
+                } else if(leftExpVal.getDataType() == Type.INTEGER && rightExpVal.getDataType() == Type.INTEGER) {
+                    return new SymbolInfo(leftExpVal.getIntegerValue() / rightExpVal.getIntegerValue());
+                } else {
+                    throw new RuntimeException("Unsupported types lhs : " + leftExpVal.getDataType() + ", rhs : " + rightExpVal.getDataType());
+                }
+            case MUL:
+                if(leftExpVal.getDataType() == Type.DOUBLE && rightExpVal.getDataType() == Type.DOUBLE) {
+                    return new SymbolInfo(leftExpVal.getDoubleValue() * rightExpVal.getDoubleValue());
+                } else if(leftExpVal.getDataType() == Type.DOUBLE && rightExpVal.getDataType() == Type.FLOAT) {
+                    return new SymbolInfo(leftExpVal.getDoubleValue() * rightExpVal.getFloatValue());
+                } else if(leftExpVal.getDataType() == Type.DOUBLE && rightExpVal.getDataType() == Type.INTEGER) {
+                    return new SymbolInfo(leftExpVal.getDoubleValue() * rightExpVal.getIntegerValue());
+                } else if(leftExpVal.getDataType() == Type.DOUBLE && rightExpVal.getDataType() == Type.LONG) {
+                    return new SymbolInfo(leftExpVal.getDoubleValue() * rightExpVal.getLongValue());
+                } else if(leftExpVal.getDataType() == Type.FLOAT && rightExpVal.getDataType() == Type.FLOAT) {
+                    return new SymbolInfo(leftExpVal.getFloatValue() * rightExpVal.getFloatValue());
+                } else if(leftExpVal.getDataType() == Type.FLOAT && rightExpVal.getDataType() == Type.DOUBLE) {
+                    return new SymbolInfo(leftExpVal.getFloatValue() * rightExpVal.getDoubleValue());
+                } else if(leftExpVal.getDataType() == Type.FLOAT && rightExpVal.getDataType() == Type.LONG) {
+                    return new SymbolInfo(leftExpVal.getFloatValue() * rightExpVal.getLongValue());
+                } else if(leftExpVal.getDataType() == Type.FLOAT && rightExpVal.getDataType() == Type.INTEGER) {
+                    return new SymbolInfo(leftExpVal.getFloatValue() * rightExpVal.getIntegerValue());
+                } else if(leftExpVal.getDataType() == Type.LONG && rightExpVal.getDataType() == Type.FLOAT) {
+                    return new SymbolInfo(leftExpVal.getLongValue() * rightExpVal.getFloatValue());
+                } else if(leftExpVal.getDataType() == Type.LONG && rightExpVal.getDataType() == Type.DOUBLE) {
+                    return new SymbolInfo(leftExpVal.getLongValue() * rightExpVal.getDoubleValue());
+                } else if(leftExpVal.getDataType() == Type.LONG && rightExpVal.getDataType() == Type.LONG) {
+                    return new SymbolInfo(leftExpVal.getLongValue() * rightExpVal.getLongValue());
+                } else if(leftExpVal.getDataType() == Type.LONG && rightExpVal.getDataType() == Type.INTEGER) {
+                    return new SymbolInfo(leftExpVal.getLongValue() * rightExpVal.getIntegerValue());
+                } else if(leftExpVal.getDataType() == Type.INTEGER && rightExpVal.getDataType() == Type.FLOAT) {
+                    return new SymbolInfo(leftExpVal.getIntegerValue() * rightExpVal.getFloatValue());
+                } else if(leftExpVal.getDataType() == Type.INTEGER && rightExpVal.getDataType() == Type.DOUBLE) {
+                    return new SymbolInfo(leftExpVal.getIntegerValue() * rightExpVal.getDoubleValue());
+                } else if(leftExpVal.getDataType() == Type.INTEGER && rightExpVal.getDataType() == Type.LONG) {
+                    return new SymbolInfo(leftExpVal.getIntegerValue() * rightExpVal.getLongValue());
+                } else if(leftExpVal.getDataType() == Type.INTEGER && rightExpVal.getDataType() == Type.INTEGER) {
+                    return new SymbolInfo(leftExpVal.getIntegerValue() * rightExpVal.getIntegerValue());
+                } else {
+                    throw new RuntimeException("Unsupported types lhs : " + leftExpVal.getDataType() + ", rhs : " + rightExpVal.getDataType());
+                }
+            default:
+                throw new RuntimeException("Unsupported Operator: " + operator);
+        }
     }
 
 }

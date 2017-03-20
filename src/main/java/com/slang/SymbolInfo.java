@@ -7,8 +7,10 @@ public class SymbolInfo {
 
     private String variableName;
     private String stringValue;
+    private Float floatValue;
     private Double doubleValue;
     private Integer integerValue;
+    private Long longValue;
     private Boolean boolValue;
     private Type dataType;
 
@@ -25,6 +27,16 @@ public class SymbolInfo {
     public SymbolInfo(Integer integerValue) {
         this.integerValue = integerValue;
         dataType = Type.INTEGER;
+    }
+
+    public SymbolInfo(Float floatValue) {
+        this.floatValue = floatValue;
+        dataType = Type.FLOAT;
+    }
+
+    public SymbolInfo(Long longValue) {
+        this.longValue = longValue;
+        dataType = Type.LONG;
     }
 
     public SymbolInfo(Object o, String varName) {
@@ -53,6 +65,14 @@ public class SymbolInfo {
         return integerValue;
     }
 
+    public Float getFloatValue() {
+        return floatValue;
+    }
+
+    public Long getLongValue() {
+        return longValue;
+    }
+
     public Boolean getBoolValue() {
         return boolValue;
     }
@@ -65,6 +85,15 @@ public class SymbolInfo {
         if (null == dataType || Type.STRING == dataType) {
             this.stringValue = stringValue;
             dataType = Type.STRING;
+        } else {
+            throw new RuntimeException("Type mismatch on assigning the value");
+        }
+    }
+
+    public void setFloatValue(Float floatValue) {
+        if (null == dataType || Type.FLOAT == dataType) {
+            this.floatValue = floatValue;
+            dataType = Type.FLOAT;
         } else {
             throw new RuntimeException("Type mismatch on assigning the value");
         }
@@ -88,6 +117,15 @@ public class SymbolInfo {
         }
     }
 
+    public void setLongValue(Long longValue) {
+        if (null == dataType || Type.LONG == dataType) {
+            this.longValue = longValue;
+            dataType = Type.LONG;
+        } else {
+            throw new RuntimeException("Type mismatch on assigning the value");
+        }
+    }
+
     public void setBoolValue(Boolean boolValue) {
         if (null == dataType || Type.BOOL == dataType) {
             this.boolValue = boolValue;
@@ -98,8 +136,10 @@ public class SymbolInfo {
 
     public void nullify() {
         stringValue = null;
+        floatValue = null;
         doubleValue = null;
         integerValue = null;
+        longValue = null;
         boolValue = null;
     }
 
@@ -108,8 +148,10 @@ public class SymbolInfo {
         return "SymbolInfo{" +
                 "variableName='" + variableName + '\'' +
                 ", stringValue='" + stringValue + '\'' +
+                ", floatValue=" + floatValue +
                 ", doubleValue=" + doubleValue +
                 ", integerValue=" + integerValue +
+                ", longValue=" + longValue +
                 ", boolValue=" + boolValue +
                 ", dataType=" + dataType +
                 '}';
