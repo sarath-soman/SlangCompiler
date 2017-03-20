@@ -7,6 +7,6 @@ import com.slang.SymbolInfo;
  */
 public interface IVisitable {
 
-    SymbolInfo accept(IVisitor visitor);
+    SymbolInfo accept(IVisitor visitor, Context context);
 
 }

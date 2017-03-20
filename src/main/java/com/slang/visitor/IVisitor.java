@@ -8,14 +8,16 @@ import com.slang.ast.*;
  */
 public interface IVisitor {
     //Expression Visitors
-    SymbolInfo visit(NumericExpression expression);
-    SymbolInfo visit(UnaryExpression expression);
-    SymbolInfo visit(BinaryExpression expression);
-    SymbolInfo visit(StringLiteral stringLiteral);
-    SymbolInfo visit(BooleanExpression booleanExpression);
+    SymbolInfo visit(NumericExpression expression, Context context);
+    SymbolInfo visit(UnaryExpression expression, Context context);
+    SymbolInfo visit(BinaryExpression expression, Context context);
+    SymbolInfo visit(StringLiteral stringLiteral, Context context);
+    SymbolInfo visit(BooleanExpression booleanExpression, Context context);
+    SymbolInfo visit(VariableExpression variableExpression, Context context);
 
     //Statement Visitors
-    SymbolInfo visit(PrintStatement printStatement);
-    SymbolInfo visit(PrintlnStatement printlnStatement);
-    SymbolInfo visit(VariableDeclarationStatement variableDeclarationStatement);
+    SymbolInfo visit(PrintStatement printStatement, Context context);
+    SymbolInfo visit(PrintlnStatement printlnStatement, Context context);
+    SymbolInfo visit(VariableDeclarationStatement variableDeclarationStatement, Context context);
+    SymbolInfo visit(VariableAssignmentStatement variableAssignmentStatement, Context context);
 }

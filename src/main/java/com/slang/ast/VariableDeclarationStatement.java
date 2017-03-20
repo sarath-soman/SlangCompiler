@@ -1,6 +1,7 @@
 package com.slang.ast;
 
 import com.slang.SymbolInfo;
+import com.slang.visitor.Context;
 import com.slang.visitor.IVisitor;
 
 /**
@@ -8,17 +9,17 @@ import com.slang.visitor.IVisitor;
  */
 public class VariableDeclarationStatement extends Statement {
 
-    private SymbolInfo variableInfo;
+    private VariableExpression variableExpression;
 
-    public VariableDeclarationStatement(SymbolInfo variableInfo) {
-        this.variableInfo = variableInfo;
+    public VariableDeclarationStatement(VariableExpression variableExpression) {
+        this.variableExpression= variableExpression;
     }
 
-    public SymbolInfo accept(IVisitor visitor) {
-        return visitor.visit(this);
+    public SymbolInfo accept(IVisitor visitor, Context context) {
+        return visitor.visit(this, context);
     }
 
-    public SymbolInfo getVariableInfo() {
-        return variableInfo;
+    public VariableExpression getVariableExpression() {
+        return variableExpression;
     }
 }

@@ -44,6 +44,7 @@ public class SymbolInfo {
         return stringValue;
     }
 
+
     public Double getDoubleValue() {
         return doubleValue;
     }
@@ -58,5 +59,37 @@ public class SymbolInfo {
 
     public Type getDataType() {
         return dataType;
+    }
+
+    public void setStringValue(String stringValue) {
+        if (null == dataType || Type.STRING == dataType) {
+            this.stringValue = stringValue;
+        } else {
+            throw new RuntimeException("Type mismatch on assigning the value");
+        }
+    }
+
+    public void setDoubleValue(Double doubleValue) {
+        if (null == dataType || Type.DOUBLE == dataType) {
+            this.doubleValue = doubleValue;
+        } else {
+            throw new RuntimeException("Type mismatch on assigning the value");
+        }
+    }
+
+    public void setIntegerValue(Integer integerValue) {
+        if (null == dataType || Type.INTEGER == dataType) {
+            this.integerValue = integerValue;
+        } else {
+            throw new RuntimeException("Type mismatch on assigning the value");
+        }
+    }
+
+    public void setBoolValue(Boolean boolValue) {
+        if (null == dataType || Type.BOOL == dataType) {
+            this.boolValue = boolValue;
+        } else {
+            throw new RuntimeException("Type mismatch on assigning the value");
+        }
     }
 }

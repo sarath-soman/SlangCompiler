@@ -1,6 +1,7 @@
 package com.slang.ast;
 
 import com.slang.SymbolInfo;
+import com.slang.visitor.Context;
 import com.slang.visitor.IVisitor;
 
 /**
@@ -14,8 +15,8 @@ public class PrintStatement extends Statement {
         this.expression = expression;
     }
 
-    public SymbolInfo accept(IVisitor visitor) {
-        visitor.visit(this);
+    public SymbolInfo accept(IVisitor visitor, Context context) {
+        visitor.visit(this, context);
         return null;
     }
 

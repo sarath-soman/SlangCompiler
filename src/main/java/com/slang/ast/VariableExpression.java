@@ -7,19 +7,19 @@ import com.slang.visitor.IVisitor;
 /**
  * Created by sarath on 20/3/17.
  */
-public class BooleanExpression extends Expression {
+public class VariableExpression extends Expression {
+    private final String variableName;
 
-    private Boolean value;
-
-    public BooleanExpression(Boolean value) {
-        this.value = value;
+    public VariableExpression(String variableName) {
+        this.variableName = variableName;
     }
 
+    @Override
     public SymbolInfo accept(IVisitor visitor, Context context) {
         return visitor.visit(this, context);
     }
 
-    public Boolean getValue() {
-        return value;
+    public String getVariableName() {
+        return variableName;
     }
 }

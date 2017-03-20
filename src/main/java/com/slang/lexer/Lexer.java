@@ -84,6 +84,10 @@ public class Lexer {
                     currentToken = Token.SEMICLN;
                     index++;
                     break moduleStream;
+                case '=':
+                    previousToken = currentToken;
+                    currentToken = Token.EQ;
+                    break moduleStream;
                 case '"':
                     stringLiteral  = readString();
                     previousToken = currentToken;

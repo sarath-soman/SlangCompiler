@@ -29,7 +29,7 @@ public class Parser {
     }
 
     public Statement parseStatement() {
-        //First call to parseStatement require eat and once parsing has started we should not call eat() and it will
+        //First call to parseStatement require eat and once parsing has started we should not call eat() as it will
         //skip a token
         if (null == lexer.getPreviousToken()) {
             lexer.eat();
@@ -51,15 +51,26 @@ public class Parser {
 
         if(Token.VAR == token) {
             Expression expression = parseExpression();
-            String varName = StringLiteral.class.cast(expression).getStringLiteral();
-            SymbolInfo symbolInfo = new SymbolInfo(null, varName);
+            VariableExpression variableExpression = (VariableExpression) expression;
             lexer.expect(Token.SEMICLN);
             lexer.eat();
-            return new VariableDeclarationStatement(symbolInfo);
+            return new VariableDeclarationStatement(variableExpression);
 
         }
 
-        System.out.println(token);
+//        if(Token.VAR_NAME == token) {
+//            lexer.eat();
+//            lexer.expect(Token.EQ);
+//            String varName = lexer.getVariableName();
+//            Expression expression = parseExpression();
+//            VariableAssignmentStatement variableAssignmentStatement = null
+//            Class<? extends Expression> expressionClazz = expression.getClass();
+//
+//            lexer.expect(Token.SEMICLN);
+//            lexer.eat();
+//            return variableAssignmentStatement;
+//
+//        }
 
         throw new RuntimeException("Expected PRINT or PRINTLN");
 
@@ -110,7 +121,7 @@ public class Parser {
                 return new StringLiteral(lexer.getStringLiteral());
             case VAR_NAME:
             case STRING:
-                return new StringLiteral(lexer.getVariableName());
+                return new VariableExpression(lexer.getVariableName());
             case TRUE:
                 return new BooleanExpression(true);
             case FALSE:

@@ -31,6 +31,8 @@ public enum Token {
 
     VAR_NAME,
 
-    UNKNOWN
+    UNKNOWN,
+
+    EQ
 
 }

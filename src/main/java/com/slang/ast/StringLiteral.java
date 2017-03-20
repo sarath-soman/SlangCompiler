@@ -1,6 +1,7 @@
 package com.slang.ast;
 
 import com.slang.SymbolInfo;
+import com.slang.visitor.Context;
 import com.slang.visitor.IVisitor;
 
 /**
@@ -14,8 +15,8 @@ public class StringLiteral extends Expression {
         this.stringLiteral = stringLiteral;
     }
 
-    public SymbolInfo accept(IVisitor visitor) {
-        return visitor.visit(this);
+    public SymbolInfo accept(IVisitor visitor, Context context) {
+        return visitor.visit(this, context);
     }
 
     public String getStringLiteral() {
