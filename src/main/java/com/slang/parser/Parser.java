@@ -58,19 +58,17 @@ public class Parser {
 
         }
 
-//        if(Token.VAR_NAME == token) {
-//            lexer.eat();
-//            lexer.expect(Token.EQ);
-//            String varName = lexer.getVariableName();
-//            Expression expression = parseExpression();
-//            VariableAssignmentStatement variableAssignmentStatement = null
-//            Class<? extends Expression> expressionClazz = expression.getClass();
-//
-//            lexer.expect(Token.SEMICLN);
-//            lexer.eat();
-//            return variableAssignmentStatement;
-//
-//        }
+        if(Token.VAR_NAME == token) {
+            lexer.eat();
+            lexer.expect(Token.EQ);
+            String varName = lexer.getVariableName();
+            Expression expression = parseExpression();
+            VariableAssignmentStatement variableAssignmentStatement = new VariableAssignmentStatement(varName, expression);
+            lexer.expect(Token.SEMICLN);
+            lexer.eat();
+            return variableAssignmentStatement;
+
+        }
 
         throw new RuntimeException("Expected PRINT or PRINTLN");
 
@@ -120,7 +118,6 @@ public class Parser {
             case STRLTRL:
                 return new StringLiteral(lexer.getStringLiteral());
             case VAR_NAME:
-            case STRING:
                 return new VariableExpression(lexer.getVariableName());
             case TRUE:
                 return new BooleanExpression(true);

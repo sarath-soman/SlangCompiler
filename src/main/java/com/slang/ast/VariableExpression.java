@@ -22,4 +22,11 @@ public class VariableExpression extends Expression {
     public String getVariableName() {
         return variableName;
     }
+
+    @Override
+    public String toString() {
+        return "VariableExpression{" +
+                "variableName='" + variableName + '\'' +
+                '}';
+    }
 }

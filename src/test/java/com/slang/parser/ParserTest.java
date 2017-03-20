@@ -143,4 +143,20 @@ public class ParserTest {
         statements.stream()
                 .forEach(statement -> statement.accept(visitor, context));
     }
+
+    @Test
+    public void testParseStatements1() {
+        Context context = new InterpretterContext(null);
+
+        Lexer lexer = new Lexer("var x; x = 10;");
+        Parser parser = new Parser(lexer);
+        List<Statement> statements = parser.parseStatements();
+        IVisitor visitor = new Interpretter();
+        statements.stream()
+                .forEach(statement -> {
+                    System.out.println(statement);
+                    statement.accept(visitor, context);
+                });
+        System.out.println(context.getSymbolInfo("x"));
+    }
 }

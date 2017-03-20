@@ -22,4 +22,11 @@ public class VariableDeclarationStatement extends Statement {
     public VariableExpression getVariableExpression() {
         return variableExpression;
     }
+
+    @Override
+    public String toString() {
+        return "VariableDeclarationStatement{" +
+                "variableExpression=" + variableExpression +
+                '}';
+    }
 }

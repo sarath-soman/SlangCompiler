@@ -64,6 +64,7 @@ public class SymbolInfo {
     public void setStringValue(String stringValue) {
         if (null == dataType || Type.STRING == dataType) {
             this.stringValue = stringValue;
+            dataType = Type.STRING;
         } else {
             throw new RuntimeException("Type mismatch on assigning the value");
         }
@@ -72,6 +73,7 @@ public class SymbolInfo {
     public void setDoubleValue(Double doubleValue) {
         if (null == dataType || Type.DOUBLE == dataType) {
             this.doubleValue = doubleValue;
+            dataType = Type.DOUBLE;
         } else {
             throw new RuntimeException("Type mismatch on assigning the value");
         }
@@ -80,6 +82,7 @@ public class SymbolInfo {
     public void setIntegerValue(Integer integerValue) {
         if (null == dataType || Type.INTEGER == dataType) {
             this.integerValue = integerValue;
+            dataType = Type.INTEGER;
         } else {
             throw new RuntimeException("Type mismatch on assigning the value");
         }
@@ -91,5 +94,24 @@ public class SymbolInfo {
         } else {
             throw new RuntimeException("Type mismatch on assigning the value");
         }
+    }
+
+    public void nullify() {
+        stringValue = null;
+        doubleValue = null;
+        integerValue = null;
+        boolValue = null;
+    }
+
+    @Override
+    public String toString() {
+        return "SymbolInfo{" +
+                "variableName='" + variableName + '\'' +
+                ", stringValue='" + stringValue + '\'' +
+                ", doubleValue=" + doubleValue +
+                ", integerValue=" + integerValue +
+                ", boolValue=" + boolValue +
+                ", dataType=" + dataType +
+                '}';
     }
 }

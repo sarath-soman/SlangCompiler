@@ -22,4 +22,11 @@ public class StringLiteral extends Expression {
     public String getStringLiteral() {
         return stringLiteral;
     }
+
+    @Override
+    public String toString() {
+        return "StringLiteral{" +
+                "stringLiteral='" + stringLiteral + '\'' +
+                '}';
+    }
 }

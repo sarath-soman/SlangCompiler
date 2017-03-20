@@ -29,4 +29,12 @@ public class VariableAssignmentStatement extends Statement {
     public Expression getExpression() {
         return expression;
     }
+
+    @Override
+    public String toString() {
+        return "VariableAssignmentStatement{" +
+                "variableName='" + variableName + '\'' +
+                ", expression=" + expression +
+                '}';
+    }
 }

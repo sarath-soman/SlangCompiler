@@ -22,4 +22,11 @@ public class BooleanExpression extends Expression {
     public Boolean getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return "BooleanExpression{" +
+                "value=" + value +
+                '}';
+    }
 }

@@ -34,4 +34,13 @@ public class BinaryExpression extends Expression {
     public SymbolInfo accept(IVisitor visitor, Context context) {
         return visitor.visit(this, context);
     }
+
+    @Override
+    public String toString() {
+        return "BinaryExpression{" +
+                "leftExpression=" + leftExpression +
+                ", rightExpression=" + rightExpression +
+                ", operator=" + operator +
+                '}';
+    }
 }

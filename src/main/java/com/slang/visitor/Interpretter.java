@@ -48,7 +48,7 @@ public class Interpretter implements IVisitor {
     }
 
     public SymbolInfo visit(VariableExpression variableExpression, Context context) {
-        return new SymbolInfo(null, variableExpression.getVariableName());
+        return context.getSymbolInfo(variableExpression.getVariableName());
     }
 
     public SymbolInfo visit(PrintStatement printStatement, Context context) {
@@ -91,39 +91,66 @@ public class Interpretter implements IVisitor {
 
     public SymbolInfo visit(VariableDeclarationStatement variableDeclarationStatement, Context context) {
         VariableExpression variableExpression= variableDeclarationStatement.getVariableExpression();
-        SymbolInfo symbolInfo = variableExpression.accept(this, context);
-        SymbolInfo temp = context.getSymbolInfoFromCurrentScope(symbolInfo.getVariableName());
+        String variableToBeDeclared = variableExpression.getVariableName();
+        SymbolInfo temp = context.getSymbolInfoFromCurrentScope(variableToBeDeclared);
         if(null != temp) {
             throw new RuntimeException("Variable '" + temp.getVariableName() + "' is already defined");
         }
-        context.addToSymbolTable(symbolInfo.getVariableName(), symbolInfo);
-        return symbolInfo;
+        SymbolInfo decSymbolInfo = new SymbolInfo(null, variableToBeDeclared);
+        context.addToSymbolTable(variableToBeDeclared, decSymbolInfo);
+        return decSymbolInfo;
     }
 
-    @Override
     public SymbolInfo visit(VariableAssignmentStatement variableAssignmentStatement, Context context) {
-        SymbolInfo symbolInfo = context.getSymbolInfo(variableAssignmentStatement.getVariableName());
-        if(null == symbolInfo) {
+        //LHS
+        SymbolInfo lhsInfo = context.getSymbolInfo(variableAssignmentStatement.getVariableName());
+        if(null == lhsInfo) {
             throw new RuntimeException("Undefined Variable : " + variableAssignmentStatement.getVariableName());
         }
-        SymbolInfo valueInfo = variableAssignmentStatement.getExpression().accept(this, context);
-        //HERE
-        Type dataType = null;
-        if(null == valueInfo.getDataType()) {
+        Type lhsType = lhsInfo.getDataType();
+
+        //RHS
+        SymbolInfo rhsInfo = variableAssignmentStatement.getExpression().accept(this, context);
+        if(null == rhsInfo) {
+            throw new RuntimeException("Undefined Variable : " +
+                    VariableExpression.class.cast(variableAssignmentStatement.getExpression()).getVariableName());
+        }
+        Type rhsType = rhsInfo.getDataType();
+        if(null == lhsType && null != rhsType) {
+            //when lhs is declared and rhs has value
+            switch (rhsInfo.getDataType()) {
+                case DOUBLE:
+                    lhsInfo.setDoubleValue(rhsInfo.getDoubleValue());
+                    break;
+                case STRING:
+                    lhsInfo.setStringValue(rhsInfo.getStringValue());
+                    break;
+                case BOOL:
+                    lhsInfo.setBoolValue(rhsInfo.getBoolValue());
+                    break;
+            }
+        } else if(null != lhsType && null == rhsType) {
+            //assigning already declared but not assigned variable to lhs
+            lhsInfo.nullify();
+        } else if(null != lhsInfo && null != rhsInfo) {
+            //mutating lhs with value of rhs
+            if(lhsType == Type.DOUBLE && rhsType == Type.DOUBLE) {
+                lhsInfo.setDoubleValue(rhsInfo.getDoubleValue());
+            } else if(lhsType == Type.DOUBLE && rhsType == Type.INTEGER) {
+                lhsInfo.setDoubleValue(Double.valueOf(rhsInfo.getIntegerValue()));
+            } else if(lhsType == Type.INTEGER && rhsType == Type.INTEGER) {
+                lhsInfo.setIntegerValue(rhsInfo.getIntegerValue());
+            } else if(lhsType == Type.BOOL && rhsType == Type.BOOL) {
+                lhsInfo.setBoolValue(rhsInfo.getBoolValue());
+            } else if(lhsType == Type.STRING && rhsType == Type.STRING) {
+                lhsInfo.setStringValue(rhsInfo.getStringValue());
+            } else {
+                throw new RuntimeException("Unsupported types lhs : " + lhsType + ", rhs : " + rhsType);
+            }
 
         }
-        switch (valueInfo.getDataType()) {
-            case DOUBLE:
-                symbolInfo.setDoubleValue(valueInfo.getDoubleValue());
-                break;
-            case STRING:
-                symbolInfo.setStringValue(valueInfo.getStringValue());
-                break;
-            case BOOL:
-                symbolInfo.setBoolValue(valueInfo.getBoolValue());
-                break;
-        }
-        return symbolInfo;
+        //if lhs is just declared and rhs is also just declared then do nothing
+        return lhsInfo;
     }
 
 }

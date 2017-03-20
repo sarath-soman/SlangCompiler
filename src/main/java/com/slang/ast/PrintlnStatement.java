@@ -23,4 +23,11 @@ public class PrintlnStatement extends Statement {
     public Expression getExpression() {
         return expression;
     }
+
+    @Override
+    public String toString() {
+        return "PrintlnStatement{" +
+                "expression=" + expression +
+                '}';
+    }
 }
