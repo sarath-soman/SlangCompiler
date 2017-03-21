@@ -61,7 +61,6 @@ public class Interpreter implements IVisitor {
         SymbolInfo rightExpVal = expression.getRightExpression().accept(this, context);
         Token token = expression.getOperator();
         SymbolInfo resp = typeCheckAndApplyBinaryOperator(leftExpVal, rightExpVal, token);
-        System.out.println("TY " + resp);
         return resp;
     }
 
@@ -341,12 +340,12 @@ public class Interpreter implements IVisitor {
                 } else if(leftExpVal.getDataType() == Type.INTEGER && rightExpVal.getDataType() == Type.LONG) {
                     return SymbolInfo.Builder.builder()
                             .withDataType(Type.DOUBLE)
-                            .withDoubleValue(Double.valueOf(leftExpVal.getIntegerValue() / rightExpVal.getLongValue()))
+                            .withDoubleValue(leftExpVal.getIntegerValue() / (double)rightExpVal.getLongValue())
                             .build();
                 } else if(leftExpVal.getDataType() == Type.INTEGER && rightExpVal.getDataType() == Type.INTEGER) {
                     return SymbolInfo.Builder.builder()
                             .withDataType(Type.DOUBLE)
-                            .withDoubleValue(Double.valueOf(leftExpVal.getIntegerValue() / rightExpVal.getIntegerValue()))
+                            .withDoubleValue(leftExpVal.getIntegerValue() / (double)rightExpVal.getIntegerValue())
                             .build();
                 } else {
                     throw new RuntimeException("Unsupported types lhs : " + leftExpVal.getDataType() + ", rhs : " + rightExpVal.getDataType());

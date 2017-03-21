@@ -236,14 +236,14 @@ public class Lexer {
             if ('l' == module.charAt(index)) {
                 index++;
                 return Type.LONG;
-            } else if ('d' == module.charAt(index) && foundDot) {
+            } else if ('f' == module.charAt(index) && foundDot) {
                 index++;
-                return Type.DOUBLE;
+                return Type.FLOAT;
             }
         }
 
         if (foundDot) {
-            return Type.FLOAT;
+            return Type.DOUBLE;
         }
 
         return Type.INTEGER;

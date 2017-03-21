@@ -26,8 +26,7 @@ public class LexerTest {
         lexer.eat();
         token = lexer.getCurrentToken();
         Assert.assertTrue(Token.NUM.equals(token));
-        System.out.println("sadasd" + lexer.getFloatNum());
-        Assert.assertTrue(123.3456f == lexer.getFloatNum());
+        Assert.assertTrue(123.3456 == lexer.getDoubleNum());
 
         lexer = new Lexer("123.3456.344");
         exception.expect(RuntimeException.class);

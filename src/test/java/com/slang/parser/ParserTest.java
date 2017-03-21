@@ -27,19 +27,19 @@ public class ParserTest {
         Parser parser = new Parser(lexer);
         Expression expression = parser.parseExpression();
         Assert.assertTrue(NumericExpression.class.isInstance(expression));
-        Assert.assertTrue(123 == NumericExpression.class.cast(expression).getLongValue());
+        Assert.assertTrue(123 == NumericExpression.class.cast(expression).getIntegerValue());
 
         lexer = new Lexer("+ 123");
         parser = new Parser(lexer);
         expression = parser.parseExpression();
         Assert.assertTrue(NumericExpression.class.isInstance(expression));
-        Assert.assertTrue(123 == NumericExpression.class.cast(expression).getLongValue());
+        Assert.assertTrue(123 == NumericExpression.class.cast(expression).getIntegerValue());
 
         lexer = new Lexer("- 123");
         parser = new Parser(lexer);
         expression = parser.parseExpression();
         Assert.assertTrue(UnaryExpression.class.isInstance(expression));
-        Assert.assertTrue(123 == NumericExpression.class.cast(UnaryExpression.class.cast(expression).getLeftExpression()).getLongValue());
+        Assert.assertTrue(123 == NumericExpression.class.cast(UnaryExpression.class.cast(expression).getLeftExpression()).getIntegerValue());
     }
 
     @Test
@@ -74,7 +74,7 @@ public class ParserTest {
         parser = new Parser(lexer);
         expression = parser.parseExpression();
         visitor = new Interpreter();
-        Assert.assertTrue(4f == expression.accept(visitor, context).getDoubleValue());
+        Assert.assertTrue(4 == expression.accept(visitor, context).getDoubleValue());
 
         lexer = new Lexer("(10 / -5) * (-1) + 2  ");
         parser = new Parser(lexer);
@@ -86,7 +86,7 @@ public class ParserTest {
         parser = new Parser(lexer);
         expression = parser.parseExpression();
         visitor = new Interpreter();
-        Assert.assertTrue(-15.488372093023258 ==expression.accept(visitor, context).getDoubleValue());
+        Assert.assertTrue(-15.488372093023258 == expression.accept(visitor, context).getDoubleValue());
 
         lexer = new Lexer("23/90*6+65-54");
         parser = new Parser(lexer);
@@ -205,10 +205,8 @@ public class ParserTest {
         IVisitor visitor = new Interpreter();
         statements.stream()
                 .forEach(statement -> {
-                    System.out.println(statement);
                     statement.accept(visitor, context);
                 });
-        System.out.println("SSS" + context.getSymbolInfo("val"));
         Assert.assertTrue(context.getSymbolInfo("val").getDoubleValue() == 12.533333333333331);
     }
 
