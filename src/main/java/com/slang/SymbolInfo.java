@@ -48,6 +48,10 @@ public class SymbolInfo {
         dataType = Type.BOOL;
     }
 
+    public SymbolInfo() {
+
+    }
+
     public String getVariableName() {
         return variableName;
     }
@@ -155,5 +159,61 @@ public class SymbolInfo {
                 ", boolValue=" + boolValue +
                 ", dataType=" + dataType +
                 '}';
+    }
+
+
+    public static final class Builder {
+        private SymbolInfo symbolInfo = new SymbolInfo();
+
+        private Builder() {
+        }
+
+        public static Builder builder() {
+            return new Builder();
+        }
+
+        public Builder withVariableName(String variableName) {
+            symbolInfo.variableName = variableName;
+            return this;
+        }
+
+        public Builder withStringValue(String stringValue) {
+            symbolInfo.stringValue = stringValue;
+            return this;
+        }
+
+        public Builder withFloatValue(Float floatValue) {
+            symbolInfo.floatValue = floatValue;
+            return this;
+        }
+
+        public Builder withDoubleValue(Double doubleValue) {
+            symbolInfo.doubleValue = doubleValue;
+            return this;
+        }
+
+        public Builder withIntegerValue(Integer integerValue) {
+            symbolInfo.integerValue = integerValue;
+            return this;
+        }
+
+        public Builder withLongValue(Long longValue) {
+            symbolInfo.longValue = longValue;
+            return this;
+        }
+
+        public Builder withBoolValue(Boolean boolValue) {
+            symbolInfo.boolValue = boolValue;
+            return this;
+        }
+
+        public Builder withDataType(Type dataType) {
+            symbolInfo.dataType = dataType;
+            return this;
+        }
+
+        public SymbolInfo build() {
+            return symbolInfo;
+        }
     }
 }

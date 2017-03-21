@@ -20,13 +20,14 @@ public class LexerTest {
         lexer.eat();
         Token token = lexer.getCurrentToken();
         Assert.assertTrue(Token.NUM.equals(token));
-        Assert.assertTrue(123 == lexer.getNum());
+        Assert.assertTrue(123 == lexer.getIntegerNum());
 
         lexer = new Lexer("123.3456");
         lexer.eat();
         token = lexer.getCurrentToken();
         Assert.assertTrue(Token.NUM.equals(token));
-        Assert.assertTrue(123.3456 == lexer.getNum());
+        System.out.println("sadasd" + lexer.getFloatNum());
+        Assert.assertTrue(123.3456f == lexer.getFloatNum());
 
         lexer = new Lexer("123.3456.344");
         exception.expect(RuntimeException.class);

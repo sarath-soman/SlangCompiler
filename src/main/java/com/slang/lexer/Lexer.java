@@ -1,5 +1,6 @@
 package com.slang.lexer;
 
+import com.slang.Type;
 import com.slang.ast.Token;
 
 /**
@@ -12,7 +13,11 @@ public class Lexer {
     private final String module;
     private final int moduleLen;
     private int index;
-    private double num;
+    private Double doubleNum;
+    private Float floatNum;
+    private Long longNum;
+    private Integer integerNum;
+    private Type numType;
     private String stringLiteral;
     private String variableName;
 
@@ -41,7 +46,49 @@ public class Lexer {
                 case '7':
                 case '8':
                 case '9':
-                    num = readNum();
+                    StringBuilder numberBuilder = new StringBuilder();
+                    Type dataType = readNum(numberBuilder);
+
+                    switch (dataType) {
+                        case DOUBLE:
+                            try {
+                                doubleNum = Double.valueOf(numberBuilder.toString());
+                                numType = Type.DOUBLE;
+                            } catch (NumberFormatException ex) {
+                                throw new RuntimeException(numberBuilder.toString() + " cannot be converted to a number in slang");
+                            }
+                            break;
+                        case FLOAT:
+                            try {
+                                floatNum = Float.valueOf(numberBuilder.toString());
+                                numType = Type.FLOAT;
+                            } catch (NumberFormatException ex) {
+                                throw new RuntimeException(numberBuilder.toString() + " cannot be converted to a number in slang");
+                            }
+                            break;
+                        case LONG:
+                            try {
+                                longNum = Long.valueOf(numberBuilder.toString());
+                                numType = Type.LONG;
+                            } catch (NumberFormatException ex) {
+                                throw new RuntimeException(numberBuilder.toString() + " cannot be converted to a number in slang");
+                            }
+                            break ;
+                        case INTEGER:
+                            try {
+                                integerNum = Integer.valueOf(numberBuilder.toString());
+                                numType = Type.INTEGER;
+                            } catch (NumberFormatException e) {
+                                try {
+                                    longNum = Long.valueOf(numberBuilder.toString());
+                                    numType = Type.LONG;
+                                } catch (NumberFormatException ex) {
+                                    throw new RuntimeException(numberBuilder.toString() + " cannot be converted to a number in slang");
+                                }
+                            }
+                            break ;
+                    }
+
                     previousToken = currentToken;
                     currentToken = Token.NUM;
                     break moduleStream;
@@ -161,9 +208,9 @@ public class Lexer {
         return keyWordBuilder.toString();
     }
 
-    private double readNum() {
+    private Type readNum(StringBuilder numberBuilder) {
         boolean foundDot = false;
-        StringBuilder numberBuilder = new StringBuilder();
+
         //Iterating till end of module
         while (isNotEndOfModule()) {
             char c = module.charAt(index);
@@ -172,11 +219,11 @@ public class Lexer {
                 break;
             }
 
-            if (foundDot) {
-                throw new RuntimeException("Found '.' more than two times in the number");
-            }
 
-            if ('.' == num) {
+            if ('.' == c) {
+                if (foundDot) {
+                            throw new RuntimeException("Found '.' more than two times in the number");
+                }
                 foundDot = true;
             }
 
@@ -185,7 +232,21 @@ public class Lexer {
 
         }
 
-        return Double.valueOf(numberBuilder.toString());
+        if(isNotEndOfModule()) {
+            if ('l' == module.charAt(index)) {
+                index++;
+                return Type.LONG;
+            } else if ('d' == module.charAt(index) && foundDot) {
+                index++;
+                return Type.DOUBLE;
+            }
+        }
+
+        if (foundDot) {
+            return Type.FLOAT;
+        }
+
+        return Type.INTEGER;
     }
 
     private boolean isNumeric(char c) {
@@ -256,10 +317,6 @@ public class Lexer {
         this.index = index;
     }
 
-    public double getNum() {
-        return num;
-    }
-
     public String getStringLiteral() {
         return stringLiteral;
     }
@@ -268,4 +325,23 @@ public class Lexer {
         return variableName;
     }
 
+    public Double getDoubleNum() {
+        return doubleNum;
+    }
+
+    public Long getLongNum() {
+        return longNum;
+    }
+
+    public Type getNumType() {
+        return numType;
+    }
+
+    public Float getFloatNum() {
+        return floatNum;
+    }
+
+    public Integer getIntegerNum() {
+        return integerNum;
+    }
 }

@@ -10,7 +10,19 @@ import com.slang.ast.*;
 public class Interpreter implements IVisitor {
 
     public SymbolInfo visit(NumericExpression expression, Context context) {
-        return new SymbolInfo(expression.getValue());
+        switch (expression.getDataType()) {
+            case DOUBLE:
+                return new SymbolInfo(expression.getDoubleValue());
+            case FLOAT:
+                return new SymbolInfo(expression.getFloatValue());
+            case LONG:
+                return new SymbolInfo(expression.getLongValue());
+            case INTEGER:
+                return new SymbolInfo(expression.getIntegerValue());
+
+            default:
+                throw new RuntimeException("Unsupported data type");
+        }
     }
 
     public SymbolInfo visit(UnaryExpression expression, Context context) {
@@ -48,9 +60,9 @@ public class Interpreter implements IVisitor {
         SymbolInfo leftExpVal = expression.getLeftExpression().accept(this, context);
         SymbolInfo rightExpVal = expression.getRightExpression().accept(this, context);
         Token token = expression.getOperator();
-        System.out.println(leftExpVal);
-        System.out.println(rightExpVal);
-        return typeCheckAndApplyBinaryOperator(leftExpVal, rightExpVal, token);
+        SymbolInfo resp = typeCheckAndApplyBinaryOperator(leftExpVal, rightExpVal, token);
+        System.out.println("TY " + resp);
+        return resp;
     }
 
     public SymbolInfo visit(StringLiteral stringLiteral, Context context) {
@@ -313,17 +325,29 @@ public class Interpreter implements IVisitor {
                 } else if(leftExpVal.getDataType() == Type.LONG && rightExpVal.getDataType() == Type.DOUBLE) {
                     return new SymbolInfo(leftExpVal.getLongValue() / rightExpVal.getDoubleValue());
                 } else if(leftExpVal.getDataType() == Type.LONG && rightExpVal.getDataType() == Type.LONG) {
-                    return new SymbolInfo(leftExpVal.getLongValue() / rightExpVal.getLongValue());
+                    return SymbolInfo.Builder.builder()
+                            .withDataType(Type.DOUBLE)
+                            .withDoubleValue(leftExpVal.getLongValue() / (double)rightExpVal.getLongValue())
+                            .build();
                 } else if(leftExpVal.getDataType() == Type.LONG && rightExpVal.getDataType() == Type.INTEGER) {
-                    return new SymbolInfo(leftExpVal.getLongValue() / rightExpVal.getIntegerValue());
+                    return SymbolInfo.Builder.builder()
+                            .withDataType(Type.DOUBLE)
+                            .withDoubleValue(leftExpVal.getLongValue() / (double)rightExpVal.getIntegerValue())
+                            .build();
                 } else if(leftExpVal.getDataType() == Type.INTEGER && rightExpVal.getDataType() == Type.FLOAT) {
                     return new SymbolInfo(leftExpVal.getIntegerValue() / rightExpVal.getFloatValue());
                 } else if(leftExpVal.getDataType() == Type.INTEGER && rightExpVal.getDataType() == Type.DOUBLE) {
                     return new SymbolInfo(leftExpVal.getIntegerValue() / rightExpVal.getDoubleValue());
                 } else if(leftExpVal.getDataType() == Type.INTEGER && rightExpVal.getDataType() == Type.LONG) {
-                    return new SymbolInfo(leftExpVal.getIntegerValue() / rightExpVal.getLongValue());
+                    return SymbolInfo.Builder.builder()
+                            .withDataType(Type.DOUBLE)
+                            .withDoubleValue(Double.valueOf(leftExpVal.getIntegerValue() / rightExpVal.getLongValue()))
+                            .build();
                 } else if(leftExpVal.getDataType() == Type.INTEGER && rightExpVal.getDataType() == Type.INTEGER) {
-                    return new SymbolInfo(leftExpVal.getIntegerValue() / rightExpVal.getIntegerValue());
+                    return SymbolInfo.Builder.builder()
+                            .withDataType(Type.DOUBLE)
+                            .withDoubleValue(Double.valueOf(leftExpVal.getIntegerValue() / rightExpVal.getIntegerValue()))
+                            .build();
                 } else {
                     throw new RuntimeException("Unsupported types lhs : " + leftExpVal.getDataType() + ", rhs : " + rightExpVal.getDataType());
                 }

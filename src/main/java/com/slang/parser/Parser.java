@@ -112,7 +112,18 @@ public class Parser {
 
         switch (token) {
             case NUM:
-                return new NumericExpression(lexer.getNum());
+                switch (lexer.getNumType()) {
+                    case DOUBLE:
+                        return new NumericExpression(lexer.getDoubleNum());
+                    case FLOAT:
+                        return new NumericExpression(lexer.getFloatNum());
+                    case LONG:
+                        return new NumericExpression(lexer.getLongNum());
+                    case INTEGER:
+                        return new NumericExpression(lexer.getIntegerNum());
+                    default:
+                        throw new RuntimeException("Unsupported Data type");
+                }
             case ADD:
                 return parseFactor();
             case SUB:
