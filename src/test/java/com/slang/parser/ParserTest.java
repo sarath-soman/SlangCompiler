@@ -1,5 +1,6 @@
 package com.slang.parser;
 
+import com.slang.Type;
 import com.slang.ast.*;
 import com.slang.lexer.Lexer;
 import com.slang.visitor.Context;
@@ -195,43 +196,4 @@ public class ParserTest {
                 });
     }
 
-    @Test
-    public void testExpInterpretting() {
-        Context context = new InterpreterContext(null);
-
-        Lexer lexer = new Lexer("var x; var y; var z; var a; var b; x = 23; y = 90; z = 6; a = 65; b = 54; var val; val = x/y*z+a-b;");
-        Parser parser = new Parser(lexer);
-        List<Statement> statements = parser.parseStatements();
-        IVisitor visitor = new Interpreter();
-        statements.stream()
-                .forEach(statement -> {
-                    statement.accept(visitor, context);
-                });
-        Assert.assertTrue(context.getSymbolInfo("val").getDoubleValue() == 12.533333333333331);
-    }
-
-    @Test
-    public void testVarDecAndAssign() {
-        Context context = new InterpreterContext(null);
-
-        Lexer lexer = new Lexer("var x = 10;");
-        Parser parser = new Parser(lexer);
-        List<Statement> statements = parser.parseStatements();
-        IVisitor visitor = new Interpreter();
-        statements.stream()
-                .forEach(statement -> {
-                    statement.accept(visitor, context);
-                });
-        Assert.assertTrue(context.getSymbolInfo("x").getIntegerValue() == 10);
-
-        lexer = new Lexer("var y = 23/90*6+65-54;");
-        parser = new Parser(lexer);
-        statements = parser.parseStatements();
-        IVisitor visitor2 = new Interpreter();
-        statements.stream()
-                .forEach(statement -> {
-                    statement.accept(visitor2, context);
-                });
-        Assert.assertTrue(context.getSymbolInfo("y").getDoubleValue() == 12.533333333333331);
-    }
 }
