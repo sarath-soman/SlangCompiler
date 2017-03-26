@@ -132,9 +132,37 @@ public class Lexer {
                     index++;
                     break moduleStream;
                 case '=':
-                    previousToken = currentToken;
-                    currentToken = Token.EQ;
-                    index++;
+                    if (index + 1 < moduleLen && '=' == module.charAt(index + 1)) {
+                        previousToken = currentToken;
+                        currentToken = Token.DEQ;
+                        index += 2;
+                    } else {
+                        previousToken = currentToken;
+                        currentToken = Token.EQ;
+                        index++;
+                    }
+                    break moduleStream;
+                case '<':
+                    if (index + 1 < moduleLen && '=' == module.charAt(index + 1)) {
+                        previousToken = currentToken;
+                        currentToken = Token.LTE;
+                        index += 2;
+                    } else {
+                        previousToken = currentToken;
+                        currentToken = Token.LT;
+                        index++;
+                    }
+                    break moduleStream;
+                case '>':
+                    if (index + 1 < moduleLen && '=' == module.charAt(index + 1)) {
+                        previousToken = currentToken;
+                        currentToken = Token.GTE;
+                        index += 2;
+                    } else {
+                        previousToken = currentToken;
+                        currentToken = Token.GT;
+                        index++;
+                    }
                     break moduleStream;
                 case '"':
                     stringLiteral  = readString();

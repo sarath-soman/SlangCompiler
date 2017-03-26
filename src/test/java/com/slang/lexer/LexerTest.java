@@ -105,4 +105,28 @@ public class LexerTest {
         Assert.assertTrue("sdasda".equals(lexer.getStringLiteral()));
     }
 
+    @Test
+    public void testRelationalOperators() {
+        Lexer lexer = new Lexer("==");
+        lexer.eat();
+        Assert.assertTrue(Token.DEQ.equals(lexer.getCurrentToken()));
+
+        lexer = new Lexer("<");
+        lexer.eat();
+        Assert.assertTrue(Token.LT.equals(lexer.getCurrentToken()));
+
+        lexer = new Lexer("<=");
+        lexer.eat();
+        Assert.assertTrue(Token.LTE.equals(lexer.getCurrentToken()));
+
+        lexer = new Lexer(">");
+        lexer.eat();
+        Assert.assertTrue(Token.GT.equals(lexer.getCurrentToken()));
+
+        lexer = new Lexer(">=");
+        lexer.eat();
+        Assert.assertTrue(Token.GTE.equals(lexer.getCurrentToken()));
+
+    }
+
 }
