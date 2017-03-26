@@ -33,6 +33,13 @@ public enum Token {
 
     UNKNOWN,
 
-    EQ
+    EQ,
+
+    DEQ,
+    NEQ,
+    LT,
+    LTE,
+    GT,
+    GTE
 
 }

@@ -168,16 +168,11 @@ public class Lexer {
         while (isNotEndOfModule()) {
             char c = module.charAt(index);
 
-            if(c == ' ' || c == '\n' || c == ';' ) {
+            if(Character.isAlphabetic(c) || (keyWordBuilder.length() > 0 && Character.isDigit(c))) {
+                keyWordBuilder.append(c);
+            } else {
                 break;
             }
-
-            if(c == '/' || c == '*' || c == '-'
-                    || c == '+' || c == '(' || c == ')') {
-                break;
-            }
-
-            keyWordBuilder.append(c);
             index++;
         }
         return keyWordBuilder.toString();
