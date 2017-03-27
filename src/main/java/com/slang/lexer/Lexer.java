@@ -164,6 +164,27 @@ public class Lexer {
                         index++;
                     }
                     break moduleStream;
+                case '&':
+                    if (index + 1 < moduleLen && '&' == module.charAt(index + 1)) {
+                        previousToken = currentToken;
+                        currentToken = Token.ANDAND;
+                        index += 2;
+                        break moduleStream;
+                    }
+                    throw new RuntimeException("'&' is not supported");
+                case '|':
+                    if (index + 1 < moduleLen && '|' == module.charAt(index + 1)) {
+                        previousToken = currentToken;
+                        currentToken = Token.OR;
+                        index += 2;
+                        break moduleStream;
+                    }
+                    throw new RuntimeException("'|' is not supported");
+                case '!':
+                    previousToken = currentToken;
+                    currentToken = Token.NOT;
+                    index++;
+                    break moduleStream;
                 case '"':
                     stringLiteral  = readString();
                     previousToken = currentToken;

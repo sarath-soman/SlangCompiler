@@ -167,7 +167,7 @@ public class ProgramTest {
     }
 
     @Test
-    public void testRelationalExpressions() {
+    public void testRelationalExpressionEQ() {
         Context context = new InterpreterContext(null);
 
         Lexer lexer = new Lexer("var a = 10; var b = 10/10; var c = 10 == 10;");
@@ -211,8 +211,39 @@ public class ProgramTest {
         Assert.assertTrue(context.getSymbolInfo("exp11").getBoolValue() == false);
 
 
-        lexer = new Lexer("var exp6 = 10.0f == 10; var exp7 = 10.0f == 10.0; var exp8 = 10l == 10.0f; " +
-                "var exp9 = (10l == 10); var exp10 = 10l == 11; var exp11 = (10l == 11);");
+        lexer = new Lexer("var exp12 = 10.0f == 10; var exp13 = 10.0f == 10.0; var exp14 = 10l == 10.0f; " +
+                "var exp15 = (10l == 10); var exp16 = 10l == 11; var exp17 = (10l == 11); var exp18 = 10.12 == 10.12; var exp19 = 10.12 == 10.21;");
+        parser = new Parser(lexer);
+        statements = parser.parseStatements();
+        statements.stream()
+                .forEach(statement -> {
+                    statement.accept(new Interpreter(), context);
+                });
+        Assert.assertTrue(context.getSymbolInfo("exp12").getBoolValue() == true);
+        Assert.assertTrue(context.getSymbolInfo("exp13").getBoolValue() == true);
+        Assert.assertTrue(context.getSymbolInfo("exp14").getBoolValue() == true);
+        Assert.assertTrue(context.getSymbolInfo("exp15").getBoolValue() == true);
+        Assert.assertTrue(context.getSymbolInfo("exp16").getBoolValue() == false);
+        Assert.assertTrue(context.getSymbolInfo("exp17").getBoolValue() == false);
+        Assert.assertTrue(context.getSymbolInfo("exp18").getBoolValue() == true);
+        Assert.assertTrue(context.getSymbolInfo("exp19").getBoolValue() == false);
+
+    }
+
+    @Test
+    public void testLogicalExpression() {
+        Context context = new InterpreterContext(null);
+
+        Lexer lexer = new Lexer("var c = 10 < 10;");
+        Parser parser = new Parser(lexer);
+        List<Statement> statements = parser.parseStatements();
+        statements.stream()
+                .forEach(statement -> {
+                    statement.accept(new Interpreter(), context);
+                });
+        Assert.assertTrue(context.getSymbolInfo("c").getBoolValue() == false);
+
+        lexer = new Lexer("var exp6 = true || 10 < 2; var exp7 = (true && false); var exp8 = !false;");
         parser = new Parser(lexer);
         statements = parser.parseStatements();
         statements.stream()
@@ -220,11 +251,7 @@ public class ProgramTest {
                     statement.accept(new Interpreter(), context);
                 });
         Assert.assertTrue(context.getSymbolInfo("exp6").getBoolValue() == true);
-        Assert.assertTrue(context.getSymbolInfo("exp7").getBoolValue() == true);
+        Assert.assertTrue(context.getSymbolInfo("exp7").getBoolValue() == false);
         Assert.assertTrue(context.getSymbolInfo("exp8").getBoolValue() == true);
-        Assert.assertTrue(context.getSymbolInfo("exp9").getBoolValue() == true);
-        Assert.assertTrue(context.getSymbolInfo("exp10").getBoolValue() == false);
-        Assert.assertTrue(context.getSymbolInfo("exp11").getBoolValue() == false);
-
     }
 }
