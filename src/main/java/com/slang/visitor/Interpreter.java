@@ -56,11 +56,11 @@ public class Interpreter implements IVisitor {
         }
     }
 
-    public SymbolInfo visit(BinaryExpression expression, Context context) {
+    public SymbolInfo visit(ArithmeticExpressionExpression expression, Context context) {
         SymbolInfo leftExpVal = expression.getLeftExpression().accept(this, context);
         SymbolInfo rightExpVal = expression.getRightExpression().accept(this, context);
         Token token = expression.getOperator();
-        SymbolInfo resp = typeCheckAndApplyBinaryOperator(leftExpVal, rightExpVal, token);
+        SymbolInfo resp = typeCheckAndApplyArithmeticOperator(leftExpVal, rightExpVal, token);
         return resp;
     }
 
@@ -74,6 +74,33 @@ public class Interpreter implements IVisitor {
 
     public SymbolInfo visit(VariableExpression variableExpression, Context context) {
         return context.getSymbolInfo(variableExpression.getVariableName());
+    }
+
+    @Override
+    public SymbolInfo visit(RelationalExpression relationalExpression, Context context) {
+        SymbolInfo leftExpVal = relationalExpression.getLeftExpression().accept(this, context);
+        SymbolInfo rightExpVal = relationalExpression.getRightExpression().accept(this, context);
+
+        return typeCheckAndApplyRelationalExpression(leftExpVal, rightExpVal, relationalExpression.getOperator());
+    }
+
+    private SymbolInfo typeCheckAndApplyRelationalExpression(SymbolInfo leftExpVal, SymbolInfo rightExpVal, Token operator) {
+        Type lhsType = leftExpVal.getDataType();
+        Type rhsType = rightExpVal.getDataType();
+        switch (operator) {
+            case DEQ:
+                if(lhsType == Type.INTEGER && rhsType == Type.INTEGER) {
+                    return new SymbolInfo(leftExpVal.getIntegerValue().equals(rightExpVal.getIntegerValue()));
+                } else if(lhsType == Type.INTEGER && rhsType == Type.LONG) {
+                    return new SymbolInfo(Long.valueOf(leftExpVal.getIntegerValue()).equals(rightExpVal.getLongValue()));
+                } else if(lhsType == Type.INTEGER && rhsType == Type.FLOAT) {
+                    return new SymbolInfo(Float.valueOf(leftExpVal.getIntegerValue()).equals(rightExpVal.getFloatValue()));
+                } else if(lhsType == Type.INTEGER && rhsType == Type.DOUBLE) {
+                    return new SymbolInfo(Double.valueOf(leftExpVal.getIntegerValue()).equals(rightExpVal.getDoubleValue()));
+                }
+                default:
+                    throw new RuntimeException("Unsupported operator : " + operator + ", on relational expression");
+        }
     }
 
     public SymbolInfo visit(PrintStatement printStatement, Context context) {
@@ -226,7 +253,7 @@ public class Interpreter implements IVisitor {
     }
 
     //Type check helpers
-    private SymbolInfo typeCheckAndApplyBinaryOperator(SymbolInfo leftExpVal, SymbolInfo rightExpVal, Token operator) {
+    private SymbolInfo typeCheckAndApplyArithmeticOperator(SymbolInfo leftExpVal, SymbolInfo rightExpVal, Token operator) {
         switch (operator) {
             case ADD:
                 if(leftExpVal.getDataType() == Type.DOUBLE && rightExpVal.getDataType() == Type.DOUBLE) {

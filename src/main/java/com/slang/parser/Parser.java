@@ -1,6 +1,5 @@
 package com.slang.parser;
 
-import com.slang.SymbolInfo;
 import com.slang.ast.*;
 import com.slang.lexer.Lexer;
 
@@ -83,11 +82,22 @@ public class Parser {
     }
 
     public Expression parseExpression() {
+        Expression expression = parseArithmeticExpression();
+        Token token = lexer.getCurrentToken();
+        while (Token.DEQ == token || Token.LT == token || Token.LTE == token || Token.GT == token || Token.GTE == token) {
+            Expression rightExp = parseArithmeticExpression();
+            expression = new RelationalExpression(expression, rightExp, token);
+            token = lexer.getCurrentToken();
+        }
+        return expression;
+    }
+
+    public Expression parseArithmeticExpression() {
         Expression expression = parseTerm();
         Token token = lexer.getCurrentToken();
         while (Token.ADD == token || Token.SUB == token) {
             Expression rightExp = parseTerm();
-            expression = new BinaryExpression(expression, rightExp, token);
+            expression = new ArithmeticExpressionExpression(expression, rightExp, token);
             token = lexer.getCurrentToken();
         }
         return expression;
@@ -99,7 +109,7 @@ public class Parser {
         Token token = lexer.getCurrentToken();
         while (Token.MUL == token || Token.DIV == token) {
             Expression rightExp = parseFactor();
-            expression = new BinaryExpression(expression, rightExp, token);
+            expression = new ArithmeticExpressionExpression(expression, rightExp, token);
             lexer.eat();
             token = lexer.getCurrentToken();
         }

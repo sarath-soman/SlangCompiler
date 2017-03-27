@@ -10,10 +10,11 @@ public interface IVisitor {
     //Expression Visitors
     SymbolInfo visit(NumericExpression expression, Context context);
     SymbolInfo visit(UnaryExpression expression, Context context);
-    SymbolInfo visit(BinaryExpression expression, Context context);
+    SymbolInfo visit(ArithmeticExpressionExpression expression, Context context);
     SymbolInfo visit(StringLiteral stringLiteral, Context context);
     SymbolInfo visit(BooleanExpression booleanExpression, Context context);
     SymbolInfo visit(VariableExpression variableExpression, Context context);
+    SymbolInfo visit(RelationalExpression relationalExpression, Context context);
 
     //Statement Visitors
     SymbolInfo visit(PrintStatement printStatement, Context context);

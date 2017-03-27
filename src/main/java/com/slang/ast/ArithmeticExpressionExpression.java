@@ -7,13 +7,13 @@ import com.slang.visitor.IVisitor;
 /**
  * Created by sarath on 16/3/17.
  */
-public class BinaryExpression extends Expression {
+public class ArithmeticExpressionExpression extends Expression {
 
     private Expression leftExpression;
     private Expression rightExpression;
     private Token operator;
 
-    public BinaryExpression(Expression leftExpression, Expression rightExpression, Token operator) {
+    public ArithmeticExpressionExpression(Expression leftExpression, Expression rightExpression, Token operator) {
         this.leftExpression = leftExpression;
         this.rightExpression = rightExpression;
         this.operator = operator;
@@ -37,7 +37,7 @@ public class BinaryExpression extends Expression {
 
     @Override
     public String toString() {
-        return "BinaryExpression{" +
+        return "ArithmeticExpressionExpression{" +
                 "leftExpression=" + leftExpression +
                 ", rightExpression=" + rightExpression +
                 ", operator=" + operator +

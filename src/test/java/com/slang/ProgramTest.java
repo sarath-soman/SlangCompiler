@@ -165,4 +165,35 @@ public class ProgramTest {
 
         Assert.assertTrue(Type.DOUBLE.equals(context.getSymbolInfo("d3").getDataType()));
     }
+
+    @Test
+    public void testRelationalExpressions() {
+        Context context = new InterpreterContext(null);
+
+        Lexer lexer = new Lexer("var a = 10; var b = 10/10; var c = 10 == 10;");
+        Parser parser = new Parser(lexer);
+        List<Statement> statements = parser.parseStatements();
+        statements.stream()
+                .forEach(statement -> {
+                    statement.accept(new Interpreter(), context);
+                });
+        Assert.assertTrue(context.getSymbolInfo("a").getIntegerValue() == 10);
+        Assert.assertTrue(context.getSymbolInfo("b").getDoubleValue() == 1);
+        Assert.assertTrue(context.getSymbolInfo("c").getBoolValue() == true);
+
+        lexer = new Lexer("var exp1 = 10 == 10l; var exp2 = 10 == 10.0; var exp3 = 10 == 10.0f; " +
+                "var exp4 = (10 == 10.1); var exp5 = 10 == 11;");
+        parser = new Parser(lexer);
+        statements = parser.parseStatements();
+        statements.stream()
+                .forEach(statement -> {
+                    statement.accept(new Interpreter(), context);
+                });
+        Assert.assertTrue(context.getSymbolInfo("exp1").getBoolValue() == true);
+        Assert.assertTrue(context.getSymbolInfo("exp2").getBoolValue() == true);
+        Assert.assertTrue(context.getSymbolInfo("exp3").getBoolValue() == true);
+        Assert.assertTrue(context.getSymbolInfo("exp4").getBoolValue() == false);
+        Assert.assertTrue(context.getSymbolInfo("exp5").getBoolValue() == false);
+
+    }
 }
