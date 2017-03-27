@@ -15,6 +15,8 @@ public interface IVisitor {
     SymbolInfo visit(BooleanExpression booleanExpression, Context context);
     SymbolInfo visit(VariableExpression variableExpression, Context context);
     SymbolInfo visit(RelationalExpression relationalExpression, Context context);
+    SymbolInfo visit(LogicalExpression logicalExpression, Context context);
+    SymbolInfo visit(NotExpression notExpression, Context context);
 
     //Statement Visitors
     SymbolInfo visit(PrintStatement printStatement, Context context);
@@ -22,4 +24,5 @@ public interface IVisitor {
     SymbolInfo visit(VariableDeclarationStatement variableDeclarationStatement, Context context);
     SymbolInfo visit(VariableAssignmentStatement variableAssignmentStatement, Context context);
     SymbolInfo visit(VariableDeclAndAssignStatement variableDeclAndAssignStatement, Context context);
+
 }

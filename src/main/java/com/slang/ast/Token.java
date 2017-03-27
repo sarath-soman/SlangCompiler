@@ -40,6 +40,10 @@ public enum Token {
     LT,
     LTE,
     GT,
-    GTE
+    GTE,
+
+    ANDAND,
+    OR,
+    NOT,
 
 }

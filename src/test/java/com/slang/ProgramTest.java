@@ -195,5 +195,36 @@ public class ProgramTest {
         Assert.assertTrue(context.getSymbolInfo("exp4").getBoolValue() == false);
         Assert.assertTrue(context.getSymbolInfo("exp5").getBoolValue() == false);
 
+        lexer = new Lexer("var exp6 = 10l == 10; var exp7 = 10l == 10.0; var exp8 = 10l == 10.0f; " +
+                "var exp9 = (10l == 10); var exp10 = 10l == 11; var exp11 = (10l == 11);");
+        parser = new Parser(lexer);
+        statements = parser.parseStatements();
+        statements.stream()
+                .forEach(statement -> {
+                    statement.accept(new Interpreter(), context);
+                });
+        Assert.assertTrue(context.getSymbolInfo("exp6").getBoolValue() == true);
+        Assert.assertTrue(context.getSymbolInfo("exp7").getBoolValue() == true);
+        Assert.assertTrue(context.getSymbolInfo("exp8").getBoolValue() == true);
+        Assert.assertTrue(context.getSymbolInfo("exp9").getBoolValue() == true);
+        Assert.assertTrue(context.getSymbolInfo("exp10").getBoolValue() == false);
+        Assert.assertTrue(context.getSymbolInfo("exp11").getBoolValue() == false);
+
+
+        lexer = new Lexer("var exp6 = 10.0f == 10; var exp7 = 10.0f == 10.0; var exp8 = 10l == 10.0f; " +
+                "var exp9 = (10l == 10); var exp10 = 10l == 11; var exp11 = (10l == 11);");
+        parser = new Parser(lexer);
+        statements = parser.parseStatements();
+        statements.stream()
+                .forEach(statement -> {
+                    statement.accept(new Interpreter(), context);
+                });
+        Assert.assertTrue(context.getSymbolInfo("exp6").getBoolValue() == true);
+        Assert.assertTrue(context.getSymbolInfo("exp7").getBoolValue() == true);
+        Assert.assertTrue(context.getSymbolInfo("exp8").getBoolValue() == true);
+        Assert.assertTrue(context.getSymbolInfo("exp9").getBoolValue() == true);
+        Assert.assertTrue(context.getSymbolInfo("exp10").getBoolValue() == false);
+        Assert.assertTrue(context.getSymbolInfo("exp11").getBoolValue() == false);
+
     }
 }

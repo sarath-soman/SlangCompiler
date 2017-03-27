@@ -82,6 +82,17 @@ public class Parser {
     }
 
     public Expression parseExpression() {
+        Expression expression = parseRelationalExpression();
+        Token token = lexer.getCurrentToken();
+        while (Token.ANDAND == token || Token.OR == token) {
+            Expression rightExp = parseRelationalExpression();
+            expression = new RelationalExpression(expression, rightExp, token);
+            token = lexer.getCurrentToken();
+        }
+        return expression;
+    }
+
+    public Expression parseRelationalExpression() {
         Expression expression = parseArithmeticExpression();
         Token token = lexer.getCurrentToken();
         while (Token.DEQ == token || Token.LT == token || Token.LTE == token || Token.GT == token || Token.GTE == token) {
