@@ -166,8 +166,7 @@ public class Parser {
             case FALSE:
                 return new BooleanExpression(false);
             case NOT:
-                Expression notExp = parseExpression();
-                System.out.println(notExp);
+                Expression notExp = parseFactor();
                 return new NotExpression(notExp);
 
             default:

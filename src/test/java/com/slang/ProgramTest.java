@@ -243,7 +243,7 @@ public class ProgramTest {
                 });
         Assert.assertTrue(context.getSymbolInfo("c").getBoolValue() == false);
 
-        lexer = new Lexer("var exp6 = true || 10 < 2; var exp7 = (true && false); var exp8 = !false;");
+        lexer = new Lexer("var exp6 = true || 10 < 2; var exp7 = (true && false); var exp8 = !false; var exp10 = true; var exp9 = !(true && false || exp10);");
         parser = new Parser(lexer);
         statements = parser.parseStatements();
         statements.stream()
@@ -253,5 +253,6 @@ public class ProgramTest {
         Assert.assertTrue(context.getSymbolInfo("exp6").getBoolValue() == true);
         Assert.assertTrue(context.getSymbolInfo("exp7").getBoolValue() == false);
         Assert.assertTrue(context.getSymbolInfo("exp8").getBoolValue() == true);
+        Assert.assertTrue(context.getSymbolInfo("exp9").getBoolValue() == false);
     }
 }

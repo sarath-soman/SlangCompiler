@@ -133,6 +133,7 @@ public class SymbolInfo {
     public void setBoolValue(Boolean boolValue) {
         if (null == dataType || Type.BOOL == dataType) {
             this.boolValue = boolValue;
+            dataType = Type.BOOL;
         } else {
             throw new RuntimeException("Type mismatch on assigning the value");
         }
