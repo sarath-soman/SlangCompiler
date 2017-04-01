@@ -260,9 +260,27 @@ public class ProgramTest {
     public void testIfStatement() {
         Context context = new InterpreterContext(null);
 
-        Lexer lexer = new Lexer("if(10 == 10) print(20); endif");
+        Lexer lexer = new Lexer("if(10 == 10) then  print(20); endif");
         Parser parser = new Parser(lexer);
         List<Statement> statements = parser.parseStatements();
+        statements.stream()
+                .forEach(statement -> {
+                    statement.accept(new Interpreter(), context);
+                });
+
+        lexer = new Lexer(" var x = 10; var y = 20; if(x == 10) then x = 20; var y = 30; println y; endif");
+        parser = new Parser(lexer);
+        statements = parser.parseStatements();
+        statements.stream()
+                .forEach(statement -> {
+                    statement.accept(new Interpreter(), context);
+                });
+        Assert.assertTrue(context.getSymbolInfo("x").getIntegerValue().equals(20));
+        Assert.assertTrue(context.getSymbolInfo("y").getIntegerValue().equals(20));
+
+        lexer = new Lexer("if(x == 10) then endif");
+        parser = new Parser(lexer);
+        statements = parser.parseStatements();
         statements.stream()
                 .forEach(statement -> {
                     statement.accept(new Interpreter(), context);

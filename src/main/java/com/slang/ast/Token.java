@@ -47,5 +47,6 @@ public enum Token {
     NOT,
     IF,
     ENDIF,
+    THEN,
 
 }

@@ -137,6 +137,18 @@ public class ParserTest {
         visitor = new Interpreter();
         statement.accept(visitor, context);
 
+        lexer = new Lexer("println(10);");
+        parser = new Parser(lexer);
+        statement = parser.parseStatement();
+        visitor = new Interpreter();
+        statement.accept(visitor, context);
+
+        lexer = new Lexer("print(10);");
+        parser = new Parser(lexer);
+        statement = parser.parseStatement();
+        visitor = new Interpreter();
+        statement.accept(visitor, context);
+
     }
 
     @Test

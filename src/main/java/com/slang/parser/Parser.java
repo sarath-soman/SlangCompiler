@@ -79,18 +79,32 @@ public class Parser {
 
         if(Token.IF == token) {
             lexer.eat();
-            lexer.expect(Token.OPAR);
+
             Expression expression = parseExpression();
-            System.out.println(lexer.getCurrentToken());
-            lexer.expect(Token.CPAR);
-            List<Statement> ifBody = parseStatements();
-            lexer.expect(Token.ENDIF);
+
+            lexer.eat();
+
+            lexer.expect(Token.THEN);
+
+            lexer.eat();
+
+            //If no body
+            if(lexer.getCurrentToken() == Token.ENDIF) {
+                lexer.eat();
+                return new IfStatement(expression, new ArrayList<>());
+            }
+
+            List<Statement> ifBody = new ArrayList<>();
+
+            do {
+                Statement statement = parseStatement();
+                ifBody.add(statement);
+            } while (lexer.getCurrentToken() != Token.ENDIF);
+
+            lexer.eat();
             return new IfStatement(expression, ifBody);
         }
 
-//        System.out.println(lexer.getNumType());
-//        System.out.println(lexer.getIntegerNum());
-//        System.out.println(token);
         throw new RuntimeException("Expected PRINT or PRINTLN");
 
     }
