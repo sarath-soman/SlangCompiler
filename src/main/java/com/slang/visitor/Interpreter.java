@@ -467,6 +467,23 @@ public class Interpreter implements IVisitor {
         return null;
     }
 
+    @Override
+    public SymbolInfo visit(WhileStatement whileStatement, Context context) {
+        SymbolInfo symbolInfo = whileStatement.getExpression().accept(this, context);
+
+        if(Type.BOOL != symbolInfo.getDataType()) {
+            throw new RuntimeException("While condition expression should be of type boolean");
+        }
+
+        while(symbolInfo.getBoolValue() == true) {
+            Context whileContext = new InterpreterContext(context);
+            whileStatement.getBody().stream().forEach(statement -> statement.accept(this, whileContext));
+            symbolInfo = whileStatement.getExpression().accept(this, context);
+        }
+
+        return null;
+    }
+
     //Type check helpers
     private SymbolInfo typeCheckAndApplyArithmeticOperator(SymbolInfo leftExpVal, SymbolInfo rightExpVal, Token operator) {
         switch (operator) {

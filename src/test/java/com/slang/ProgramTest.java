@@ -321,4 +321,19 @@ public class ProgramTest {
                     statement.accept(new Interpreter(), context);
                 });
     }
+
+    @Test
+    public void testWhileStatement() {
+        Context context = new InterpreterContext(null);
+
+        Lexer lexer = new Lexer("var i = 0; var x = 10; while(i < 10) println(i); println(\"sadasd\"); i = i + 1; x = 20; var x = 30; wend");
+        Parser parser = new Parser(lexer);
+        List<Statement> statements = parser.parseStatements();
+        statements.stream()
+                .forEach(statement -> {
+                    statement.accept(new Interpreter(), context);
+                });
+        Assert.assertTrue(context.getSymbolInfo("i").getIntegerValue().equals(10));
+        Assert.assertTrue(context.getSymbolInfo("x").getIntegerValue().equals(20));
+    }
 }

@@ -110,18 +110,34 @@ public class Parser {
                     falseBody.add(statement);
                 } while (lexer.getCurrentToken() != Token.ENDIF);
             }
-
+            lexer.expect(Token.ENDIF);
             lexer.eat();
             return new IfStatement(expression, trueBody, falseBody);
         }
 
-//        if(Token.WHILE == token) {
-//            lexer.eat();
-//
-//            Expression expression = parseExpression();
-//
-//            lexer.eat();
-//        }
+        if(Token.WHILE == token) {
+            lexer.eat();
+
+            Expression expression = parseExpression();
+
+            lexer.eat();
+
+            if(lexer.getCurrentToken() == Token.WEND ) {
+                throw new RuntimeException("Empty loop is not allowed");
+            }
+
+            List<Statement> body = new ArrayList<>();
+
+            do {
+                Statement statement = parseStatement();
+                body.add(statement);
+            } while (lexer.getCurrentToken() != Token.WEND);
+
+            lexer.expect(Token.WEND);
+
+            lexer.eat();
+            return new WhileStatement(expression, body);
+        }
 
         throw new RuntimeException("Expected PRINT or PRINTLN");
 

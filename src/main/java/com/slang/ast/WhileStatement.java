@@ -30,6 +30,6 @@ public class WhileStatement extends Statement {
 
     @Override
     public SymbolInfo accept(IVisitor visitor, Context context) {
-        return null;
+        return visitor.visit(this, context);
     }
 }
