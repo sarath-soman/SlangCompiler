@@ -335,5 +335,20 @@ public class ProgramTest {
                 });
         Assert.assertTrue(context.getSymbolInfo("i").getIntegerValue().equals(10));
         Assert.assertTrue(context.getSymbolInfo("x").getIntegerValue().equals(20));
+
+    }
+
+    @Test
+    public void testBreakInWhile() {
+        Context context = new InterpreterContext(null);
+
+        Lexer lexer = new Lexer("var j = 0; while(j < 10) if (j == 5) then break; endif println(j); j = j + 1; wend");
+        Parser parser = new Parser(lexer);
+        List<Statement> statements = parser.parseStatements();
+        statements.stream()
+                .forEach(statement -> {
+                    statement.accept(new Interpreter(), context);
+                });
+        Assert.assertTrue(context.getSymbolInfo("j").getIntegerValue().equals(5));
     }
 }

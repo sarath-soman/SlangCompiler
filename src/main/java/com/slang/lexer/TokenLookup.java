@@ -28,6 +28,7 @@ public class TokenLookup {
         tokenMap.put("else", Token.ELSE);
         tokenMap.put("while", Token.WHILE);
         tokenMap.put("wend", Token.WEND);
+        tokenMap.put("break", Token.BREAK);
     }
 
     public static Token getToken(String keyword) {

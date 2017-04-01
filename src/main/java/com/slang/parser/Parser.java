@@ -139,6 +139,13 @@ public class Parser {
             return new WhileStatement(expression, body);
         }
 
+        if(Token.BREAK == token) {
+            lexer.eat();
+            lexer.expect(Token.SEMICLN);
+            lexer.eat();
+            return new BreakStatement();
+        }
+
         throw new RuntimeException("Expected PRINT or PRINTLN");
 
     }

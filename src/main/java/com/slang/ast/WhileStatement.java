@@ -32,4 +32,12 @@ public class WhileStatement extends Statement {
     public SymbolInfo accept(IVisitor visitor, Context context) {
         return visitor.visit(this, context);
     }
+
+    @Override
+    public String toString() {
+        return "WhileStatement{" +
+                "expression=" + expression +
+                ", body=" + body +
+                '}';
+    }
 }

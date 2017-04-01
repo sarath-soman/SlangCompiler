@@ -38,4 +38,13 @@ public class IfStatement extends Statement {
     public SymbolInfo accept(IVisitor visitor, Context context) {
         return visitor.visit(this, context);
     }
+
+    @Override
+    public String toString() {
+        return "IfStatement{" +
+                "booleanExpression=" + booleanExpression +
+                ", trueBody=" + trueBody +
+                ", falseBody=" + falseBody +
+                '}';
+    }
 }

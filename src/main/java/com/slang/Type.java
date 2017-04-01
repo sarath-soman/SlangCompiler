@@ -9,6 +9,8 @@ public enum Type {
     FLOAT,
     INTEGER,
     DOUBLE,
-    BOOL, LONG,
+    BOOL,
+    LONG,
+    VOID,
 
 }

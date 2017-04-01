@@ -50,6 +50,10 @@ public enum Token {
     THEN,
     ELSE,
     WHILE,
-    WEND
+    WEND,
 
+    VOID,
+    FUNCTION,
+    RETURN,
+    BREAK
 }

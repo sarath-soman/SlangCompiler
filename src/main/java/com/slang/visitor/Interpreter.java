@@ -460,7 +460,13 @@ public class Interpreter implements IVisitor {
         Context ifContext = new InterpreterContext(context);
 
         if(symbolInfo.getBoolValue() == true) {
-            ifStatement.getTrueBody().stream().forEach(statement -> statement.accept(this, ifContext));
+            for (Statement statement : ifStatement.getTrueBody()) {
+                statement.accept(this, ifContext);
+                if (ifContext.getSymbolInfo("break") != null) {
+                    context.addToSymbolTable("break", new SymbolInfo());
+                    break;
+                }
+            }
         } else {
             ifStatement.getFalseBody().stream().forEach(statement -> statement.accept(this, ifContext));
         }
@@ -475,12 +481,26 @@ public class Interpreter implements IVisitor {
             throw new RuntimeException("While condition expression should be of type boolean");
         }
 
+        slangWhile:
         while(symbolInfo.getBoolValue() == true) {
             Context whileContext = new InterpreterContext(context);
-            whileStatement.getBody().stream().forEach(statement -> statement.accept(this, whileContext));
+
+            //Executing body of while
+            for(Statement statement : whileStatement.getBody()) {
+                statement.accept(this, whileContext);
+                if(whileContext.getSymbolInfo("break") != null) {
+                    break slangWhile;
+                }
+            }
             symbolInfo = whileStatement.getExpression().accept(this, context);
         }
 
+        return null;
+    }
+
+    @Override
+    public SymbolInfo visit(BreakStatement breakStatement, Context context) {
+        context.addToSymbolTable("break", new SymbolInfo());
         return null;
     }
 
