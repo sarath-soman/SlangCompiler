@@ -45,5 +45,7 @@ public enum Token {
     ANDAND,
     OR,
     NOT,
+    IF,
+    ENDIF,
 
 }

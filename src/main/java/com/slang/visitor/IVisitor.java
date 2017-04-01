@@ -24,5 +24,5 @@ public interface IVisitor {
     SymbolInfo visit(VariableDeclarationStatement variableDeclarationStatement, Context context);
     SymbolInfo visit(VariableAssignmentStatement variableAssignmentStatement, Context context);
     SymbolInfo visit(VariableDeclAndAssignStatement variableDeclAndAssignStatement, Context context);
-
+    SymbolInfo visit(IfStatement ifStatement, Context context);
 }

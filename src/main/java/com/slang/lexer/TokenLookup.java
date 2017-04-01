@@ -22,6 +22,8 @@ public class TokenLookup {
         tokenMap.put("var", Token.VAR);
         tokenMap.put("true", Token.TRUE);
         tokenMap.put("false", Token.FALSE);
+        tokenMap.put("if", Token.IF);
+        tokenMap.put("endif", Token.ENDIF);
     }
 
     public static Token getToken(String keyword) {

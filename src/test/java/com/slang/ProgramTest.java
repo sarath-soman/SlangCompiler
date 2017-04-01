@@ -255,4 +255,17 @@ public class ProgramTest {
         Assert.assertTrue(context.getSymbolInfo("exp8").getBoolValue() == true);
         Assert.assertTrue(context.getSymbolInfo("exp9").getBoolValue() == false);
     }
+
+    @Test
+    public void testIfStatement() {
+        Context context = new InterpreterContext(null);
+
+        Lexer lexer = new Lexer("if(10 == 10) print(20); endif");
+        Parser parser = new Parser(lexer);
+        List<Statement> statements = parser.parseStatements();
+        statements.stream()
+                .forEach(statement -> {
+                    statement.accept(new Interpreter(), context);
+                });
+    }
 }

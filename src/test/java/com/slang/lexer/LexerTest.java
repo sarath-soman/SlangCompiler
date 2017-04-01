@@ -129,4 +129,15 @@ public class LexerTest {
 
     }
 
+    @Test
+    public void testIF() {
+        Lexer lexer = new Lexer("if endif");
+
+        lexer.eat();
+        Assert.assertTrue(Token.IF.equals(lexer.getCurrentToken()));
+
+        lexer.eat();
+        Assert.assertTrue(Token.ENDIF.equals(lexer.getCurrentToken()));
+    }
+
 }

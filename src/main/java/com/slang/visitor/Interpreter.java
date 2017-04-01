@@ -450,6 +450,18 @@ public class Interpreter implements IVisitor {
         return variableDeclAndAssignStatement.getVariableAssignmentStatement().accept(this, context);
     }
 
+    @Override
+    public SymbolInfo visit(IfStatement ifStatement, Context context) {
+        SymbolInfo symbolInfo = ifStatement.getBooleanExpression().accept(this, context);
+        if(Type.BOOL != symbolInfo.getDataType()) {
+            throw new RuntimeException("If condition expression should be of type boolean");
+        }
+
+        Context ifContext = new InterpreterContext(context);
+        ifStatement.getBody().stream().forEach(statement -> statement.accept(this, ifContext));
+        return null;
+    }
+
     //Type check helpers
     private SymbolInfo typeCheckAndApplyArithmeticOperator(SymbolInfo leftExpVal, SymbolInfo rightExpVal, Token operator) {
         switch (operator) {
