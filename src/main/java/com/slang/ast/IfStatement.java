@@ -13,19 +13,25 @@ public class IfStatement extends Statement {
 
     private Expression booleanExpression;
 
-    private List<Statement> body;
+    private List<Statement> trueBody;
+    private List<Statement> falseBody;
 
-    public IfStatement(Expression booleanExpression, List<Statement> body) {
+    public IfStatement(Expression booleanExpression, List<Statement> trueBody, List<Statement> falseBody) {
         this.booleanExpression = booleanExpression;
-        this.body = body;
+        this.trueBody = trueBody;
+        this.falseBody = falseBody;
     }
 
     public Expression getBooleanExpression() {
         return booleanExpression;
     }
 
-    public List<Statement> getBody() {
-        return body;
+    public List<Statement> getTrueBody() {
+        return trueBody;
+    }
+
+    public List<Statement> getFalseBody() {
+        return falseBody;
     }
 
     @Override

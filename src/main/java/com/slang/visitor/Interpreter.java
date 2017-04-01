@@ -458,7 +458,12 @@ public class Interpreter implements IVisitor {
         }
 
         Context ifContext = new InterpreterContext(context);
-        ifStatement.getBody().stream().forEach(statement -> statement.accept(this, ifContext));
+
+        if(symbolInfo.getBoolValue() == true) {
+            ifStatement.getTrueBody().stream().forEach(statement -> statement.accept(this, ifContext));
+        } else {
+            ifStatement.getFalseBody().stream().forEach(statement -> statement.accept(this, ifContext));
+        }
         return null;
     }
 

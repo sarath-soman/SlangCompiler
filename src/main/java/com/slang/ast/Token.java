@@ -48,5 +48,8 @@ public enum Token {
     IF,
     ENDIF,
     THEN,
+    ELSE,
+    WHILE,
+    WEND
 
 }

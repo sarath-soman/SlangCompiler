@@ -90,20 +90,38 @@ public class Parser {
 
             //If no body
             if(lexer.getCurrentToken() == Token.ENDIF) {
-                lexer.eat();
-                return new IfStatement(expression, new ArrayList<>());
+                throw new RuntimeException("Empty If condition is not allowed");
             }
 
-            List<Statement> ifBody = new ArrayList<>();
+            List<Statement> trueBody = new ArrayList<>();
 
             do {
                 Statement statement = parseStatement();
-                ifBody.add(statement);
-            } while (lexer.getCurrentToken() != Token.ENDIF);
+                trueBody.add(statement);
+            } while (lexer.getCurrentToken() != Token.ENDIF && lexer.getCurrentToken() != Token.ELSE);
+
+            List<Statement> falseBody = new ArrayList<>();
+
+            //IF false part exists
+            if(lexer.getCurrentToken() == Token.ELSE) {
+                lexer.eat();
+                do {
+                    Statement statement = parseStatement();
+                    falseBody.add(statement);
+                } while (lexer.getCurrentToken() != Token.ENDIF);
+            }
 
             lexer.eat();
-            return new IfStatement(expression, ifBody);
+            return new IfStatement(expression, trueBody, falseBody);
         }
+
+//        if(Token.WHILE == token) {
+//            lexer.eat();
+//
+//            Expression expression = parseExpression();
+//
+//            lexer.eat();
+//        }
 
         throw new RuntimeException("Expected PRINT or PRINTLN");
 

@@ -8,7 +8,9 @@ import com.slang.visitor.IVisitor;
 import com.slang.visitor.Interpreter;
 import com.slang.visitor.InterpreterContext;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.List;
 
@@ -16,6 +18,9 @@ import java.util.List;
  * Created by sarath on 24/3/17.
  */
 public class ProgramTest {
+
+    @Rule
+    public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void testExpEvalOnVariables() {
@@ -279,6 +284,36 @@ public class ProgramTest {
         Assert.assertTrue(context.getSymbolInfo("y").getIntegerValue().equals(20));
 
         lexer = new Lexer("if(x == 10) then endif");
+        parser = new Parser(lexer);
+        expectedException.expect(RuntimeException.class);
+        statements = parser.parseStatements();
+        statements.stream()
+                .forEach(statement -> {
+                    statement.accept(new Interpreter(), context);
+                });
+    }
+
+    @Test
+    public void testIfElseStatement() {
+        Context context = new InterpreterContext(null);
+
+        Lexer lexer = new Lexer("if(10 < 10) then println(20); println(10); else println(30); println(20); endif");
+        Parser parser = new Parser(lexer);
+        List<Statement> statements = parser.parseStatements();
+        statements.stream()
+                .forEach(statement -> {
+                    statement.accept(new Interpreter(), context);
+                });
+
+        lexer = new Lexer("if(10 == 10) then println(20); println(10); else println(30); println(20); endif");
+        parser = new Parser(lexer);
+        statements = parser.parseStatements();
+        statements.stream()
+                .forEach(statement -> {
+                    statement.accept(new Interpreter(), context);
+                });
+
+        lexer = new Lexer("if(10 < 10) then println(20); println(10); else  if(20 == 20) then println(1); println(2); endif endif");
         parser = new Parser(lexer);
         statements = parser.parseStatements();
         statements.stream()
