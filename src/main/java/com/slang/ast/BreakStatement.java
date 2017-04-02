@@ -12,4 +12,5 @@ public class BreakStatement extends Statement {
     public SymbolInfo accept(IVisitor visitor, Context context) {
         return visitor.visit(this, context);
     }
+
 }

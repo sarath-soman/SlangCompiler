@@ -462,13 +462,19 @@ public class Interpreter implements IVisitor {
         if(symbolInfo.getBoolValue() == true) {
             for (Statement statement : ifStatement.getTrueBody()) {
                 statement.accept(this, ifContext);
+                //Todo evaluate the behaviour of break
                 if (ifContext.getSymbolInfo("break") != null) {
                     context.addToSymbolTable("break", new SymbolInfo());
-                    break;
                 }
             }
         } else {
-            ifStatement.getFalseBody().stream().forEach(statement -> statement.accept(this, ifContext));
+            for (Statement statement : ifStatement.getFalseBody()) {
+                statement.accept(this, ifContext);
+                //Todo evaluate the behaviour of break
+                if (ifContext.getSymbolInfo("break") != null) {
+                    context.addToSymbolTable("break", new SymbolInfo());
+                }
+            }
         }
         return null;
     }

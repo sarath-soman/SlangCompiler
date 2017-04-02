@@ -131,13 +131,41 @@ public class LexerTest {
 
     @Test
     public void testIF() {
-        Lexer lexer = new Lexer("if endif");
+        Lexer lexer = new Lexer("if then  endif");
 
         lexer.eat();
         Assert.assertTrue(Token.IF.equals(lexer.getCurrentToken()));
 
         lexer.eat();
+        Assert.assertTrue(Token.THEN.equals(lexer.getCurrentToken()));
+
+        lexer.eat();
         Assert.assertTrue(Token.ENDIF.equals(lexer.getCurrentToken()));
+    }
+
+    @Test
+    public void testWhile() {
+        Lexer lexer = new Lexer("while wend");
+
+        lexer.eat();
+        Assert.assertTrue(Token.WHILE.equals(lexer.getCurrentToken()));
+
+        lexer.eat();
+        Assert.assertTrue(Token.WEND.equals(lexer.getCurrentToken()));
+    }
+
+    @Test
+    public void testTrailingWhiteSpaceBehaviour() {
+        Lexer lexer = new Lexer("while wend  ");
+
+        lexer.eat();
+        Assert.assertTrue(Token.WHILE.equals(lexer.getCurrentToken()));
+
+        lexer.eat();
+        Assert.assertTrue(Token.WEND.equals(lexer.getCurrentToken()));
+
+        lexer.eat();
+        Assert.assertTrue(Token.UNKNOWN.equals(lexer.getCurrentToken()));
     }
 
 }

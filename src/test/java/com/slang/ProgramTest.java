@@ -350,5 +350,37 @@ public class ProgramTest {
                     statement.accept(new Interpreter(), context);
                 });
         Assert.assertTrue(context.getSymbolInfo("j").getIntegerValue().equals(5));
+
+        lexer = new Lexer("var k = 0; while(k < 10) if (k == 5) then break; endif break; wend");
+        parser = new Parser(lexer);
+        statements = parser.parseStatements();
+        statements.stream()
+                .forEach(statement -> {
+                    statement.accept(new Interpreter(), context);
+                });
+        Assert.assertTrue(context.getSymbolInfo("k").getIntegerValue().equals(0));
+
+        lexer = new Lexer("var a = 0; while(a < 10) var l = 0; while(l < 10) if(l == 5) then break; endif println(l); l = l + 1; wend println(\"\"); a = a + 1; wend");
+        parser = new Parser(lexer);
+        statements = parser.parseStatements();
+        statements.stream()
+                .forEach(statement -> {
+                    statement.accept(new Interpreter(), context);
+                });
+        Assert.assertTrue(context.getSymbolInfo("a").getIntegerValue().equals(10));
+    }
+
+    @Test
+    public void testBreakInIf() {
+        Context context = new InterpreterContext(null);
+
+        Lexer lexer = new Lexer("var j = 5; if (j == 5) then j = 10; break; j = 15; endif ");
+        Parser parser = new Parser(lexer);
+        List<Statement> statements = parser.parseStatements();
+        statements.stream()
+                .forEach(statement -> {
+                    statement.accept(new Interpreter(), context);
+                });
+        System.out.println(context.getSymbolInfo("j"));
     }
 }

@@ -95,6 +95,10 @@ public class Lexer {
                 case ' ':
                 case '\n':
                     index ++;
+                    if(isEndOfModule()) {
+                        previousToken = currentToken;
+                        currentToken = Token.UNKNOWN;
+                    }
                     break ;
                 case '+':
                     previousToken = currentToken;
@@ -387,5 +391,15 @@ public class Lexer {
 
     public Integer getIntegerNum() {
         return integerNum;
+    }
+
+    @Override
+    public String toString() {
+        return "Lexer{" +
+                "previousToken=" + previousToken +
+                ", currentToken=" + currentToken +
+                ", moduleLen=" + moduleLen +
+                ", index=" + index +
+                '}';
     }
 }
