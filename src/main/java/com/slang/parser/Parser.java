@@ -1,5 +1,6 @@
 package com.slang.parser;
 
+import com.slang.Type;
 import com.slang.ast.*;
 import com.slang.lexer.Lexer;
 
@@ -144,6 +145,35 @@ public class Parser {
             lexer.expect(Token.SEMICLN);
             lexer.eat();
             return new BreakStatement();
+        }
+
+        if(Token.FUNCTION == token) {
+            lexer.eat();
+            Type returnType = null;
+            switch (lexer.getCurrentToken()) {
+                case VOID:
+                    returnType = Type.VOID;
+                    break;
+                case INT:
+                    returnType = Type.INTEGER;
+                    break;
+                case LONG:
+                    returnType = Type.LONG;
+                    break;
+                case FLOAT:
+                    returnType = Type.FLOAT;
+                    break;
+                case DOUBLE:
+                    returnType = Type.DOUBLE;
+                    break;
+                case BOOL:
+                    returnType = Type.BOOL;
+                    break;
+                default:
+                    throw new RuntimeException("Return type cannot be " + lexer.getCurrentToken());
+            }
+
+
         }
 
         throw new RuntimeException("Expected PRINT or PRINTLN");

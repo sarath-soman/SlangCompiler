@@ -21,7 +21,9 @@ public enum Token {
     STRLTRL,
 
     INT,
+    LONG,
     FLOAT,
+    DOUBLE,
     BOOL,
     STRING,
     VAR,
@@ -55,5 +57,7 @@ public enum Token {
     VOID,
     FUNCTION,
     RETURN,
-    BREAK
+    BREAK,
+    COMMA,
+    END
 }

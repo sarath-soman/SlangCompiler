@@ -168,4 +168,21 @@ public class LexerTest {
         Assert.assertTrue(Token.UNKNOWN.equals(lexer.getCurrentToken()));
     }
 
+    @Test
+    public void testFunction() {
+        Lexer lexer = new Lexer("function void , end ");
+
+        lexer.eat();
+        Assert.assertTrue(Token.FUNCTION.equals(lexer.getCurrentToken()));
+
+        lexer.eat();
+        Assert.assertTrue(Token.VOID.equals(lexer.getCurrentToken()));
+
+        lexer.eat();
+        Assert.assertTrue(Token.COMMA.equals(lexer.getCurrentToken()));
+
+        lexer.eat();
+        Assert.assertTrue(Token.END.equals(lexer.getCurrentToken()));
+    }
+
 }

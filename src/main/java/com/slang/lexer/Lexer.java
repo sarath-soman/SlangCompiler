@@ -189,6 +189,11 @@ public class Lexer {
                     currentToken = Token.NOT;
                     index++;
                     break moduleStream;
+                case ',':
+                    previousToken = currentToken;
+                    currentToken = Token.COMMA;
+                    index++;
+                    break moduleStream;
                 case '"':
                     stringLiteral  = readString();
                     previousToken = currentToken;
