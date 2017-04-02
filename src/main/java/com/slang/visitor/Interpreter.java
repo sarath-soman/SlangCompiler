@@ -465,6 +465,7 @@ public class Interpreter implements IVisitor {
                 //Todo evaluate the behaviour of break
                 if (ifContext.getSymbolInfo("break") != null) {
                     context.addToSymbolTable("break", new SymbolInfo());
+                    break;
                 }
             }
         } else {
@@ -473,6 +474,7 @@ public class Interpreter implements IVisitor {
                 //Todo evaluate the behaviour of break
                 if (ifContext.getSymbolInfo("break") != null) {
                     context.addToSymbolTable("break", new SymbolInfo());
+                    break;
                 }
             }
         }

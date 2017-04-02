@@ -360,7 +360,7 @@ public class ProgramTest {
                 });
         Assert.assertTrue(context.getSymbolInfo("k").getIntegerValue().equals(0));
 
-        lexer = new Lexer("var a = 0; while(a < 10) var l = 0; while(l < 10) if(l == 5) then break; endif println(l); l = l + 1; wend println(\"\"); a = a + 1; wend");
+        lexer = new Lexer("var a = 0; while(a < 10) var l = 0; while(l < 10) if(l == 5) then break; a = 10; endif println(l); l = l + 1; wend println(\"\"); a = a + 1; wend");
         parser = new Parser(lexer);
         statements = parser.parseStatements();
         statements.stream()
@@ -381,6 +381,6 @@ public class ProgramTest {
                 .forEach(statement -> {
                     statement.accept(new Interpreter(), context);
                 });
-        System.out.println(context.getSymbolInfo("j"));
+        Assert.assertTrue(context.getSymbolInfo("j").getIntegerValue().equals(10));
     }
 }
