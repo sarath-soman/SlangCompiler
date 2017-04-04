@@ -5,7 +5,9 @@ import com.slang.ast.*;
 import com.slang.lexer.Lexer;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by sarath on 16/3/17.
@@ -16,6 +18,100 @@ public class Parser {
 
     public Parser(Lexer lexer) {
         this.lexer = lexer;
+    }
+
+    public Map<String, Function> parseFunctions() {
+        Token token = null;
+        Map<String, Function> functions = new LinkedHashMap<>();
+        do {
+            Function function = parseFunction();
+            functions.put(function.getName(), function);
+            token = lexer.getCurrentToken();
+        } while (Token.UNKNOWN != token);
+        return functions;
+    }
+
+    public Function parseFunction() {
+        //First call to parseFunction require eat and once parsing has started we should not call eat() as it will
+        //skip a token
+        if (null == lexer.getPreviousToken()) {
+            lexer.eat();
+        }
+        lexer.expect(Token.FUNCTION);
+        lexer.eat();
+        Type returnType = null;
+        switch (lexer.getCurrentToken()) {
+            case VOID:
+                returnType = Type.VOID;
+                break;
+            case INT:
+                returnType = Type.INTEGER;
+                break;
+            case LONG:
+                returnType = Type.LONG;
+                break;
+            case FLOAT:
+                returnType = Type.FLOAT;
+                break;
+            case DOUBLE:
+                returnType = Type.DOUBLE;
+                break;
+            case BOOL:
+                returnType = Type.BOOL;
+                break;
+            default:
+                throw new RuntimeException("Return type cannot be " + lexer.getCurrentToken());
+        }
+
+        lexer.eat();
+        if (lexer.getCurrentToken() != Token.VAR_NAME) {
+            throw new RuntimeException("Function name expected");
+        }
+        String name = lexer.getVariableName();
+
+        lexer.eat();
+        lexer.expect(Token.OPAR);
+
+        LinkedHashMap<String, Type> formalArguments = new LinkedHashMap<>();
+
+        lexer.eat();
+        while (lexer.getCurrentToken() != Token.CPAR) {
+            Type varType = getType(lexer.getCurrentToken());
+            lexer.eat();
+            if (lexer.getCurrentToken() != Token.VAR_NAME) {
+                throw new RuntimeException("Formal parameter name expected");
+            }
+            String varName = lexer.getVariableName();
+            lexer.eat();
+
+            formalArguments.put(varName, varType);
+
+            if (lexer.getCurrentToken() != Token.COMMA) {
+                break;
+            }
+            lexer.eat();
+        }
+
+        if (lexer.getPreviousToken() == Token.COMMA) {
+            throw new RuntimeException("Expecting a formal parameter after comma");
+        }
+
+        lexer.expect(Token.CPAR);
+        lexer.eat();
+        List<Statement> functionBody = new ArrayList<>();
+
+        do {
+            Statement statement = parseStatement();
+            functionBody.add(statement);
+        } while (lexer.getCurrentToken() != Token.END);
+
+        lexer.expect(Token.END);
+
+        Function function = new Function(name, returnType, formalArguments, functionBody);
+        lexer.eat();
+        System.out.println(function);
+        return function;
+
     }
 
     public List<Statement> parseStatements() {
@@ -147,37 +243,28 @@ public class Parser {
             return new BreakStatement();
         }
 
-        if(Token.FUNCTION == token) {
-            lexer.eat();
-            Type returnType = null;
-            switch (lexer.getCurrentToken()) {
-                case VOID:
-                    returnType = Type.VOID;
-                    break;
-                case INT:
-                    returnType = Type.INTEGER;
-                    break;
-                case LONG:
-                    returnType = Type.LONG;
-                    break;
-                case FLOAT:
-                    returnType = Type.FLOAT;
-                    break;
-                case DOUBLE:
-                    returnType = Type.DOUBLE;
-                    break;
-                case BOOL:
-                    returnType = Type.BOOL;
-                    break;
-                default:
-                    throw new RuntimeException("Return type cannot be " + lexer.getCurrentToken());
-            }
-
-
-        }
-
+        System.out.println(lexer);
         throw new RuntimeException("Expected PRINT or PRINTLN");
 
+    }
+
+    private Type getType(Token currentToken) {
+        switch (lexer.getCurrentToken()) {
+            case VOID:
+                return Type.VOID;
+            case INT:
+                return Type.INTEGER;
+            case LONG:
+                return Type.LONG;
+            case FLOAT:
+                return Type.FLOAT;
+            case DOUBLE:
+                return Type.DOUBLE;
+            case BOOL:
+                return Type.BOOL;
+            default:
+                throw new RuntimeException("Formal param type cannot be " + lexer.getCurrentToken());
+        }
     }
 
     public Expression parseExpression() {

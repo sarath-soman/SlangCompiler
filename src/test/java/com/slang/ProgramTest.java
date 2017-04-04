@@ -1,18 +1,17 @@
 package com.slang;
 
+import com.slang.ast.Function;
 import com.slang.ast.Statement;
 import com.slang.lexer.Lexer;
 import com.slang.parser.Parser;
-import com.slang.visitor.Context;
-import com.slang.visitor.IVisitor;
-import com.slang.visitor.Interpreter;
-import com.slang.visitor.InterpreterContext;
+import com.slang.visitor.*;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by sarath on 24/3/17.
@@ -382,5 +381,17 @@ public class ProgramTest {
                     statement.accept(new Interpreter(), context);
                 });
         Assert.assertTrue(context.getSymbolInfo("j").getIntegerValue().equals(10));
+    }
+
+    @Test
+    public void testFunction() {
+        Context context = new InterpreterContext(null);
+
+        Lexer lexer = new Lexer("function void add(int x, int y) println x + y; println 22; end function void main() add(10, 20); end ");
+        Parser parser = new Parser(lexer);
+        Map<String, Function> functions = parser.parseFunctions();
+        IVisitor interpreter = new Interpreter();
+
+        System.out.println(context);
     }
 }

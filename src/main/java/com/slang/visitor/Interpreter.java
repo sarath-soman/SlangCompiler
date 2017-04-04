@@ -4,6 +4,11 @@ import com.slang.SymbolInfo;
 import com.slang.Type;
 import com.slang.ast.*;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 /**
  * Created by sarath on 18/3/17.
  */
@@ -509,6 +514,51 @@ public class Interpreter implements IVisitor {
     @Override
     public SymbolInfo visit(BreakStatement breakStatement, Context context) {
         context.addToSymbolTable("break", new SymbolInfo());
+        return null;
+    }
+
+    @Override
+    public SymbolInfo visit(Function function, Context context) {
+        context.addToFunctionTable(function.getName(), function);
+        return null;
+    }
+
+    @Override
+    public SymbolInfo visit(ReturnStatement returnStatement, Context context) {
+        SymbolInfo returnSymbolInfo = returnStatement.getExpression().accept(this, context);
+        return returnSymbolInfo;
+    }
+
+    @Override
+    public SymbolInfo visit(FunctionInvokeExpression functionInvokeExpression, Context context) {
+        Function function = context.getFunction(functionInvokeExpression.getFunctionName());
+        List<SymbolInfo> actualParams = functionInvokeExpression.getActualFunctionArguments()
+                .stream()
+                .map(expression -> expression.accept(this, context))
+                .collect(Collectors.toList());
+
+        if(actualParams.size() != function.getFormalArguments().entrySet().size()) {
+            throw new RuntimeException("Formal and actual param size doesn't match");
+        }
+
+        Context functionContext = new InterpreterContext(context);
+
+        //HERE
+        Set<Map.Entry<String, Type>> formalParams = function.getFormalArguments().entrySet();
+
+        int i = 0;
+        for (Map.Entry<String, Type> formalParam : function.getFormalArguments().entrySet()) {
+            if (actualParams.get(i).getDataType() != formalParam.getValue()) {
+                throw new RuntimeException("Actual and formal params data type is not matching");
+            }
+
+            functionContext.addToSymbolTable(formalParam.getKey(), actualParams.get(i));
+            i++;
+        }
+
+        //TODO return on return statement
+        function.getBody().stream().forEach(statement -> statement.accept(this, functionContext));
+
         return null;
     }
 

@@ -15,16 +15,20 @@ import java.util.Map;
  */
 public class Function implements IVisitable {
 
+    private String name;
     private Type returnType;
     private LinkedHashMap<String, Type> formalArguments;
-    private Expression returnExpression;
     private List<Statement> body;
 
-    public Function(Type returnType, LinkedHashMap<String, Type> formalArguments, Expression returnExpression, List<Statement> body) {
+    public Function(String name, Type returnType, LinkedHashMap<String, Type> formalArguments, List<Statement> body) {
+        this.name = name;
         this.returnType = returnType;
         this.formalArguments = formalArguments;
-        this.returnExpression = returnExpression;
         this.body = body;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public Type getReturnType() {
@@ -35,16 +39,22 @@ public class Function implements IVisitable {
         return formalArguments;
     }
 
-    public Expression getReturnExpression() {
-        return returnExpression;
-    }
-
     public List<Statement> getBody() {
         return body;
     }
 
     @Override
     public SymbolInfo accept(IVisitor visitor, Context context) {
-        return null;
+        return visitor.visit(this, context);
+    }
+
+    @Override
+    public String toString() {
+        return "Function{" +
+                "name='" + name + '\'' +
+                ", returnType=" + returnType +
+                ", formalArguments=" + formalArguments +
+                ", body=" + body +
+                '}';
     }
 }

@@ -27,4 +27,7 @@ public interface IVisitor {
     SymbolInfo visit(IfStatement ifStatement, Context context);
     SymbolInfo visit(WhileStatement whileStatement, Context context);
     SymbolInfo visit(BreakStatement breakStatement, Context context);
+    SymbolInfo visit(Function function, Context context);
+    SymbolInfo visit(ReturnStatement returnStatement, Context context);
+    SymbolInfo visit(FunctionInvokeExpression functionInvokeExpression, Context context);
 }
