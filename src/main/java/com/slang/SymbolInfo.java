@@ -139,6 +139,10 @@ public class SymbolInfo {
         }
     }
 
+    public void setVoidValue() {
+        dataType = Type.VOID;
+    }
+
     public void nullify() {
         stringValue = null;
         floatValue = null;

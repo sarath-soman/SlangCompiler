@@ -92,24 +92,28 @@ public class Parser {
             lexer.eat();
         }
 
-        if (lexer.getPreviousToken() == Token.COMMA) {
-            throw new RuntimeException("Expecting a formal parameter after comma");
-        }
-
         lexer.expect(Token.CPAR);
         lexer.eat();
         List<Statement> functionBody = new ArrayList<>();
 
+        boolean foundReturn = false;
         do {
             Statement statement = parseStatement();
+            if(ReturnStatement.class.isAssignableFrom(statement.getClass())) {
+                foundReturn = true;
+            }
             functionBody.add(statement);
         } while (lexer.getCurrentToken() != Token.END);
 
+        if (Type.VOID != returnType && !foundReturn) {
+            throw new RuntimeException("Return type expected");
+        } else if (Type.VOID == returnType && !foundReturn) {
+            functionBody.add(new ReturnStatement(new VoidExpression()));
+        }
         lexer.expect(Token.END);
 
         Function function = new Function(name, returnType, formalArguments, functionBody);
         lexer.eat();
-        System.out.println(function);
         return function;
 
     }
@@ -163,14 +167,80 @@ public class Parser {
         }
 
         if(Token.VAR_NAME == token) {
-            lexer.eat();
-            lexer.expect(Token.EQ);
             String varName = lexer.getVariableName();
-            Expression expression = parseExpression();
-            VariableAssignmentStatement variableAssignmentStatement = new VariableAssignmentStatement(varName, expression);
-            lexer.expect(Token.SEMICLN);
             lexer.eat();
-            return variableAssignmentStatement;
+
+            //function invocation
+            if(lexer.getCurrentToken() == Token.OPAR) {
+//                lexer.eat();
+
+                List<Expression> actualParams = new ArrayList<>();
+
+                while (lexer.getCurrentToken() != Token.CPAR) {
+                    //horrible hack to get parsing right
+                    try {
+                        actualParams.add(parseExpression());
+                    } catch (RuntimeException ex) {
+                        //TODO think of alternative ways to parse
+                        if(lexer.getCurrentToken() == Token.CPAR) {
+                            break;
+                        }
+                    }
+                    if (lexer.getCurrentToken() != Token.COMMA) {
+                        break;
+                    }
+                }
+
+
+
+                lexer.expect(Token.CPAR);
+                lexer.eat();
+
+                lexer.expect(Token.SEMICLN);
+                lexer.eat();
+
+                return new FunctionInvokeStatement(new FunctionInvokeExpression(varName, actualParams));
+
+            //variable assignment
+            } else if (lexer.getCurrentToken() == Token.EQ) {
+                Expression expression = parseExpression();
+                if(lexer.getPreviousToken() == Token.VAR_NAME && lexer.getCurrentToken() == Token.OPAR) {
+                    String functionName = lexer.getVariableName();
+                    List<Expression> actualParams = new ArrayList<>();
+
+                    while (lexer.getCurrentToken() != Token.CPAR) {
+                        //horrible hack to get parsing right
+                        try {
+                            actualParams.add(parseExpression());
+                        } catch (RuntimeException ex) {
+                            //TODO think of alternative ways to parse
+                            if(lexer.getCurrentToken() == Token.CPAR) {
+                                break;
+                            }
+                        }
+                        if (lexer.getCurrentToken() != Token.COMMA) {
+                            break;
+                        }
+                    }
+
+
+
+                    lexer.expect(Token.CPAR);
+                    lexer.eat();
+
+                    lexer.expect(Token.SEMICLN);
+                    lexer.eat();
+
+                    return new VariableAssignmentStatement(varName, new FunctionInvokeExpression(functionName, actualParams));
+                } else {
+                    VariableAssignmentStatement variableAssignmentStatement = new VariableAssignmentStatement(varName, expression);
+                    lexer.expect(Token.SEMICLN);
+                    lexer.eat();
+                    return variableAssignmentStatement;
+                }
+            }
+
+            throw new RuntimeException("Illega token " + lexer.getCurrentToken());
 
         }
 
@@ -243,8 +313,22 @@ public class Parser {
             return new BreakStatement();
         }
 
+        if(Token.RETURN == token) {
+            //Again another hack to get parsing right
+            try {
+                Expression expression = parseExpression();
+                lexer.expect(Token.SEMICLN);
+                lexer.eat();
+                return new ReturnStatement(expression);
+            } catch (RuntimeException ex) {
+                lexer.expect(Token.SEMICLN);
+                lexer.eat();
+                return new ReturnStatement(new VoidExpression());
+            }
+        }
+
         System.out.println(lexer);
-        throw new RuntimeException("Expected PRINT or PRINTLN");
+        throw new RuntimeException("Unexpected token : " + lexer.getCurrentToken());
 
     }
 
@@ -356,7 +440,7 @@ public class Parser {
                 return new NotExpression(notExp);
 
             default:
-                throw new RuntimeException("Un expected token at leaf : " + token);
+                throw new RuntimeException("Unexpected token at leaf : " + token);
         }
     }
 }

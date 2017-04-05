@@ -11,27 +11,12 @@ import java.util.Map;
  */
 public abstract class Context {
 
-    public Context() {
-    }
-
-    public Context(Map<String, Function> functionTable) {
-        this.functionTable = functionTable;
-    }
-
-    private Map<String, Function> functionTable = new LinkedHashMap<>();
-
     public abstract void addToSymbolTable(String symbolName, SymbolInfo symbolInfo);
 
     public abstract SymbolInfo getSymbolInfo(String symbolName);
 
     public abstract SymbolInfo getSymbolInfoFromCurrentScope(String symbolName);
 
-    public void addToFunctionTable(String functionIdentifier, Function function) {
-        functionTable.put(functionIdentifier, function);
-    }
-
-    public Function getFunction(String functionIdentifier) {
-        return functionTable.get(functionIdentifier);
-    }
+    public abstract Function getFunction(String functionIdentifier);
 
 }

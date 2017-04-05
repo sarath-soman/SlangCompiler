@@ -1,6 +1,7 @@
 package com.slang.visitor;
 
 import com.slang.SymbolInfo;
+import com.slang.ast.Function;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +11,13 @@ import java.util.Map;
  */
 public class InterpreterContext extends Context {
 
+    protected Context parentContext = null;
+    protected Map<String, Function> functionTable;
+
+    public InterpreterContext(Map<String, Function> functions) {
+        this.functionTable = functions;
+    }
+
     public static enum Scope {
         CURRENT,
         ALL
@@ -17,10 +25,12 @@ public class InterpreterContext extends Context {
 
     private Map<String, SymbolInfo> symbolTable = new HashMap<>();
 
-    private Context parentContext = null;
-
     public InterpreterContext(Context parentContext) {
         this.parentContext = parentContext;
+    }
+
+    public InterpreterContext() {
+        super();
     }
 
     @Override
@@ -43,6 +53,14 @@ public class InterpreterContext extends Context {
         return symbolTable.get(symbolName);
     }
 
+    @Override
+    public Function getFunction(String functionIdentifier) {
+        return null == functionTable
+                ? null == parentContext
+                ? null : parentContext.getFunction(functionIdentifier)
+                : functionTable.get(functionIdentifier);
+    }
+
     public SymbolInfo getSymbolInfo(String symbolName, Scope scope) {
         switch (scope) {
             case ALL:
@@ -55,4 +73,5 @@ public class InterpreterContext extends Context {
 
         }
     }
+
 }

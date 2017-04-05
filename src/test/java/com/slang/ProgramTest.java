@@ -1,6 +1,7 @@
 package com.slang;
 
 import com.slang.ast.Function;
+import com.slang.ast.FunctionInvokeExpression;
 import com.slang.ast.Statement;
 import com.slang.lexer.Lexer;
 import com.slang.parser.Parser;
@@ -10,6 +11,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +25,7 @@ public class ProgramTest {
 
     @Test
     public void testExpEvalOnVariables() {
-        Context context = new InterpreterContext(null);
+        Context context = new InterpreterContext();
 
         Lexer lexer = new Lexer("var x; var y; var z; var a; var b; x = 23; y = 90; z = 6; a = 65; b = 54; var val; val = x/y*z+a-b;");
         Parser parser = new Parser(lexer);
@@ -38,7 +40,7 @@ public class ProgramTest {
 
     @Test
     public void testVarDecAndAssign() {
-        Context context = new InterpreterContext(null);
+        Context context = new InterpreterContext();
 
         Lexer lexer = new Lexer("var x = 10;");
         Parser parser = new Parser(lexer);
@@ -63,7 +65,7 @@ public class ProgramTest {
 
     @Test
     public void testImplicitTypes() {
-        Context context = new InterpreterContext(null);
+        Context context = new InterpreterContext();
 
         Lexer lexer = new Lexer("var a = 10; var b = 10.1; var c = 10.34f; var d = 10l; var e = \"asdasda\";");
         Parser parser = new Parser(lexer);
@@ -94,7 +96,7 @@ public class ProgramTest {
 
     @Test
     public void testTypesPromotedAfterMathOperations() {
-        Context context = new InterpreterContext(null);
+        Context context = new InterpreterContext();
 
         //Integer as left operand
         Lexer lexer = new Lexer("var a = 10/10; var b = 10/2.5; var c = 10/2.5f; var d = 100/10l;");
@@ -172,7 +174,7 @@ public class ProgramTest {
 
     @Test
     public void testRelationalExpressionEQ() {
-        Context context = new InterpreterContext(null);
+        Context context = new InterpreterContext();
 
         Lexer lexer = new Lexer("var a = 10; var b = 10/10; var c = 10 == 10;");
         Parser parser = new Parser(lexer);
@@ -236,7 +238,7 @@ public class ProgramTest {
 
     @Test
     public void testLogicalExpression() {
-        Context context = new InterpreterContext(null);
+        Context context = new InterpreterContext();
 
         Lexer lexer = new Lexer("var c = 10 < 10;");
         Parser parser = new Parser(lexer);
@@ -262,7 +264,7 @@ public class ProgramTest {
 
     @Test
     public void testIfStatement() {
-        Context context = new InterpreterContext(null);
+        Context context = new InterpreterContext();
 
         Lexer lexer = new Lexer("if(10 == 10) then  print(20); endif");
         Parser parser = new Parser(lexer);
@@ -294,7 +296,7 @@ public class ProgramTest {
 
     @Test
     public void testIfElseStatement() {
-        Context context = new InterpreterContext(null);
+        Context context = new InterpreterContext();
 
         Lexer lexer = new Lexer("if(10 < 10) then println(20); println(10); else println(30); println(20); endif");
         Parser parser = new Parser(lexer);
@@ -323,7 +325,7 @@ public class ProgramTest {
 
     @Test
     public void testWhileStatement() {
-        Context context = new InterpreterContext(null);
+        Context context = new InterpreterContext();
 
         Lexer lexer = new Lexer("var i = 0; var x = 10; while(i < 10) println(i); println(\"sadasd\"); i = i + 1; x = 20; var x = 30; wend");
         Parser parser = new Parser(lexer);
@@ -339,7 +341,7 @@ public class ProgramTest {
 
     @Test
     public void testBreakInWhile() {
-        Context context = new InterpreterContext(null);
+        Context context = new InterpreterContext();
 
         Lexer lexer = new Lexer("var j = 0; while(j < 10) if (j == 5) then break; endif println(j); j = j + 1; wend");
         Parser parser = new Parser(lexer);
@@ -371,7 +373,7 @@ public class ProgramTest {
 
     @Test
     public void testBreakInIf() {
-        Context context = new InterpreterContext(null);
+        Context context = new InterpreterContext();
 
         Lexer lexer = new Lexer("var j = 5; if (j == 5) then j = 10; break; j = 15; endif ");
         Parser parser = new Parser(lexer);
@@ -385,13 +387,27 @@ public class ProgramTest {
 
     @Test
     public void testFunction() {
-        Context context = new InterpreterContext(null);
 
         Lexer lexer = new Lexer("function void add(int x, int y) println x + y; println 22; end function void main() add(10, 20); end ");
         Parser parser = new Parser(lexer);
         Map<String, Function> functions = parser.parseFunctions();
         IVisitor interpreter = new Interpreter();
+        new FunctionInvokeExpression("main", new ArrayList<>()).accept(interpreter, new InterpreterContext(functions));
 
-        System.out.println(context);
+        lexer = new Lexer("function void sayHello() println \"Hello, World!\"; end function void main() sayHello(); end ");
+        parser = new Parser(lexer);
+        functions = parser.parseFunctions();
+        new FunctionInvokeExpression("main", new ArrayList<>()).accept(interpreter, new InterpreterContext(functions));
+    }
+
+    @Test
+    public void testFunctionWithReturn() {
+
+        Lexer lexer = new Lexer("function int add(int x, int y) println 22; return x + y; end function void main() var sum; sum = add(10, 20); println sum; end ");
+        Parser parser = new Parser(lexer);
+        Map<String, Function> functions = parser.parseFunctions();
+        IVisitor interpreter = new Interpreter();
+        new FunctionInvokeExpression("main", new ArrayList<>()).accept(interpreter, new InterpreterContext(functions));
+
     }
 }

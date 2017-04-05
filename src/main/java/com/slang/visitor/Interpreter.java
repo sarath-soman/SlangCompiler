@@ -519,19 +519,23 @@ public class Interpreter implements IVisitor {
 
     @Override
     public SymbolInfo visit(Function function, Context context) {
-        context.addToFunctionTable(function.getName(), function);
+//        context.addToFunctionTable(function.getName(), function);
         return null;
     }
 
     @Override
     public SymbolInfo visit(ReturnStatement returnStatement, Context context) {
         SymbolInfo returnSymbolInfo = returnStatement.getExpression().accept(this, context);
-        return returnSymbolInfo;
+        context.addToSymbolTable("return", returnSymbolInfo);
+        return null;
     }
 
     @Override
     public SymbolInfo visit(FunctionInvokeExpression functionInvokeExpression, Context context) {
         Function function = context.getFunction(functionInvokeExpression.getFunctionName());
+        if(null == function) {
+            throw new RuntimeException("Undefined function : " + functionInvokeExpression.getFunctionName());
+        }
         List<SymbolInfo> actualParams = functionInvokeExpression.getActualFunctionArguments()
                 .stream()
                 .map(expression -> expression.accept(this, context))
@@ -543,7 +547,6 @@ public class Interpreter implements IVisitor {
 
         Context functionContext = new InterpreterContext(context);
 
-        //HERE
         Set<Map.Entry<String, Type>> formalParams = function.getFormalArguments().entrySet();
 
         int i = 0;
@@ -556,10 +559,36 @@ public class Interpreter implements IVisitor {
             i++;
         }
 
-        //TODO return on return statement
-        function.getBody().stream().forEach(statement -> statement.accept(this, functionContext));
+        boolean foundReturn = false;
+        for(Statement statement : function.getBody()) {
+            statement.accept(this, functionContext);
+            SymbolInfo returnInfo = functionContext.getSymbolInfo("return");
+            if(null != returnInfo && (function.getReturnType() != returnInfo.getDataType())) {
+                throw new RuntimeException("Return type doesn't match the function definition");
+            }
+            if(null != returnInfo) {
+                foundReturn = true;
+                return returnInfo;
+            }
+        }
+
+        if(!foundReturn) {
+            throw new RuntimeException("Expecting a return statement in AST");
+        }
 
         return null;
+    }
+
+    @Override
+    public SymbolInfo visit(FunctionInvokeStatement functionInvokeStatement, Context context) {
+        return functionInvokeStatement.getFunctionInvokeExpression().accept(this, context);
+    }
+
+    @Override
+    public SymbolInfo visit(VoidExpression voidExpression, Context context) {
+        SymbolInfo voidSymbol = new SymbolInfo();
+        voidSymbol.setVoidValue();
+        return voidSymbol;
     }
 
     //Type check helpers
