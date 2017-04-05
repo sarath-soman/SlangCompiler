@@ -403,7 +403,7 @@ public class ProgramTest {
     @Test
     public void testFunctionWithReturn() {
 
-        Lexer lexer = new Lexer("function int add(int x, int y) println 22; return x + y; end function void main() var sum; sum = add(10, 20); println sum; end ");
+        Lexer lexer = new Lexer("function int add(int x, int y) println 22; return x + y; end function void main() var sum; sum = add(10, 20); var sum1 = add(10, 20); println sum;  println sum1; end ");
         Parser parser = new Parser(lexer);
         Map<String, Function> functions = parser.parseFunctions();
         IVisitor interpreter = new Interpreter();

@@ -158,10 +158,41 @@ public class Parser {
                 return new VariableDeclarationStatement(variableExpression);
             } else if(Token.EQ == lexer.getCurrentToken()) {
                 Expression rhsExp = parseExpression();
-                lexer.expect(Token.SEMICLN);
-                lexer.eat();
-                return new VariableDeclAndAssignStatement(new VariableDeclarationStatement(variableExpression),
-                        new VariableAssignmentStatement(variableExpression.getVariableName(), rhsExp));
+                if(lexer.getPreviousToken() == Token.VAR_NAME && lexer.getCurrentToken() == Token.OPAR) {
+                    String functionName = lexer.getVariableName();
+                    List<Expression> actualParams = new ArrayList<>();
+
+                    while (lexer.getCurrentToken() != Token.CPAR) {
+                        //horrible hack to get parsing right
+                        try {
+                            actualParams.add(parseExpression());
+                        } catch (RuntimeException ex) {
+                            //TODO think of alternative ways to parse
+                            if(lexer.getCurrentToken() == Token.CPAR) {
+                                break;
+                            }
+                        }
+                        if (lexer.getCurrentToken() != Token.COMMA) {
+                            break;
+                        }
+                    }
+
+
+
+                    lexer.expect(Token.CPAR);
+                    lexer.eat();
+
+                    lexer.expect(Token.SEMICLN);
+                    lexer.eat();
+
+                    return new VariableDeclAndAssignStatement(new VariableDeclarationStatement(variableExpression),
+                            new VariableAssignmentStatement(variableExpression.getVariableName(), new FunctionInvokeExpression(functionName, actualParams)));
+                } else {
+                    lexer.expect(Token.SEMICLN);
+                    lexer.eat();
+                    return new VariableDeclAndAssignStatement(new VariableDeclarationStatement(variableExpression),
+                            new VariableAssignmentStatement(variableExpression.getVariableName(), rhsExp));
+                }
             }
 
         }
