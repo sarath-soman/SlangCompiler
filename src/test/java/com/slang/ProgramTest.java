@@ -403,11 +403,56 @@ public class ProgramTest {
     @Test
     public void testFunctionWithReturn() {
 
-        Lexer lexer = new Lexer("function int add(int x, int y) println 22; return x + y; end function void main() var sum; sum = add(10, 20); var sum1 = add(10, 20); println sum;  println sum1; end ");
+        Lexer lexer = new Lexer("function int add(int x, int y) println 22; return x + y; end function void main() var sum; sum = add(10, 20); " +
+                "var sum1 = add(10, 20); println sum;  println sum1; end ");
         Parser parser = new Parser(lexer);
         Map<String, Function> functions = parser.parseFunctions();
         IVisitor interpreter = new Interpreter();
         new FunctionInvokeExpression("main", new ArrayList<>()).accept(interpreter, new InterpreterContext(functions));
 
+    }
+
+    @Test
+    public void testPassByRef() {
+
+        Lexer lexer = new Lexer("function int add(int x, int y) x = x + y; return x; end function void main() var x = 10; var y = 20; var sum = add(x, y); println x; end ");
+        Parser parser = new Parser(lexer);
+        Map<String, Function> functions = parser.parseFunctions();
+        IVisitor interpreter = new Interpreter();
+        Context context = new InterpreterContext(functions);
+        new FunctionInvokeExpression("main", new ArrayList<>()).accept(interpreter, context);
+    }
+
+    @Test
+    public void testFunctionTypeMismatch() {
+        Lexer lexer = new Lexer("function int add(int x, int y) x = x + y; return x; end function void main() var x = 10.1f; var y = 20.1f; var sum = add(x, y); println x; end ");
+        Parser parser = new Parser(lexer);
+        Map<String, Function> functions = parser.parseFunctions();
+        IVisitor interpreter = new Interpreter();
+        Context context = new InterpreterContext(functions);
+        expectedException.expect(RuntimeException.class);
+        new FunctionInvokeExpression("main", new ArrayList<>()).accept(interpreter, context);
+    }
+
+    @Test
+    public void testFunctionTypeMismatch1() {
+        Lexer lexer = new Lexer("function int add(int x, int y) x = x + y; return x; end function void main() var x = 10.1f; var y = 20.1f; var sum = add(); println x; end ");
+        Parser parser = new Parser(lexer);
+        Map<String, Function> functions = parser.parseFunctions();
+        IVisitor interpreter = new Interpreter();
+        Context context = new InterpreterContext(functions);
+        expectedException.expect(RuntimeException.class);
+        new FunctionInvokeExpression("main", new ArrayList<>()).accept(interpreter, context);
+    }
+
+    @Test
+    public void testFunctionRetunTypeMismatch1() {
+        Lexer lexer = new Lexer("function string add(int x, int y) x = x + y; return x; end function void main() var x = 10; var y = 20; var sum = add(x, y); println x; end ");
+        Parser parser = new Parser(lexer);
+        Map<String, Function> functions = parser.parseFunctions();
+        IVisitor interpreter = new Interpreter();
+        Context context = new InterpreterContext(functions);
+        expectedException.expect(RuntimeException.class);
+        new FunctionInvokeExpression("main", new ArrayList<>()).accept(interpreter, context);
     }
 }

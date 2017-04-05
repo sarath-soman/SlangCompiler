@@ -59,6 +59,9 @@ public class Parser {
             case BOOL:
                 returnType = Type.BOOL;
                 break;
+            case STRING:
+                returnType = Type.STRING;
+                break;
             default:
                 throw new RuntimeException("Return type cannot be " + lexer.getCurrentToken());
         }
