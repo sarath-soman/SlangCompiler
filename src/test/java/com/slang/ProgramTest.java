@@ -459,15 +459,32 @@ public class ProgramTest {
     @Test
     public void testFunctionTypeCheck() {
 
-        Lexer lexer = new Lexer("function void add(int x, int y) println x + y; println 22; end function void main() add(10, 20); end ");
+        Lexer lexer = new Lexer("function void add(int x, int y) return x + y;  end function void main() var sum = add(10, 20); println sum; end ");
         Parser parser = new Parser(lexer);
         Map<String, Function> functions = parser.parseFunctions();
         IVisitor typeChecker = new TypeChecker();
-        new FunctionInvokeExpression("main", new ArrayList<>()).accept(typeChecker, new InterpreterContext(functions));
-
-        lexer = new Lexer("function void sayHello() println \"Hello, World!\"; end function void main() sayHello(); end ");
-        parser = new Parser(lexer);
-        functions = parser.parseFunctions();
-        new FunctionInvokeExpression("main", new ArrayList<>()).accept(typeChecker, new InterpreterContext(functions));
+        Context context = new InterpreterContext(functions);
+        expectedException.expect(RuntimeException.class);
+        functions.entrySet().stream().forEach(stringFunctionEntry -> {
+            context.setCurrentFunction(stringFunctionEntry.getValue());
+            stringFunctionEntry.getValue().accept(typeChecker, context);
+        });
     }
+
+    @Test
+    public void testFunctionTypeCheckForBreak() {
+
+        Lexer lexer = new Lexer("function void add(int x, int y) if true then break; endif end");
+        Parser parser = new Parser(lexer);
+        Map<String, Function> functions = parser.parseFunctions();
+        IVisitor typeChecker = new TypeChecker();
+        Context context = new InterpreterContext(functions);
+        expectedException.expect(RuntimeException.class);
+        functions.entrySet().stream().forEach(stringFunctionEntry -> {
+            context.setCurrentFunction(stringFunctionEntry.getValue());
+            stringFunctionEntry.getValue().accept(typeChecker, context);
+        });
+    }
+
+
 }

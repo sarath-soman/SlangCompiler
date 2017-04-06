@@ -279,11 +279,8 @@ public class Parser {
         }
 
         if(Token.IF == token) {
-            lexer.eat();
 
             Expression expression = parseExpression();
-
-            lexer.eat();
 
             lexer.expect(Token.THEN);
 

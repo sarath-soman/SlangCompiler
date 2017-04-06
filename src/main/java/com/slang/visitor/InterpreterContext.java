@@ -82,7 +82,7 @@ public class InterpreterContext extends Context {
 
     @Override
     public boolean isInLoopBlock() {
-        return WhileStatement.class.isAssignableFrom(currentBlock.getClass())
+        return null == currentBlock ? false : WhileStatement.class.isAssignableFrom(currentBlock.getClass())
                 ? true : null == parentContext ? false : parentContext.isInLoopBlock();
     }
 

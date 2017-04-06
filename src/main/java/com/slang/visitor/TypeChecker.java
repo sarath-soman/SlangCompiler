@@ -14,7 +14,7 @@ public class TypeChecker implements IVisitor{
 
     @Override
     public SymbolInfo visit(NumericExpression expression, Context context) {
-        return expression.accept(this, context);
+        return SymbolInfo.builder().withDataType(expression.getDataType()).build();
     }
 
     @Override
@@ -37,6 +37,7 @@ public class TypeChecker implements IVisitor{
     public SymbolInfo visit(ArithmeticExpressionExpression expression, Context context) {
         SymbolInfo lhsInfo = expression.getLeftExpression().accept(this, context);
         SymbolInfo rhsInfo = expression.getRightExpression().accept(this, context);
+        System.out.println(expression);
         return TypeCheckerHelper.checkArithmeticExpresion(lhsInfo, rhsInfo, expression.getOperator());
     }
 
@@ -107,6 +108,7 @@ public class TypeChecker implements IVisitor{
         SymbolInfo variableInfo = context.getSymbolInfo(variableAssignmentStatement.getVariableName());
         SymbolInfo rhsExpInfo = variableAssignmentStatement.getExpression().accept(this, context);
 
+        System.out.println(variableAssignmentStatement);
         if(null == variableInfo) {
             throw new RuntimeException("Cannot assign to an undefined type");
         } else if(null == variableInfo.getDataType()) {
@@ -206,6 +208,26 @@ public class TypeChecker implements IVisitor{
 
     @Override
     public SymbolInfo visit(Function function, Context context) {
+        Context functionContext = new InterpreterContext(context);
+        function.getFormalArguments().entrySet().forEach(formalParamEntry ->
+                functionContext.addToSymbolTable(formalParamEntry.getKey(),
+                        SymbolInfo.builder()
+                                .withDataType(formalParamEntry.getValue())
+                                .build()));
+        functionContext.setCurrentFunction(function);
+        for(Statement statement : function.getBody()) {
+            if(ReturnStatement.class.isAssignableFrom(statement.getClass())) {
+                ReturnStatement returnStatement = ReturnStatement.class.cast(statement);
+                SymbolInfo returnInfo = returnStatement.accept(this, functionContext);
+                Function currentFunction = context.getCurrentFunction();
+                if(currentFunction.getReturnType() != returnInfo.getDataType()) {
+                    throw new RuntimeException("Return type doesn't (" + currentFunction.getReturnType() + ") match function return type ( " + returnInfo.getDataType() + ")");
+                }
+                //TODO remove unused code - rewrite AST
+                continue;
+            }
+            statement.accept(this, functionContext);
+        }
         return null;
     }
 
