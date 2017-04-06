@@ -496,5 +496,18 @@ public class ProgramTest {
         });
     }
 
+    @Test
+    public void testOperatortypeCheck() {
+        Lexer lexer = new Lexer("function void add(int x, int y) print \"sdaad\" && 20;print !\"sadas\"; print \"sa\"* 2; print \"sad\" + 10; end");
+        Parser parser = new Parser(lexer);
+        Map<String, Function> functions = parser.parseFunctions();
+        IVisitor typeChecker = new TypeChecker();
+        Context context = new InterpreterContext(functions);
+        expectedException.expect(RuntimeException.class);
+        functions.entrySet().stream().forEach(stringFunctionEntry -> {
+            context.setCurrentFunction(stringFunctionEntry.getValue());
+            stringFunctionEntry.getValue().accept(typeChecker, context);
+        });
+    }
 
 }
