@@ -474,15 +474,25 @@ public class ProgramTest {
     @Test
     public void testFunctionTypeCheckForBreak() {
 
-        Lexer lexer = new Lexer("function void add(int x, int y) if true then break; endif end");
+        Lexer lexer = new Lexer("function void add(int x, int y) while false if true then break; endif wend end");
         Parser parser = new Parser(lexer);
         Map<String, Function> functions = parser.parseFunctions();
         IVisitor typeChecker = new TypeChecker();
         Context context = new InterpreterContext(functions);
-        expectedException.expect(RuntimeException.class);
         functions.entrySet().stream().forEach(stringFunctionEntry -> {
             context.setCurrentFunction(stringFunctionEntry.getValue());
             stringFunctionEntry.getValue().accept(typeChecker, context);
+        });
+
+        lexer = new Lexer("function void add(int x, int y) if true then break; endif end");
+        parser = new Parser(lexer);
+        functions = parser.parseFunctions();
+        IVisitor typeChecker2 = new TypeChecker();
+        Context context2 = new InterpreterContext(functions);
+        expectedException.expect(RuntimeException.class);
+        functions.entrySet().stream().forEach(stringFunctionEntry -> {
+            context2.setCurrentFunction(stringFunctionEntry.getValue());
+            stringFunctionEntry.getValue().accept(typeChecker2, context2);
         });
     }
 

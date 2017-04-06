@@ -314,11 +314,8 @@ public class Parser {
         }
 
         if(Token.WHILE == token) {
-            lexer.eat();
 
             Expression expression = parseExpression();
-
-            lexer.eat();
 
             if(lexer.getCurrentToken() == Token.WEND ) {
                 throw new RuntimeException("Empty loop is not allowed");
