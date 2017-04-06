@@ -2,6 +2,7 @@ package com.slang.visitor;
 
 import com.slang.SymbolInfo;
 import com.slang.ast.Function;
+import com.slang.ast.Statement;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -18,5 +19,13 @@ public abstract class Context {
     public abstract SymbolInfo getSymbolInfoFromCurrentScope(String symbolName);
 
     public abstract Function getFunction(String functionIdentifier);
+
+    public abstract void setCurrentFunction(Function function);
+
+    public abstract Function getCurrentFunction();
+
+    public abstract void setCurrentBlock(Statement statement);
+
+    public abstract boolean isInLoopBlock() ;
 
 }

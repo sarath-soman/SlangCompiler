@@ -2,6 +2,8 @@ package com.slang.visitor;
 
 import com.slang.SymbolInfo;
 import com.slang.ast.Function;
+import com.slang.ast.Statement;
+import com.slang.ast.WhileStatement;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +15,8 @@ public class InterpreterContext extends Context {
 
     protected Context parentContext = null;
     protected Map<String, Function> functionTable;
+    protected Function currentFunction;
+    protected Statement currentBlock; //Can be 'if' or 'while'
 
     public InterpreterContext(Map<String, Function> functions) {
         this.functionTable = functions;
@@ -61,6 +65,27 @@ public class InterpreterContext extends Context {
                 : functionTable.get(functionIdentifier);
     }
 
+    @Override
+    public void setCurrentFunction(Function function) {
+        currentFunction = function;
+    }
+
+    @Override
+    public Function getCurrentFunction() {
+        return currentFunction;
+    }
+
+    @Override
+    public void setCurrentBlock(Statement statement) {
+        currentBlock = statement;
+    }
+
+    @Override
+    public boolean isInLoopBlock() {
+        return WhileStatement.class.isAssignableFrom(currentBlock.getClass())
+                ? true : null == parentContext ? false : parentContext.isInLoopBlock();
+    }
+
     public SymbolInfo getSymbolInfo(String symbolName, Scope scope) {
         switch (scope) {
             case ALL:
@@ -73,5 +98,7 @@ public class InterpreterContext extends Context {
 
         }
     }
+
+
 
 }

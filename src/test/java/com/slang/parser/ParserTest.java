@@ -45,7 +45,7 @@ public class ParserTest {
 
     @Test
     public void testParseExpression() {
-        Context context = new InterpreterContext(null);
+        Context context = new InterpreterContext();
 
         Lexer lexer = new Lexer("20/5 * 2 + 4");
         Parser parser = new Parser(lexer);
@@ -105,7 +105,7 @@ public class ParserTest {
 
     @Test
     public void testPrintAndPrintlnProduction() {
-        Context context = new InterpreterContext(null);
+        Context context = new InterpreterContext();
 
         Lexer lexer = new Lexer("print 20 + 30;");
         Parser parser = new Parser(lexer);
@@ -153,7 +153,7 @@ public class ParserTest {
 
     @Test
     public void testParseStatements() {
-        Context context = new InterpreterContext(null);
+        Context context = new InterpreterContext();
 
         Lexer lexer = new Lexer("var x; var y;");
         Parser parser = new Parser(lexer);
@@ -165,7 +165,7 @@ public class ParserTest {
 
     @Test
     public void testParseStatements1() {
-        Context context = new InterpreterContext(null);
+        Context context = new InterpreterContext();
 
         Lexer lexer = new Lexer("var x; x = 10;");
         Parser parser = new Parser(lexer);
@@ -179,7 +179,7 @@ public class ParserTest {
 
     @Test
     public void testParseStatements2() {
-        Context context = new InterpreterContext(null);
+        Context context = new InterpreterContext();
 
         Lexer lexer = new Lexer("var x; x = 10; var y; y = x / (2 * x) - 100 ;");
         Parser parser = new Parser(lexer);

@@ -455,4 +455,19 @@ public class ProgramTest {
         expectedException.expect(RuntimeException.class);
         new FunctionInvokeExpression("main", new ArrayList<>()).accept(interpreter, context);
     }
+
+    @Test
+    public void testFunctionTypeCheck() {
+
+        Lexer lexer = new Lexer("function void add(int x, int y) println x + y; println 22; end function void main() add(10, 20); end ");
+        Parser parser = new Parser(lexer);
+        Map<String, Function> functions = parser.parseFunctions();
+        IVisitor typeChecker = new TypeChecker();
+        new FunctionInvokeExpression("main", new ArrayList<>()).accept(typeChecker, new InterpreterContext(functions));
+
+        lexer = new Lexer("function void sayHello() println \"Hello, World!\"; end function void main() sayHello(); end ");
+        parser = new Parser(lexer);
+        functions = parser.parseFunctions();
+        new FunctionInvokeExpression("main", new ArrayList<>()).accept(typeChecker, new InterpreterContext(functions));
+    }
 }

@@ -586,9 +586,7 @@ public class Interpreter implements IVisitor {
 
     @Override
     public SymbolInfo visit(VoidExpression voidExpression, Context context) {
-        SymbolInfo voidSymbol = new SymbolInfo();
-        voidSymbol.setVoidValue();
-        return voidSymbol;
+        return SymbolInfo.builder().withDataType(Type.VOID).build();
     }
 
     //Type check helpers
@@ -690,12 +688,12 @@ public class Interpreter implements IVisitor {
                 } else if(leftExpVal.getDataType() == Type.LONG && rightExpVal.getDataType() == Type.DOUBLE) {
                     return new SymbolInfo(leftExpVal.getLongValue() / rightExpVal.getDoubleValue());
                 } else if(leftExpVal.getDataType() == Type.LONG && rightExpVal.getDataType() == Type.LONG) {
-                    return SymbolInfo.Builder.builder()
+                    return SymbolInfo.builder()
                             .withDataType(Type.DOUBLE)
                             .withDoubleValue(leftExpVal.getLongValue() / (double)rightExpVal.getLongValue())
                             .build();
                 } else if(leftExpVal.getDataType() == Type.LONG && rightExpVal.getDataType() == Type.INTEGER) {
-                    return SymbolInfo.Builder.builder()
+                    return SymbolInfo.builder()
                             .withDataType(Type.DOUBLE)
                             .withDoubleValue(leftExpVal.getLongValue() / (double)rightExpVal.getIntegerValue())
                             .build();
@@ -704,12 +702,12 @@ public class Interpreter implements IVisitor {
                 } else if(leftExpVal.getDataType() == Type.INTEGER && rightExpVal.getDataType() == Type.DOUBLE) {
                     return new SymbolInfo(leftExpVal.getIntegerValue() / rightExpVal.getDoubleValue());
                 } else if(leftExpVal.getDataType() == Type.INTEGER && rightExpVal.getDataType() == Type.LONG) {
-                    return SymbolInfo.Builder.builder()
+                    return SymbolInfo.builder()
                             .withDataType(Type.DOUBLE)
                             .withDoubleValue(leftExpVal.getIntegerValue() / (double)rightExpVal.getLongValue())
                             .build();
                 } else if(leftExpVal.getDataType() == Type.INTEGER && rightExpVal.getDataType() == Type.INTEGER) {
-                    return SymbolInfo.Builder.builder()
+                    return SymbolInfo.builder()
                             .withDataType(Type.DOUBLE)
                             .withDoubleValue(leftExpVal.getIntegerValue() / (double)rightExpVal.getIntegerValue())
                             .build();

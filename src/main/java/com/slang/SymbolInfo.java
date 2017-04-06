@@ -139,10 +139,6 @@ public class SymbolInfo {
         }
     }
 
-    public void setVoidValue() {
-        dataType = Type.VOID;
-    }
-
     public void nullify() {
         stringValue = null;
         floatValue = null;
@@ -167,15 +163,16 @@ public class SymbolInfo {
     }
 
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static final class Builder {
         private SymbolInfo symbolInfo = new SymbolInfo();
 
         private Builder() {
         }
 
-        public static Builder builder() {
-            return new Builder();
-        }
 
         public Builder withVariableName(String variableName) {
             symbolInfo.variableName = variableName;
