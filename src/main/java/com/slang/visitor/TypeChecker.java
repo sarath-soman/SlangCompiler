@@ -264,4 +264,14 @@ public class TypeChecker implements IVisitor{
     public SymbolInfo visit(VoidExpression voidExpression, Context context) {
         return SymbolInfo.builder().withDataType(Type.VOID).build();
     }
+
+    @Override
+    public SymbolInfo visit(Module module, Context context) {
+        Context moduleContext = new InterpreterContext(module.getFunctionsMap());
+        module.getFunctionsMap().entrySet().stream().forEach(stringFunctionEntry -> {
+            moduleContext.setCurrentFunction(stringFunctionEntry.getValue());
+            stringFunctionEntry.getValue().accept(this, context);
+        });
+        return null;
+    }
 }

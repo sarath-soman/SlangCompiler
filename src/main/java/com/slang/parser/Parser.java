@@ -20,6 +20,10 @@ public class Parser {
         this.lexer = lexer;
     }
 
+    public Module parseModule() {
+        return new Module(parseFunctions());
+    }
+
     public Map<String, Function> parseFunctions() {
         Token token = null;
         Map<String, Function> functions = new LinkedHashMap<>();

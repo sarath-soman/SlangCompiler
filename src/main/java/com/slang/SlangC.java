@@ -8,6 +8,6 @@ import java.util.Arrays;
 public class SlangC {
 
     public static void main(String[] args) {
-        Arrays.stream(args).forEach(s -> System.out.println(s));
+        System.out.println(args[0]);
     }
 }

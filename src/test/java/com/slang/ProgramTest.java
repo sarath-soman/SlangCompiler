@@ -2,6 +2,7 @@ package com.slang;
 
 import com.slang.ast.Function;
 import com.slang.ast.FunctionInvokeExpression;
+import com.slang.ast.Module;
 import com.slang.ast.Statement;
 import com.slang.lexer.Lexer;
 import com.slang.parser.Parser;
@@ -508,6 +509,28 @@ public class ProgramTest {
             context.setCurrentFunction(stringFunctionEntry.getValue());
             stringFunctionEntry.getValue().accept(typeChecker, context);
         });
+    }
+
+    @Test
+    public void testOperatortypeCheckOnModule() {
+        Lexer lexer = new Lexer("function void add(int x, int y) print \"sdaad\" && 20;print !\"sadas\"; print \"sa\"* 2; print \"sad\" + 10; end");
+        Parser parser = new Parser(lexer);
+        Module module = parser.parseModule();
+        IVisitor typeChecker = new TypeChecker();
+        Context context = new InterpreterContext();
+        expectedException.expect(RuntimeException.class);
+        module.accept(typeChecker, context);
+    }
+
+    @Test
+    public void testPassByRefOnModule() {
+
+        Lexer lexer = new Lexer("function int add(int x, int y) x = x + y; return x; end function void main() var x = 10; var y = 20; var sum = add(x, y); println x; end ");
+        Parser parser = new Parser(lexer);
+        Module module = parser.parseModule();
+        IVisitor interpreter = new Interpreter();
+        Context context = new InterpreterContext();
+        module.accept(interpreter, context);
     }
 
 }

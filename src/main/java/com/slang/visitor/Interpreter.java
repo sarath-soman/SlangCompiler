@@ -4,6 +4,7 @@ import com.slang.SymbolInfo;
 import com.slang.Type;
 import com.slang.ast.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -587,6 +588,13 @@ public class Interpreter implements IVisitor {
     @Override
     public SymbolInfo visit(VoidExpression voidExpression, Context context) {
         return SymbolInfo.builder().withDataType(Type.VOID).build();
+    }
+
+    @Override
+    public SymbolInfo visit(Module module, Context context) {
+        Context moduleContext = new InterpreterContext(context, module.getFunctionsMap());
+        new FunctionInvokeExpression("main", new ArrayList<>()).accept(this, moduleContext);
+        return null;
     }
 
     //Type check helpers

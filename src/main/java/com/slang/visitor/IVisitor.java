@@ -32,4 +32,5 @@ public interface IVisitor {
     SymbolInfo visit(FunctionInvokeExpression functionInvokeExpression, Context context);
     SymbolInfo visit(FunctionInvokeStatement functionInvokeStatement, Context context);
     SymbolInfo visit(VoidExpression voidExpression, Context context);
+    SymbolInfo visit(Module module, Context context);
 }

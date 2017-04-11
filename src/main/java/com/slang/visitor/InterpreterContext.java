@@ -22,6 +22,11 @@ public class InterpreterContext extends Context {
         this.functionTable = functions;
     }
 
+    public InterpreterContext(Context parentContext, Map<String, Function> functionTable) {
+        this.parentContext = parentContext;
+        this.functionTable = functionTable;
+    }
+
     public static enum Scope {
         CURRENT,
         ALL
