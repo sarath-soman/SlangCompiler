@@ -75,7 +75,6 @@ public class Parser {
             throw new RuntimeException("Function name expected");
         }
         String name = lexer.getVariableName();
-
         lexer.eat();
         lexer.expect(Token.OPAR);
 
@@ -359,7 +358,6 @@ public class Parser {
             }
         }
 
-        System.out.println(lexer);
         throw new RuntimeException("Unexpected token : " + lexer.getCurrentToken());
 
     }

@@ -93,6 +93,8 @@ public class Lexer {
                     currentToken = Token.NUM;
                     break moduleStream;
                 case ' ':
+                case '\r':
+                case '\t':
                 case '\n':
                     index ++;
                     if(isEndOfModule()) {

@@ -37,7 +37,6 @@ public class TypeChecker implements IVisitor{
     public SymbolInfo visit(ArithmeticExpressionExpression expression, Context context) {
         SymbolInfo lhsInfo = expression.getLeftExpression().accept(this, context);
         SymbolInfo rhsInfo = expression.getRightExpression().accept(this, context);
-        System.out.println(expression);
         return TypeCheckerHelper.checkArithmeticExpresion(lhsInfo, rhsInfo, expression.getOperator());
     }
 
@@ -93,7 +92,7 @@ public class TypeChecker implements IVisitor{
 
     @Override
     public SymbolInfo visit(PrintlnStatement printlnStatement, Context context) {
-        printlnStatement.accept(this, context);
+        printlnStatement.getExpression().accept(this, context);
         return null;
     }
 
@@ -108,7 +107,6 @@ public class TypeChecker implements IVisitor{
         SymbolInfo variableInfo = context.getSymbolInfo(variableAssignmentStatement.getVariableName());
         SymbolInfo rhsExpInfo = variableAssignmentStatement.getExpression().accept(this, context);
 
-        System.out.println(variableAssignmentStatement);
         if(null == variableInfo) {
             throw new RuntimeException("Cannot assign to an undefined type");
         } else if(null == variableInfo.getDataType()) {
@@ -270,7 +268,7 @@ public class TypeChecker implements IVisitor{
         Context moduleContext = new InterpreterContext(module.getFunctionsMap());
         module.getFunctionsMap().entrySet().stream().forEach(stringFunctionEntry -> {
             moduleContext.setCurrentFunction(stringFunctionEntry.getValue());
-            stringFunctionEntry.getValue().accept(this, context);
+            stringFunctionEntry.getValue().accept(this, moduleContext);
         });
         return null;
     }
