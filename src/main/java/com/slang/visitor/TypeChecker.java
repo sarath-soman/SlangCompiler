@@ -93,7 +93,7 @@ public class TypeChecker implements IVisitor{
         function.setCapturedVariables(new LinkedHashMap<>(context.getSymbolTable()));
         function.accept(this, context);
 
-        return null;
+        return SymbolInfo.builder().withDataType(Type.FUNCTION).withFunctionValue(function).build();
     }
 
     @Override
@@ -117,13 +117,15 @@ public class TypeChecker implements IVisitor{
 
     @Override
     public SymbolInfo visit(VariableAssignmentStatement variableAssignmentStatement, Context context) {
-        System.out.println(variableAssignmentStatement);
         SymbolInfo variableInfo = context.getSymbolInfo(variableAssignmentStatement.getVariableName());
         SymbolInfo rhsExpInfo = variableAssignmentStatement.getExpression().accept(this, context);
 
         if(null == variableInfo) {
             throw new RuntimeException("Cannot assign to an undefined type");
         } else if(null == variableInfo.getDataType()) {
+            if(rhsExpInfo.getDataType() == Type.FUNCTION) {
+                variableInfo.setFunctionValue(rhsExpInfo.getFunctionValue());
+            }
             variableInfo.setDataType(rhsExpInfo.getDataType());
             return null;
         } else if(variableInfo.getDataType() != rhsExpInfo.getDataType()) {
@@ -242,7 +244,7 @@ public class TypeChecker implements IVisitor{
             if(ReturnStatement.class.isAssignableFrom(statement.getClass())) {
                 ReturnStatement returnStatement = ReturnStatement.class.cast(statement);
                 SymbolInfo returnInfo = returnStatement.accept(this, functionContext);
-                Function currentFunction = context.getCurrentFunction();
+                Function currentFunction = functionContext.getCurrentFunction();
                 if(currentFunction.getReturnType() != returnInfo.getDataType()) {
                     throw new RuntimeException("Return type doesn't (" + currentFunction.getReturnType() + ") match function return type ( " + returnInfo.getDataType() + ")");
                 }
@@ -262,6 +264,20 @@ public class TypeChecker implements IVisitor{
     @Override
     public SymbolInfo visit(FunctionInvokeExpression functionInvokeExpression, Context context) {
         Function function = context.getFunction(functionInvokeExpression.getFunctionName());
+
+        if(null == function) {
+            SymbolInfo functionValue = context.getSymbolInfo(functionInvokeExpression.getFunctionName());
+            if(null == functionValue || functionValue.getDataType() != Type.FUNCTION) {
+                throw new RuntimeException("Undefined function ex " + functionInvokeExpression.getFunctionName());
+            }
+
+            function = functionValue.getFunctionValue();
+        }
+
+        if(null == function) {
+            throw new RuntimeException("Undefined function " + functionInvokeExpression.getFunctionName());
+        }
+
         if(function.getFormalArguments().entrySet().size() != functionInvokeExpression.getActualFunctionArguments().size()) {
             throw new RuntimeException("Formal and actual param size doesn't match");
         }

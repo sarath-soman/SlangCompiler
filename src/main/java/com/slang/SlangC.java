@@ -28,12 +28,10 @@ public class SlangC {
 
         String moduleString = new String(Files.readAllBytes(new File(args[0]).toPath()));
 
-//        System.out.println(moduleString);
 
         Lexer lexer = new Lexer(moduleString);
         Parser parser = new Parser(lexer);
         Module module = parser.parseModule();
-        System.out.println(module);
         module.accept(new TypeChecker(), new InterpreterContext());
         module.accept(new Interpreter(), new InterpreterContext());
     }
