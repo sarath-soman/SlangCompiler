@@ -13,11 +13,12 @@ import java.util.Map;
 /**
  * Created by Sarath on 01/04/2017.
  */
-public class Function implements IVisitable {
+public class Function implements IVisitable, Cloneable {
 
     private String name;
     private Type returnType;
     private LinkedHashMap<String, Type> formalArguments;
+    private LinkedHashMap<String, SymbolInfo> capturedVariables;
     private List<Statement> body;
 
     public Function(String name, Type returnType, LinkedHashMap<String, Type> formalArguments, List<Statement> body) {
@@ -43,6 +44,14 @@ public class Function implements IVisitable {
         return body;
     }
 
+    public LinkedHashMap<String, SymbolInfo> getCapturedVariables() {
+        return capturedVariables;
+    }
+
+    public void setCapturedVariables(LinkedHashMap<String, SymbolInfo> capturedVariables) {
+        this.capturedVariables = capturedVariables;
+    }
+
     @Override
     public SymbolInfo accept(IVisitor visitor, Context context) {
         return visitor.visit(this, context);
@@ -54,7 +63,17 @@ public class Function implements IVisitable {
                 "name='" + name + '\'' +
                 ", returnType=" + returnType +
                 ", formalArguments=" + formalArguments +
+                ", capturedVariables=" + capturedVariables +
                 ", body=" + body +
                 '}';
+    }
+
+    public Function clone() {
+        try {
+            return (Function) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

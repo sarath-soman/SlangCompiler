@@ -1,5 +1,7 @@
 package com.slang;
 
+import com.slang.ast.Function;
+
 /**
  * Created by sarath on 19/3/17.
  */
@@ -12,6 +14,7 @@ public class SymbolInfo {
     private Integer integerValue;
     private Long longValue;
     private Boolean boolValue;
+    private Function functionValue;
     private Type dataType;
 
     public SymbolInfo(String stringValue) {
@@ -46,6 +49,11 @@ public class SymbolInfo {
     public SymbolInfo(Boolean boolValue) {
         this.boolValue = boolValue;
         dataType = Type.BOOL;
+    }
+
+    public SymbolInfo(Function functionValue) {
+        this.functionValue = functionValue;
+        dataType = Type.FUNCTION;
     }
 
     public SymbolInfo() {
@@ -83,6 +91,10 @@ public class SymbolInfo {
 
     public Type getDataType() {
         return dataType;
+    }
+
+    public Function getFunctionValue() {
+        return functionValue;
     }
 
     public void setStringValue(String stringValue) {
@@ -139,6 +151,15 @@ public class SymbolInfo {
         }
     }
 
+    public void setFunctionValue(Function functionValue) {
+        if (null == dataType || Type.FUNCTION == dataType) {
+            this.functionValue = functionValue;
+            dataType = Type.FUNCTION;
+        } else {
+            throw new RuntimeException("Type mismatch on assigning the value");
+        }
+    }
+
     public void nullify() {
         stringValue = null;
         floatValue = null;
@@ -146,6 +167,7 @@ public class SymbolInfo {
         integerValue = null;
         longValue = null;
         boolValue = null;
+        functionValue = null;
     }
 
     @Override
@@ -158,6 +180,7 @@ public class SymbolInfo {
                 ", integerValue=" + integerValue +
                 ", longValue=" + longValue +
                 ", boolValue=" + boolValue +
+                ", functionValue=" + functionValue +
                 ", dataType=" + dataType +
                 '}';
     }
@@ -210,6 +233,11 @@ public class SymbolInfo {
 
         public Builder withBoolValue(Boolean boolValue) {
             symbolInfo.boolValue = boolValue;
+            return this;
+        }
+
+        public Builder withFunctionValue(Function boolValue) {
+            symbolInfo.functionValue = boolValue;
             return this;
         }
 

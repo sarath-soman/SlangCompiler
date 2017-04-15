@@ -16,6 +16,8 @@ public class Parser {
 
     private final Lexer lexer;
 
+    private long lambdaCount = 0;
+
     public Parser(Lexer lexer) {
         this.lexer = lexer;
     }
@@ -141,13 +143,15 @@ public class Parser {
             lexer.eat();
         }
         Token token = lexer.getCurrentToken();
+
+        //TODO accept function invocation statement with print
         if(Token.PRINT == token) {
             Expression expression = parseExpression();
             lexer.expect(Token.SEMICLN);
             lexer.eat();
             return new PrintStatement(expression);
         }
-
+        //TODO accept function invocation statement with println
         if(Token.PRINTLN == token) {
             Expression expression = parseExpression();
             lexer.expect(Token.SEMICLN);
@@ -163,15 +167,23 @@ public class Parser {
                 lexer.eat();
                 return new VariableDeclarationStatement(variableExpression);
             } else if(Token.EQ == lexer.getCurrentToken()) {
-                Expression rhsExp = parseExpression();
-                if(lexer.getPreviousToken() == Token.VAR_NAME && lexer.getCurrentToken() == Token.OPAR) {
-                    return new VariableDeclAndAssignStatement(new VariableDeclarationStatement(variableExpression),
-                            new VariableAssignmentStatement(variableExpression.getVariableName(), parseFunctionInvocationExpression()));
-                } else {
-                    lexer.expect(Token.SEMICLN);
-                    lexer.eat();
-                    return new VariableDeclAndAssignStatement(new VariableDeclarationStatement(variableExpression),
-                            new VariableAssignmentStatement(variableExpression.getVariableName(), rhsExp));
+                try {
+                    Expression rhsExp = parseExpression();
+                    if (lexer.getPreviousToken() == Token.VAR_NAME && lexer.getCurrentToken() == Token.OPAR) {
+                        return new VariableDeclAndAssignStatement(new VariableDeclarationStatement(variableExpression),
+                                new VariableAssignmentStatement(variableExpression.getVariableName(), parseFunctionInvocationExpression()));
+                    } else {
+                        lexer.expect(Token.SEMICLN);
+                        lexer.eat();
+                        return new VariableDeclAndAssignStatement(new VariableDeclarationStatement(variableExpression),
+                                new VariableAssignmentStatement(variableExpression.getVariableName(), rhsExp));
+                    }
+                } catch (RuntimeException ex) {
+                    if(lexer.getCurrentToken() == Token.LAMBDA) {
+                        return new VariableDeclAndAssignStatement(new VariableDeclarationStatement(variableExpression),
+                                new VariableAssignmentStatement(variableExpression.getVariableName(), parseLambdaExpression()));
+                    }
+                    throw new RuntimeException("Expected token is " + Token.LAMBDA + ", but got " + lexer.getCurrentToken());
                 }
             }
 
@@ -224,6 +236,84 @@ public class Parser {
         }
 
         throw new RuntimeException("Unexpected token : " + lexer.getCurrentToken());
+
+    }
+
+    private Expression parseLambdaExpression() {
+        lexer.eat();
+        Type returnType = null;
+        switch (lexer.getCurrentToken()) {
+            case VOID:
+                returnType = Type.VOID;
+                break;
+            case INT:
+                returnType = Type.INTEGER;
+                break;
+            case LONG:
+                returnType = Type.LONG;
+                break;
+            case FLOAT:
+                returnType = Type.FLOAT;
+                break;
+            case DOUBLE:
+                returnType = Type.DOUBLE;
+                break;
+            case BOOL:
+                returnType = Type.BOOL;
+                break;
+            case STRING:
+                returnType = Type.STRING;
+                break;
+            default:
+                throw new RuntimeException("Return type cannot be " + lexer.getCurrentToken());
+        }
+
+        lexer.eat();
+        lexer.expect(Token.OPAR);
+
+        LinkedHashMap<String, Type> formalArguments = new LinkedHashMap<>();
+
+        lexer.eat();
+        while (lexer.getCurrentToken() != Token.CPAR) {
+            Type varType = getType(lexer.getCurrentToken());
+            lexer.eat();
+            if (lexer.getCurrentToken() != Token.VAR_NAME) {
+                throw new RuntimeException("Formal parameter name expected");
+            }
+            String varName = lexer.getVariableName();
+            lexer.eat();
+
+            formalArguments.put(varName, varType);
+
+            if (lexer.getCurrentToken() != Token.COMMA) {
+                break;
+            }
+            lexer.eat();
+        }
+
+        lexer.expect(Token.CPAR);
+        lexer.eat();
+        List<Statement> functionBody = new ArrayList<>();
+
+        boolean foundReturn = false;
+        do {
+            Statement statement = parseStatement();
+            if(ReturnStatement.class.isAssignableFrom(statement.getClass())) {
+                foundReturn = true;
+            }
+            functionBody.add(statement);
+        } while (lexer.getCurrentToken() != Token.ENDLAMBDA);
+
+        if (Type.VOID != returnType && !foundReturn) {
+            throw new RuntimeException("Return type expected");
+        } else if (Type.VOID == returnType && !foundReturn) {
+            functionBody.add(new ReturnStatement(new VoidExpression()));
+        }
+        lexer.expect(Token.ENDLAMBDA);
+
+        Function function = new Function("lambda$"+ (++lambdaCount), returnType, formalArguments, functionBody);
+        lexer.eat();
+        return new LambdaExpression(function);
 
     }
 
@@ -307,7 +397,7 @@ public class Parser {
             List<Expression> actualParams = new ArrayList<>();
 
             while (lexer.getCurrentToken() != Token.CPAR) {
-                //horrible hack to get parsing right
+                //hack to get parsing right
                 try {
                     actualParams.add(parseExpression());
                 } catch (RuntimeException ex2) {

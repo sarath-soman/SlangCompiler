@@ -85,6 +85,12 @@ public class TypeChecker implements IVisitor{
     }
 
     @Override
+    public SymbolInfo visit(LambdaExpression lambdaExpression, Context context) {
+        //TODO
+        return null;
+    }
+
+    @Override
     public SymbolInfo visit(PrintStatement printStatement, Context context) {
         printStatement.getExpression().accept(this, context);
         return null;
@@ -105,6 +111,7 @@ public class TypeChecker implements IVisitor{
 
     @Override
     public SymbolInfo visit(VariableAssignmentStatement variableAssignmentStatement, Context context) {
+        System.out.println(variableAssignmentStatement);
         SymbolInfo variableInfo = context.getSymbolInfo(variableAssignmentStatement.getVariableName());
         SymbolInfo rhsExpInfo = variableAssignmentStatement.getExpression().accept(this, context);
 

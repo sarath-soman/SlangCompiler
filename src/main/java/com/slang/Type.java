@@ -12,5 +12,6 @@ public enum Type {
     BOOL,
     LONG,
     VOID,
+    FUNCTION
 
 }

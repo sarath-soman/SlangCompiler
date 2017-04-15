@@ -104,6 +104,8 @@ public class InterpreterContext extends Context {
         }
     }
 
-
-
+    @Override
+    public Map<String, SymbolInfo> getSymbolTable() {
+        return symbolTable;
+    }
 }

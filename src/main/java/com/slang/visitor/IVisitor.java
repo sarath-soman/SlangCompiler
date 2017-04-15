@@ -17,6 +17,7 @@ public interface IVisitor {
     SymbolInfo visit(RelationalExpression relationalExpression, Context context);
     SymbolInfo visit(LogicalExpression logicalExpression, Context context);
     SymbolInfo visit(NotExpression notExpression, Context context);
+    SymbolInfo visit(LambdaExpression lambdaExpression, Context context);
 
     //Statement Visitors
     SymbolInfo visit(PrintStatement printStatement, Context context);
@@ -33,4 +34,5 @@ public interface IVisitor {
     SymbolInfo visit(FunctionInvokeStatement functionInvokeStatement, Context context);
     SymbolInfo visit(VoidExpression voidExpression, Context context);
     SymbolInfo visit(Module module, Context context);
+
 }

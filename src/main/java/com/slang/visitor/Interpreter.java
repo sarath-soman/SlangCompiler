@@ -4,10 +4,7 @@ import com.slang.SymbolInfo;
 import com.slang.Type;
 import com.slang.ast.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -118,6 +115,13 @@ public class Interpreter implements IVisitor {
         }
 
         return new SymbolInfo(!expVal.getBoolValue());
+    }
+
+    @Override
+    public SymbolInfo visit(LambdaExpression lambdaExpression, Context context) {
+        final Function function = lambdaExpression.getFunction().clone();
+        function.setCapturedVariables(new LinkedHashMap<>(context.getSymbolTable()));
+        return SymbolInfo.builder().withFunctionValue(function).withDataType(Type.FUNCTION).build();
     }
 
     private SymbolInfo typeCheckAndApplyRelationalExpression(SymbolInfo leftExpVal, SymbolInfo rightExpVal, Token operator) {
@@ -411,6 +415,9 @@ public class Interpreter implements IVisitor {
                 case BOOL:
                     lhsInfo.setBoolValue(rhsInfo.getBoolValue());
                     break;
+                case FUNCTION:
+                    lhsInfo.setFunctionValue(rhsInfo.getFunctionValue());
+                    break;
             }
         } else if(null != lhsType && null == rhsType) {
             //assigning already declared but not assigned variable to lhs
@@ -510,6 +517,9 @@ public class Interpreter implements IVisitor {
                 statement.accept(this, whileContext);
                 if(whileContext.getSymbolInfo("break") != null) {
                     break slangWhile;
+                } else if (whileContext.getSymbolInfo("return") != null) {
+                    context.addToSymbolTable("return", whileContext.getSymbolInfo("return"));
+                    break;
                 }
             }
             symbolInfo = whileStatement.getExpression().accept(this, context);
@@ -540,6 +550,20 @@ public class Interpreter implements IVisitor {
     @Override
     public SymbolInfo visit(FunctionInvokeExpression functionInvokeExpression, Context context) {
         Function function = context.getFunction(functionInvokeExpression.getFunctionName());
+
+        if(null == function) {
+            SymbolInfo lambdaSymbol = context.getSymbolInfo(functionInvokeExpression.getFunctionName());
+            if(null == lambdaSymbol) {
+                throw new RuntimeException("Undefined function : " + functionInvokeExpression.getFunctionName());
+            }
+
+            if(Type.FUNCTION != lambdaSymbol.getDataType()) {
+                throw new RuntimeException(functionInvokeExpression.getFunctionName() + " is not a function type");
+            }
+
+            function = lambdaSymbol.getFunctionValue();
+        }
+
         if(null == function) {
             throw new RuntimeException("Undefined function : " + functionInvokeExpression.getFunctionName());
         }
@@ -552,7 +576,13 @@ public class Interpreter implements IVisitor {
             throw new RuntimeException("Formal and actual param size doesn't match");
         }
 
-        Context functionContext = new InterpreterContext(context);
+        Context functionContext = new InterpreterContext();
+
+        if(null != function.getCapturedVariables()) {
+            for(Map.Entry<String, SymbolInfo> capturedEntry : function.getCapturedVariables().entrySet()) {
+                functionContext.addToSymbolTable(capturedEntry.getKey(), capturedEntry.getValue());
+            }
+        }
 
         Set<Map.Entry<String, Type>> formalParams = function.getFormalArguments().entrySet();
 

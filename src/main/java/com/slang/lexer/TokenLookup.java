@@ -36,6 +36,7 @@ public class TokenLookup {
         tokenMap.put("void", Token.VOID);
         tokenMap.put("end", Token.END);
         tokenMap.put("lambda", Token.LAMBDA);
+        tokenMap.put("endlambda", Token.ENDLAMBDA);
     }
 
     public static Token getToken(String keyword) {
