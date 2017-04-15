@@ -59,5 +59,5 @@ public enum Token {
     RETURN,
     BREAK,
     COMMA,
-    END
+    LAMBDA, END
 }

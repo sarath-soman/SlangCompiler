@@ -209,66 +209,14 @@ public class Parser {
 
             //function invocation
             if(lexer.getCurrentToken() == Token.OPAR) {
-//                lexer.eat();
-
-                List<Expression> actualParams = new ArrayList<>();
-
-                while (lexer.getCurrentToken() != Token.CPAR) {
-                    //horrible hack to get parsing right
-                    try {
-                        actualParams.add(parseExpression());
-                    } catch (RuntimeException ex) {
-                        //TODO think of alternative ways to parse
-                        if(lexer.getCurrentToken() == Token.CPAR) {
-                            break;
-                        }
-                    }
-                    if (lexer.getCurrentToken() != Token.COMMA) {
-                        break;
-                    }
-                }
-
-
-
-                lexer.expect(Token.CPAR);
-                lexer.eat();
-
-                lexer.expect(Token.SEMICLN);
-                lexer.eat();
-
-                return new FunctionInvokeStatement(new FunctionInvokeExpression(varName, actualParams));
-
+                return new FunctionInvokeStatement((FunctionInvokeExpression) parseFunctionInvocationExpression());
             //variable assignment
             } else if (lexer.getCurrentToken() == Token.EQ) {
                 Expression expression = parseExpression();
+
+                //Function invocation and assignment together
                 if(lexer.getPreviousToken() == Token.VAR_NAME && lexer.getCurrentToken() == Token.OPAR) {
-                    String functionName = lexer.getVariableName();
-                    List<Expression> actualParams = new ArrayList<>();
-
-                    while (lexer.getCurrentToken() != Token.CPAR) {
-                        //horrible hack to get parsing right
-                        try {
-                            actualParams.add(parseExpression());
-                        } catch (RuntimeException ex) {
-                            //TODO think of alternative ways to parse
-                            if(lexer.getCurrentToken() == Token.CPAR) {
-                                break;
-                            }
-                        }
-                        if (lexer.getCurrentToken() != Token.COMMA) {
-                            break;
-                        }
-                    }
-
-
-
-                    lexer.expect(Token.CPAR);
-                    lexer.eat();
-
-                    lexer.expect(Token.SEMICLN);
-                    lexer.eat();
-
-                    return new VariableAssignmentStatement(varName, new FunctionInvokeExpression(functionName, actualParams));
+                    return new VariableAssignmentStatement(varName, parseFunctionInvocationExpression());
                 } else {
                     VariableAssignmentStatement variableAssignmentStatement = new VariableAssignmentStatement(varName, expression);
                     lexer.expect(Token.SEMICLN);
@@ -352,57 +300,54 @@ public class Parser {
                 lexer.eat();
                 return new ReturnStatement(expression);
             } catch (RuntimeException ex) {
-                try {
-                    lexer.expect(Token.SEMICLN);
+                if(lexer.getCurrentToken() == Token.SEMICLN) {
                     lexer.eat();
                     return new ReturnStatement(new VoidExpression());
-                } catch (RuntimeException ex1) {
-                    System.out.println("asdsad " + ex1.getMessage());
-                    System.out.println(lexer);
-
-                    //TODO extract functionIvoke expression logic
-                    String functionName = lexer.getVariableName();
-//                    lexer.eat();
-
-                    //function invocation
-                    if(lexer.getCurrentToken() == Token.OPAR) {
-
-                        List<Expression> actualParams = new ArrayList<>();
-
-                        while (lexer.getCurrentToken() != Token.CPAR) {
-                            //horrible hack to get parsing right
-                            try {
-                                actualParams.add(parseExpression());
-                            } catch (RuntimeException ex2) {
-                                //TODO think of alternative ways to parse
-                                if(lexer.getCurrentToken() == Token.CPAR) {
-                                    break;
-                                }
-                            }
-                            if (lexer.getCurrentToken() != Token.COMMA) {
-                                break;
-                            }
-                        }
-
-
-
-                        lexer.expect(Token.CPAR);
-                        lexer.eat();
-
-                        lexer.expect(Token.SEMICLN);
-                        lexer.eat();
-
-                        return new ReturnStatement(new FunctionInvokeExpression(functionName, actualParams));
-
-                    }
-
-                    throw new RuntimeException("Unsuported token " + lexer.getCurrentToken());
+                } else {
+                    return new ReturnStatement(parseFunctionInvocationExpression());
                 }
+
             }
         }
 
         throw new RuntimeException("Unexpected token : " + lexer.getCurrentToken());
 
+    }
+
+    private Expression parseFunctionInvocationExpression() {
+        String functionName = lexer.getVariableName();
+
+        if (lexer.getCurrentToken() == Token.OPAR) {
+
+            List<Expression> actualParams = new ArrayList<>();
+
+            while (lexer.getCurrentToken() != Token.CPAR) {
+                //horrible hack to get parsing right
+                try {
+                    actualParams.add(parseExpression());
+                } catch (RuntimeException ex2) {
+                    //TODO think of alternative ways to parse
+                    if (lexer.getCurrentToken() == Token.CPAR) {
+                        break;
+                    }
+                }
+                if (lexer.getCurrentToken() != Token.COMMA) {
+                    break;
+                }
+            }
+
+
+            lexer.expect(Token.CPAR);
+            lexer.eat();
+
+            lexer.expect(Token.SEMICLN);
+            lexer.eat();
+
+            return new FunctionInvokeExpression(functionName, actualParams);
+
+        }
+
+        throw new RuntimeException("Unsuported token " + lexer.getCurrentToken());
     }
 
     private Type getType(Token currentToken) {
