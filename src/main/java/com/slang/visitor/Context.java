@@ -29,4 +29,6 @@ public abstract class Context {
     public abstract boolean isInLoopBlock() ;
 
     public abstract Map<String, SymbolInfo> getSymbolTable();
+
+    public abstract Map<String, Function> getFunctionTable();
 }

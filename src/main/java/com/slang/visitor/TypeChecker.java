@@ -5,6 +5,7 @@ import com.slang.Type;
 import com.slang.ast.*;
 
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -86,7 +87,12 @@ public class TypeChecker implements IVisitor{
 
     @Override
     public SymbolInfo visit(LambdaExpression lambdaExpression, Context context) {
-        //TODO
+        //TODO type check lambda expression
+        //TODO tree walk and find the correct variable to capture
+        final Function function = lambdaExpression.getFunction().clone();
+        function.setCapturedVariables(new LinkedHashMap<>(context.getSymbolTable()));
+        function.accept(this, context);
+
         return null;
     }
 
@@ -215,13 +221,23 @@ public class TypeChecker implements IVisitor{
 
     @Override
     public SymbolInfo visit(Function function, Context context) {
-        Context functionContext = new InterpreterContext(context);
+        Context functionContext = new InterpreterContext(context.getFunctionTable());
+
+        functionContext.setCurrentFunction(function);
+
+        if (null != function.getCapturedVariables()) {
+            function.getCapturedVariables().entrySet().forEach(capturedEntry ->
+                    functionContext.addToSymbolTable(capturedEntry.getKey(),
+                            SymbolInfo.builder()
+                                    .withDataType(capturedEntry.getValue().getDataType())
+                                    .build()));
+        }
         function.getFormalArguments().entrySet().forEach(formalParamEntry ->
                 functionContext.addToSymbolTable(formalParamEntry.getKey(),
                         SymbolInfo.builder()
                                 .withDataType(formalParamEntry.getValue())
                                 .build()));
-        functionContext.setCurrentFunction(function);
+
         for(Statement statement : function.getBody()) {
             if(ReturnStatement.class.isAssignableFrom(statement.getClass())) {
                 ReturnStatement returnStatement = ReturnStatement.class.cast(statement);
@@ -276,7 +292,6 @@ public class TypeChecker implements IVisitor{
     public SymbolInfo visit(Module module, Context context) {
         Context moduleContext = new InterpreterContext(module.getFunctionsMap());
         module.getFunctionsMap().entrySet().stream().forEach(stringFunctionEntry -> {
-            moduleContext.setCurrentFunction(stringFunctionEntry.getValue());
             stringFunctionEntry.getValue().accept(this, moduleContext);
         });
         return null;

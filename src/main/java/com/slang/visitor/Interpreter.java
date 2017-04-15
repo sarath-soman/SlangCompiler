@@ -119,6 +119,7 @@ public class Interpreter implements IVisitor {
 
     @Override
     public SymbolInfo visit(LambdaExpression lambdaExpression, Context context) {
+        //TODO tree walk and find the correct variable to capture
         final Function function = lambdaExpression.getFunction().clone();
         function.setCapturedVariables(new LinkedHashMap<>(context.getSymbolTable()));
         return SymbolInfo.builder().withFunctionValue(function).withDataType(Type.FUNCTION).build();
@@ -576,7 +577,7 @@ public class Interpreter implements IVisitor {
             throw new RuntimeException("Formal and actual param size doesn't match");
         }
 
-        Context functionContext = new InterpreterContext();
+        Context functionContext = new InterpreterContext(context.getFunctionTable());
 
         if(null != function.getCapturedVariables()) {
             for(Map.Entry<String, SymbolInfo> capturedEntry : function.getCapturedVariables().entrySet()) {
