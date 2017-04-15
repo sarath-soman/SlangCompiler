@@ -165,34 +165,8 @@ public class Parser {
             } else if(Token.EQ == lexer.getCurrentToken()) {
                 Expression rhsExp = parseExpression();
                 if(lexer.getPreviousToken() == Token.VAR_NAME && lexer.getCurrentToken() == Token.OPAR) {
-                    String functionName = lexer.getVariableName();
-                    List<Expression> actualParams = new ArrayList<>();
-
-                    while (lexer.getCurrentToken() != Token.CPAR) {
-                        //horrible hack to get parsing right
-                        try {
-                            actualParams.add(parseExpression());
-                        } catch (RuntimeException ex) {
-                            //TODO think of alternative ways to parse
-                            if(lexer.getCurrentToken() == Token.CPAR) {
-                                break;
-                            }
-                        }
-                        if (lexer.getCurrentToken() != Token.COMMA) {
-                            break;
-                        }
-                    }
-
-
-
-                    lexer.expect(Token.CPAR);
-                    lexer.eat();
-
-                    lexer.expect(Token.SEMICLN);
-                    lexer.eat();
-
                     return new VariableDeclAndAssignStatement(new VariableDeclarationStatement(variableExpression),
-                            new VariableAssignmentStatement(variableExpression.getVariableName(), new FunctionInvokeExpression(functionName, actualParams)));
+                            new VariableAssignmentStatement(variableExpression.getVariableName(), parseFunctionInvocationExpression()));
                 } else {
                     lexer.expect(Token.SEMICLN);
                     lexer.eat();
@@ -230,59 +204,11 @@ public class Parser {
         }
 
         if(Token.IF == token) {
-
-            Expression expression = parseExpression();
-
-            lexer.expect(Token.THEN);
-
-            lexer.eat();
-
-            //If no body
-            if(lexer.getCurrentToken() == Token.ENDIF) {
-                throw new RuntimeException("Empty If condition is not allowed");
-            }
-
-            List<Statement> trueBody = new ArrayList<>();
-
-            do {
-                Statement statement = parseStatement();
-                trueBody.add(statement);
-            } while (lexer.getCurrentToken() != Token.ENDIF && lexer.getCurrentToken() != Token.ELSE);
-
-            List<Statement> falseBody = new ArrayList<>();
-
-            //IF false part exists
-            if(lexer.getCurrentToken() == Token.ELSE) {
-                lexer.eat();
-                do {
-                    Statement statement = parseStatement();
-                    falseBody.add(statement);
-                } while (lexer.getCurrentToken() != Token.ENDIF);
-            }
-            lexer.expect(Token.ENDIF);
-            lexer.eat();
-            return new IfStatement(expression, trueBody, falseBody);
+            return parseIfStatement();
         }
 
         if(Token.WHILE == token) {
-
-            Expression expression = parseExpression();
-
-            if(lexer.getCurrentToken() == Token.WEND ) {
-                throw new RuntimeException("Empty loop is not allowed");
-            }
-
-            List<Statement> body = new ArrayList<>();
-
-            do {
-                Statement statement = parseStatement();
-                body.add(statement);
-            } while (lexer.getCurrentToken() != Token.WEND);
-
-            lexer.expect(Token.WEND);
-
-            lexer.eat();
-            return new WhileStatement(expression, body);
+            return parseWhileStatement();
         }
 
         if(Token.BREAK == token) {
@@ -293,25 +219,84 @@ public class Parser {
         }
 
         if(Token.RETURN == token) {
-            //Again another hack to get parsing right
-            try {
-                Expression expression = parseExpression();
-                lexer.expect(Token.SEMICLN);
-                lexer.eat();
-                return new ReturnStatement(expression);
-            } catch (RuntimeException ex) {
-                if(lexer.getCurrentToken() == Token.SEMICLN) {
-                    lexer.eat();
-                    return new ReturnStatement(new VoidExpression());
-                } else {
-                    return new ReturnStatement(parseFunctionInvocationExpression());
-                }
+            return parseReturnStatement();
 
-            }
         }
 
         throw new RuntimeException("Unexpected token : " + lexer.getCurrentToken());
 
+    }
+
+    private Statement parseIfStatement() {
+        Expression expression = parseExpression();
+
+        lexer.expect(Token.THEN);
+
+        lexer.eat();
+
+        //If no body
+        if(lexer.getCurrentToken() == Token.ENDIF) {
+            throw new RuntimeException("Empty If condition is not allowed");
+        }
+
+        List<Statement> trueBody = new ArrayList<>();
+
+        do {
+            Statement statement = parseStatement();
+            trueBody.add(statement);
+        } while (lexer.getCurrentToken() != Token.ENDIF && lexer.getCurrentToken() != Token.ELSE);
+
+        List<Statement> falseBody = new ArrayList<>();
+
+        //IF false part exists
+        if(lexer.getCurrentToken() == Token.ELSE) {
+            lexer.eat();
+            do {
+                Statement statement = parseStatement();
+                falseBody.add(statement);
+            } while (lexer.getCurrentToken() != Token.ENDIF);
+        }
+        lexer.expect(Token.ENDIF);
+        lexer.eat();
+        return new IfStatement(expression, trueBody, falseBody);
+    }
+
+    private Statement parseWhileStatement() {
+        Expression expression = parseExpression();
+
+        if(lexer.getCurrentToken() == Token.WEND ) {
+            throw new RuntimeException("Empty loop is not allowed");
+        }
+
+        List<Statement> body = new ArrayList<>();
+
+        do {
+            Statement statement = parseStatement();
+            body.add(statement);
+        } while (lexer.getCurrentToken() != Token.WEND);
+
+        lexer.expect(Token.WEND);
+
+        lexer.eat();
+        return new WhileStatement(expression, body);
+    }
+
+    private Statement parseReturnStatement() {
+        //Again another hack to get parsing right
+        try {
+            Expression expression = parseExpression();
+            lexer.expect(Token.SEMICLN);
+            lexer.eat();
+            return new ReturnStatement(expression);
+        } catch (RuntimeException ex) {
+            if(lexer.getCurrentToken() == Token.SEMICLN) {
+                lexer.eat();
+                return new ReturnStatement(new VoidExpression());
+            } else {
+                return new ReturnStatement(parseFunctionInvocationExpression());
+            }
+
+        }
     }
 
     private Expression parseFunctionInvocationExpression() {
@@ -347,7 +332,7 @@ public class Parser {
 
         }
 
-        throw new RuntimeException("Unsuported token " + lexer.getCurrentToken());
+        throw new RuntimeException("Unsupported token " + lexer.getCurrentToken());
     }
 
     private Type getType(Token currentToken) {

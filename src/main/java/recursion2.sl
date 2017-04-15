@@ -1,5 +1,11 @@
 function void main()
-    display(10, 0);
+    var x = display(10, 0);
+    print "Result: ";
+    println x;
+
+    x = display(10, 0);
+    print "Result: ";
+    println x;
 end
 
 function int display(int x, int y)
