@@ -466,7 +466,6 @@ public class Interpreter implements IVisitor {
         Context ifContext = new InterpreterContext(context);
 
         if(symbolInfo.getBoolValue() == true) {
-            System.out.println("true");
             for (Statement statement : ifStatement.getTrueBody()) {
                 statement.accept(this, ifContext);
                 //Todo evaluate the behaviour of break
@@ -479,7 +478,6 @@ public class Interpreter implements IVisitor {
                 }
             }
         } else {
-            System.out.println("false");
             for (Statement statement : ifStatement.getFalseBody()) {
                 statement.accept(this, ifContext);
                 //Todo evaluate the behaviour of break
