@@ -352,9 +352,52 @@ public class Parser {
                 lexer.eat();
                 return new ReturnStatement(expression);
             } catch (RuntimeException ex) {
-                lexer.expect(Token.SEMICLN);
-                lexer.eat();
-                return new ReturnStatement(new VoidExpression());
+                try {
+                    lexer.expect(Token.SEMICLN);
+                    lexer.eat();
+                    return new ReturnStatement(new VoidExpression());
+                } catch (RuntimeException ex1) {
+                    System.out.println("asdsad " + ex1.getMessage());
+                    System.out.println(lexer);
+
+                    //TODO extract functionIvoke expression logic
+                    String functionName = lexer.getVariableName();
+//                    lexer.eat();
+
+                    //function invocation
+                    if(lexer.getCurrentToken() == Token.OPAR) {
+
+                        List<Expression> actualParams = new ArrayList<>();
+
+                        while (lexer.getCurrentToken() != Token.CPAR) {
+                            //horrible hack to get parsing right
+                            try {
+                                actualParams.add(parseExpression());
+                            } catch (RuntimeException ex2) {
+                                //TODO think of alternative ways to parse
+                                if(lexer.getCurrentToken() == Token.CPAR) {
+                                    break;
+                                }
+                            }
+                            if (lexer.getCurrentToken() != Token.COMMA) {
+                                break;
+                            }
+                        }
+
+
+
+                        lexer.expect(Token.CPAR);
+                        lexer.eat();
+
+                        lexer.expect(Token.SEMICLN);
+                        lexer.eat();
+
+                        return new ReturnStatement(new FunctionInvokeExpression(functionName, actualParams));
+
+                    }
+
+                    throw new RuntimeException("Unsuported token " + lexer.getCurrentToken());
+                }
             }
         }
 

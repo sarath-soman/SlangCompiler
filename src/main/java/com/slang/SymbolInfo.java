@@ -167,6 +167,10 @@ public class SymbolInfo {
         return new Builder();
     }
 
+    public void setDataType(Type dataType) {
+        this.dataType = dataType;
+    }
+
     public static final class Builder {
         private SymbolInfo symbolInfo = new SymbolInfo();
 

@@ -98,7 +98,8 @@ public class TypeChecker implements IVisitor{
 
     @Override
     public SymbolInfo visit(VariableDeclarationStatement variableDeclarationStatement, Context context) {
-        variableDeclarationStatement.getVariableExpression().accept(this, context);
+//        variableDeclarationStatement.getVariableExpression().accept(this, context);
+        context.addToSymbolTable(variableDeclarationStatement.getVariableExpression().getVariableName(), new SymbolInfo());
         return null;
     }
 
@@ -110,6 +111,7 @@ public class TypeChecker implements IVisitor{
         if(null == variableInfo) {
             throw new RuntimeException("Cannot assign to an undefined type");
         } else if(null == variableInfo.getDataType()) {
+            variableInfo.setDataType(rhsExpInfo.getDataType());
             return null;
         } else if(variableInfo.getDataType() != rhsExpInfo.getDataType()) {
             throw new RuntimeException("Variable type (" + variableInfo.getDataType() + ") doesn't match the rhs exp type(" + rhsExpInfo.getDataType() + ")");
