@@ -13,49 +13,40 @@ import java.util.stream.Collectors;
 public class Interpreter implements IVisitor {
 
     public SymbolInfo visit(NumericExpression expression, Context context) {
-        switch (expression.getDataType()) {
-            case DOUBLE:
-                return new SymbolInfo(expression.getDoubleValue());
-            case FLOAT:
-                return new SymbolInfo(expression.getFloatValue());
-            case LONG:
-                return new SymbolInfo(expression.getLongValue());
-            case INTEGER:
-                return new SymbolInfo(expression.getIntegerValue());
-
-            default:
-                throw new RuntimeException("Unsupported data type");
+        if (Type.DOUBLE.equals(expression.getDataType())) {
+            return new SymbolInfo(expression.getDoubleValue());
+        } else if (Type.FLOAT.equals(expression.getDataType())) {
+            return new SymbolInfo(expression.getFloatValue());
+        } else if (Type.LONG.equals(expression.getDataType())) {
+            return new SymbolInfo(expression.getLongValue());
+        } else if (Type.INTEGER.equals(expression.getDataType())) {
+            return new SymbolInfo(expression.getIntegerValue());
+        } else {
+            throw new RuntimeException("Unsupported data type");
         }
     }
 
     public SymbolInfo visit(UnaryExpression expression, Context context) {
         SymbolInfo leftExpVal = expression.getLeftExpression().accept(this, context);
         if(Token.SUB != expression.getOperator()) {
-            switch (leftExpVal.getDataType()) {
-                case DOUBLE:
-                case FLOAT:
-                case LONG:
-                case INTEGER:
-                    break;
-                default:
-                    throw new RuntimeException("Unsupported data type : " + leftExpVal.getDataType());
+            if (!(Type.DOUBLE.equals(leftExpVal.getDataType()) || Type.FLOAT.equals(leftExpVal.getDataType())
+                    || Type.LONG.equals(leftExpVal.getDataType()) || Type.INTEGER.equals(leftExpVal.getDataType()))) {
+                throw new RuntimeException("Unsupported data type : " + leftExpVal.getDataType());
             }
             return leftExpVal;
         }
 
         //When oper is SUB
-        switch (leftExpVal.getDataType()) {
-            case DOUBLE:
-                return new SymbolInfo(leftExpVal.getDoubleValue() * -1);
-            case FLOAT:
-                return new SymbolInfo(leftExpVal.getFloatValue() * -1);
-            case LONG:
-                return new SymbolInfo(leftExpVal.getLongValue() * -1);
-            case INTEGER:
-                return new SymbolInfo(leftExpVal.getIntegerValue() * -1);
-
-            default:
-                throw new RuntimeException("Unsupported data type : " + leftExpVal.getDataType());
+        if(Type.DOUBLE.equals(leftExpVal.getDataType())) {
+            return new SymbolInfo(leftExpVal.getDoubleValue() * -1);
+        } else if(Type.FLOAT.equals(leftExpVal.getDataType())) {
+            return new SymbolInfo(leftExpVal.getFloatValue() * -1);
+        } else if(Type.LONG.equals(leftExpVal.getDataType())) {
+            return new SymbolInfo(leftExpVal.getLongValue() * -1);
+        } else if(Type.INTEGER.equals(leftExpVal.getDataType())) {
+            return new SymbolInfo(leftExpVal.getIntegerValue() * -1);
+        } else {
+            throw new RuntimeException("Unsupported data type : " + leftExpVal.getDataType());
         }
     }
 
@@ -314,56 +305,40 @@ public class Interpreter implements IVisitor {
 
     public SymbolInfo visit(PrintStatement printStatement, Context context) {
         SymbolInfo exp = printStatement.getExpression().accept(this, context);
-        switch (exp.getDataType()) {
-            case DOUBLE:
-                System.out.print(exp.getDoubleValue());
-                break;
-            case INTEGER:
-                System.out.print(exp.getIntegerValue());
-                break;
-            case LONG:
-                System.out.print(exp.getLongValue());
-                break;
-            case FLOAT:
-                System.out.print(exp.getFloatValue());
-                break;
-            case STRING:
-                System.out.print(exp.getStringValue());
-                break;
-            case BOOL:
-                System.out.print(exp.getBoolValue());
-                break;
-
-            default:
-                throw new RuntimeException("Unknown Data Type");
+        if (Type.DOUBLE.equals(exp.getDataType())) {
+            System.out.print(exp.getDoubleValue());
+        } else if (Type.INTEGER.equals(exp.getDataType())) {
+            System.out.print(exp.getIntegerValue());
+        } else if (Type.LONG.equals(exp.getDataType())) {
+            System.out.print(exp.getLongValue());
+        } else if (Type.FLOAT.equals(exp.getDataType())) {
+            System.out.print(exp.getFloatValue());
+        } else if (Type.STRING.equals(exp.getDataType())) {
+            System.out.print(exp.getStringValue());
+        } else if (Type.BOOL.equals(exp.getDataType())) {
+            System.out.print(exp.getBoolValue());
+        } else {
+            throw new RuntimeException("Unknown Data Type");
         }
         return null;
     }
 
     public SymbolInfo visit(PrintlnStatement printlnStatement, Context context) {
         SymbolInfo exp = printlnStatement.getExpression().accept(this, context);
-        switch (exp.getDataType()) {
-            case DOUBLE:
-                System.out.println(exp.getDoubleValue());
-                break;
-            case INTEGER:
-                System.out.println(exp.getIntegerValue());
-                break;
-            case LONG:
-                System.out.println(exp.getLongValue());
-                break;
-            case FLOAT:
-                System.out.println(exp.getFloatValue());
-                break;
-            case STRING:
-                System.out.println(exp.getStringValue());
-                break;
-            case BOOL:
-                System.out.println(exp.getBoolValue());
-                break;
-
-            default:
-                throw new RuntimeException("Unknown Data Type");
+        if (Type.DOUBLE.equals(exp.getDataType())) {
+            System.out.println(exp.getDoubleValue());
+        } else if (Type.INTEGER.equals(exp.getDataType())) {
+            System.out.println(exp.getIntegerValue());
+        } else if (Type.LONG.equals(exp.getDataType())) {
+            System.out.println(exp.getLongValue());
+        } else if (Type.FLOAT.equals(exp.getDataType())) {
+            System.out.println(exp.getFloatValue());
+        } else if (Type.STRING.equals(exp.getDataType())) {
+            System.out.println(exp.getStringValue());
+        } else if (Type.BOOL.equals(exp.getDataType())) {
+            System.out.println(exp.getBoolValue());
+        } else {
+            throw new RuntimeException("Unknown Data Type");
         }
         return null;
     }
@@ -397,28 +372,20 @@ public class Interpreter implements IVisitor {
         Type rhsType = rhsInfo.getDataType();
         if(null == lhsType && null != rhsType) {
             //when lhs is declared and rhs has value
-            switch (rhsInfo.getDataType()) {
-                case FLOAT:
-                    lhsInfo.setFloatValue(rhsInfo.getFloatValue());
-                    break;
-                case DOUBLE:
-                    lhsInfo.setDoubleValue(rhsInfo.getDoubleValue());
-                    break;
-                case INTEGER:
-                    lhsInfo.setIntegerValue(rhsInfo.getIntegerValue());
-                    break;
-                case LONG:
-                    lhsInfo.setLongValue(rhsInfo.getLongValue());
-                    break;
-                case STRING:
-                    lhsInfo.setStringValue(rhsInfo.getStringValue());
-                    break;
-                case BOOL:
-                    lhsInfo.setBoolValue(rhsInfo.getBoolValue());
-                    break;
-                case FUNCTION:
-                    lhsInfo.setFunctionValue(rhsInfo.getFunctionValue());
-                    break;
+            if (Type.FLOAT.equals(rhsInfo.getDataType())) {
+                lhsInfo.setFloatValue(rhsInfo.getFloatValue());
+            } else if (Type.DOUBLE.equals(rhsInfo.getDataType())) {
+                lhsInfo.setDoubleValue(rhsInfo.getDoubleValue());
+            } else if (Type.INTEGER.equals(rhsInfo.getDataType())) {
+                lhsInfo.setIntegerValue(rhsInfo.getIntegerValue());
+            } else if (Type.LONG.equals(rhsInfo.getDataType())) {
+                lhsInfo.setLongValue(rhsInfo.getLongValue());
+            } else if (Type.STRING.equals(rhsInfo.getDataType())) {
+                lhsInfo.setStringValue(rhsInfo.getStringValue());
+            } else if (Type.BOOL.equals(rhsInfo.getDataType())) {
+                lhsInfo.setBoolValue(rhsInfo.getBoolValue());
+            } else if (Type.FUNCTION.equals(rhsInfo.getDataType())) {
+                lhsInfo.setFunctionValue(rhsInfo.getFunctionValue());
             }
         } else if(null != lhsType && null == rhsType) {
             //assigning already declared but not assigned variable to lhs
@@ -471,7 +438,7 @@ public class Interpreter implements IVisitor {
             throw new RuntimeException("If condition expression should be of type boolean");
         }
 
-        Context ifContext = new InterpreterContext(context);
+        Context ifContext = new LexicalContext(context);
 
         if(symbolInfo.getBoolValue() == true) {
             for (Statement statement : ifStatement.getTrueBody()) {
@@ -511,7 +478,7 @@ public class Interpreter implements IVisitor {
 
         slangWhile:
         while(symbolInfo.getBoolValue() == true) {
-            Context whileContext = new InterpreterContext(context);
+            Context whileContext = new LexicalContext(context);
 
             //Executing body of while
             for(Statement statement : whileStatement.getBody()) {
@@ -577,7 +544,7 @@ public class Interpreter implements IVisitor {
             throw new RuntimeException("Formal and actual param size doesn't match");
         }
 
-        Context functionContext = new InterpreterContext(context.getFunctionTable());
+        Context functionContext = new LexicalContext(context.getFunctionTable());
 
         if(null != function.getCapturedVariables()) {
             for(Map.Entry<String, SymbolInfo> capturedEntry : function.getCapturedVariables().entrySet()) {
@@ -629,7 +596,7 @@ public class Interpreter implements IVisitor {
 
     @Override
     public SymbolInfo visit(Module module, Context context) {
-        Context moduleContext = new InterpreterContext(context, module.getFunctionsMap());
+        Context moduleContext = new LexicalContext(context, module.getFunctionsMap());
         new FunctionInvokeExpression("main", new ArrayList<>()).accept(this, moduleContext);
         return null;
     }

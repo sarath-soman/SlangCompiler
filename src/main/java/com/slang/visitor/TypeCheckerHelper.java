@@ -200,4 +200,11 @@ public class TypeCheckerHelper {
 
     }
 
+    public static boolean isEqual(Type type1, Type type2) {
+        return type1.getTypeName().equals(type2.getTypeName());
+    }
+
+    public static boolean isNotEqual(Type type1, Type type2) {
+        return !isEqual(type1, type2);
+    }
 }

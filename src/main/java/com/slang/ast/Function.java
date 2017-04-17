@@ -20,12 +20,21 @@ public class Function implements IVisitable, Cloneable {
     private LinkedHashMap<String, Type> formalArguments;
     private LinkedHashMap<String, SymbolInfo> capturedVariables;
     private List<Statement> body;
+    private Type functionType;
 
     public Function(String name, Type returnType, LinkedHashMap<String, Type> formalArguments, List<Statement> body) {
         this.name = name;
         this.returnType = returnType;
         this.formalArguments = formalArguments;
         this.body = body;
+    }
+
+    public Function(String name, Type returnType, LinkedHashMap<String, Type> formalArguments, List<Statement> body, Type functionType) {
+        this.name = name;
+        this.returnType = returnType;
+        this.formalArguments = formalArguments;
+        this.body = body;
+        this.functionType = functionType;
     }
 
     public String getName() {
@@ -52,6 +61,10 @@ public class Function implements IVisitable, Cloneable {
         this.capturedVariables = capturedVariables;
     }
 
+    public Type getFunctionType() {
+        return functionType;
+    }
+
     @Override
     public SymbolInfo accept(IVisitor visitor, Context context) {
         return visitor.visit(this, context);
@@ -65,6 +78,7 @@ public class Function implements IVisitable, Cloneable {
                 ", formalArguments=" + formalArguments +
                 ", capturedVariables=" + capturedVariables +
                 ", body=" + body +
+                ", functionType=" + functionType +
                 '}';
     }
 

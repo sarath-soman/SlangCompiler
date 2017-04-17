@@ -1,12 +1,11 @@
 package com.slang.parser;
 
-import com.slang.Type;
 import com.slang.ast.*;
 import com.slang.lexer.Lexer;
 import com.slang.visitor.Context;
 import com.slang.visitor.IVisitor;
 import com.slang.visitor.Interpreter;
-import com.slang.visitor.InterpreterContext;
+import com.slang.visitor.LexicalContext;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,7 +44,7 @@ public class ParserTest {
 
     @Test
     public void testParseExpression() {
-        Context context = new InterpreterContext();
+        Context context = new LexicalContext();
 
         Lexer lexer = new Lexer("20/5 * 2 + 4");
         Parser parser = new Parser(lexer);
@@ -105,7 +104,7 @@ public class ParserTest {
 
     @Test
     public void testPrintAndPrintlnProduction() {
-        Context context = new InterpreterContext();
+        Context context = new LexicalContext();
 
         Lexer lexer = new Lexer("print 20 + 30;");
         Parser parser = new Parser(lexer);
@@ -153,7 +152,7 @@ public class ParserTest {
 
     @Test
     public void testParseStatements() {
-        Context context = new InterpreterContext();
+        Context context = new LexicalContext();
 
         Lexer lexer = new Lexer("var x; var y;");
         Parser parser = new Parser(lexer);
@@ -165,7 +164,7 @@ public class ParserTest {
 
     @Test
     public void testParseStatements1() {
-        Context context = new InterpreterContext();
+        Context context = new LexicalContext();
 
         Lexer lexer = new Lexer("var x; x = 10;");
         Parser parser = new Parser(lexer);
@@ -179,7 +178,7 @@ public class ParserTest {
 
     @Test
     public void testParseStatements2() {
-        Context context = new InterpreterContext();
+        Context context = new LexicalContext();
 
         Lexer lexer = new Lexer("var x; x = 10; var y; y = x / (2 * x) - 100 ;");
         Parser parser = new Parser(lexer);

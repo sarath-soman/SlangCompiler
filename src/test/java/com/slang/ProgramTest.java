@@ -26,7 +26,7 @@ public class ProgramTest {
 
     @Test
     public void testExpEvalOnVariables() {
-        Context context = new InterpreterContext();
+        Context context = new LexicalContext();
 
         Lexer lexer = new Lexer("var x; var y; var z; var a; var b; x = 23; y = 90; z = 6; a = 65; b = 54; var val; val = x/y*z+a-b;");
         Parser parser = new Parser(lexer);
@@ -41,7 +41,7 @@ public class ProgramTest {
 
     @Test
     public void testVarDecAndAssign() {
-        Context context = new InterpreterContext();
+        Context context = new LexicalContext();
 
         Lexer lexer = new Lexer("var x = 10;");
         Parser parser = new Parser(lexer);
@@ -66,7 +66,7 @@ public class ProgramTest {
 
     @Test
     public void testImplicitTypes() {
-        Context context = new InterpreterContext();
+        Context context = new LexicalContext();
 
         Lexer lexer = new Lexer("var a = 10; var b = 10.1; var c = 10.34f; var d = 10l; var e = \"asdasda\";");
         Parser parser = new Parser(lexer);
@@ -97,7 +97,7 @@ public class ProgramTest {
 
     @Test
     public void testTypesPromotedAfterMathOperations() {
-        Context context = new InterpreterContext();
+        Context context = new LexicalContext();
 
         //Integer as left operand
         Lexer lexer = new Lexer("var a = 10/10; var b = 10/2.5; var c = 10/2.5f; var d = 100/10l;");
@@ -175,7 +175,7 @@ public class ProgramTest {
 
     @Test
     public void testRelationalExpressionEQ() {
-        Context context = new InterpreterContext();
+        Context context = new LexicalContext();
 
         Lexer lexer = new Lexer("var a = 10; var b = 10/10; var c = 10 == 10;");
         Parser parser = new Parser(lexer);
@@ -239,7 +239,7 @@ public class ProgramTest {
 
     @Test
     public void testLogicalExpression() {
-        Context context = new InterpreterContext();
+        Context context = new LexicalContext();
 
         Lexer lexer = new Lexer("var c = 10 < 10;");
         Parser parser = new Parser(lexer);
@@ -265,7 +265,7 @@ public class ProgramTest {
 
     @Test
     public void testIfStatement() {
-        Context context = new InterpreterContext();
+        Context context = new LexicalContext();
 
         Lexer lexer = new Lexer("if(10 == 10) then  print(20); endif");
         Parser parser = new Parser(lexer);
@@ -297,7 +297,7 @@ public class ProgramTest {
 
     @Test
     public void testIfElseStatement() {
-        Context context = new InterpreterContext();
+        Context context = new LexicalContext();
 
         Lexer lexer = new Lexer("if(10 < 10) then println(20); println(10); else println(30); println(20); endif");
         Parser parser = new Parser(lexer);
@@ -326,7 +326,7 @@ public class ProgramTest {
 
     @Test
     public void testWhileStatement() {
-        Context context = new InterpreterContext();
+        Context context = new LexicalContext();
 
         Lexer lexer = new Lexer("var i = 0; var x = 10; while(i < 10) println(i); println(\"sadasd\"); i = i + 1; x = 20; var x = 30; wend");
         Parser parser = new Parser(lexer);
@@ -342,7 +342,7 @@ public class ProgramTest {
 
     @Test
     public void testBreakInWhile() {
-        Context context = new InterpreterContext();
+        Context context = new LexicalContext();
 
         Lexer lexer = new Lexer("var j = 0; while(j < 10) if (j == 5) then break; endif println(j); j = j + 1; wend");
         Parser parser = new Parser(lexer);
@@ -374,7 +374,7 @@ public class ProgramTest {
 
     @Test
     public void testBreakInIf() {
-        Context context = new InterpreterContext();
+        Context context = new LexicalContext();
 
         Lexer lexer = new Lexer("var j = 5; if (j == 5) then j = 10; break; j = 15; endif ");
         Parser parser = new Parser(lexer);
@@ -393,12 +393,12 @@ public class ProgramTest {
         Parser parser = new Parser(lexer);
         Map<String, Function> functions = parser.parseFunctions();
         IVisitor interpreter = new Interpreter();
-        new FunctionInvokeExpression("main", new ArrayList<>()).accept(interpreter, new InterpreterContext(functions));
+        new FunctionInvokeExpression("main", new ArrayList<>()).accept(interpreter, new LexicalContext(functions));
 
         lexer = new Lexer("function void sayHello() println \"Hello, World!\"; end function void main() sayHello(); end ");
         parser = new Parser(lexer);
         functions = parser.parseFunctions();
-        new FunctionInvokeExpression("main", new ArrayList<>()).accept(interpreter, new InterpreterContext(functions));
+        new FunctionInvokeExpression("main", new ArrayList<>()).accept(interpreter, new LexicalContext(functions));
     }
 
     @Test
@@ -409,7 +409,7 @@ public class ProgramTest {
         Parser parser = new Parser(lexer);
         Map<String, Function> functions = parser.parseFunctions();
         IVisitor interpreter = new Interpreter();
-        new FunctionInvokeExpression("main", new ArrayList<>()).accept(interpreter, new InterpreterContext(functions));
+        new FunctionInvokeExpression("main", new ArrayList<>()).accept(interpreter, new LexicalContext(functions));
 
     }
 
@@ -420,7 +420,7 @@ public class ProgramTest {
         Parser parser = new Parser(lexer);
         Map<String, Function> functions = parser.parseFunctions();
         IVisitor interpreter = new Interpreter();
-        Context context = new InterpreterContext(functions);
+        Context context = new LexicalContext(functions);
         new FunctionInvokeExpression("main", new ArrayList<>()).accept(interpreter, context);
     }
 
@@ -430,7 +430,7 @@ public class ProgramTest {
         Parser parser = new Parser(lexer);
         Map<String, Function> functions = parser.parseFunctions();
         IVisitor interpreter = new Interpreter();
-        Context context = new InterpreterContext(functions);
+        Context context = new LexicalContext(functions);
         expectedException.expect(RuntimeException.class);
         new FunctionInvokeExpression("main", new ArrayList<>()).accept(interpreter, context);
     }
@@ -441,7 +441,7 @@ public class ProgramTest {
         Parser parser = new Parser(lexer);
         Map<String, Function> functions = parser.parseFunctions();
         IVisitor interpreter = new Interpreter();
-        Context context = new InterpreterContext(functions);
+        Context context = new LexicalContext(functions);
         expectedException.expect(RuntimeException.class);
         new FunctionInvokeExpression("main", new ArrayList<>()).accept(interpreter, context);
     }
@@ -452,7 +452,7 @@ public class ProgramTest {
         Parser parser = new Parser(lexer);
         Map<String, Function> functions = parser.parseFunctions();
         IVisitor interpreter = new Interpreter();
-        Context context = new InterpreterContext(functions);
+        Context context = new LexicalContext(functions);
         expectedException.expect(RuntimeException.class);
         new FunctionInvokeExpression("main", new ArrayList<>()).accept(interpreter, context);
     }
@@ -463,8 +463,8 @@ public class ProgramTest {
         Lexer lexer = new Lexer("function void add(int x, int y) return x + y;  end function void main() var sum = add(10, 20); println sum; end ");
         Parser parser = new Parser(lexer);
         Map<String, Function> functions = parser.parseFunctions();
-        IVisitor typeChecker = new TypeChecker();
-        Context context = new InterpreterContext(functions);
+        IVisitor typeChecker = new SemanticAnalyzer();
+        Context context = new LexicalContext(functions);
         expectedException.expect(RuntimeException.class);
         functions.entrySet().stream().forEach(stringFunctionEntry -> {
             context.setCurrentFunction(stringFunctionEntry.getValue());
@@ -478,8 +478,8 @@ public class ProgramTest {
         Lexer lexer = new Lexer("function void add(int x, int y) while false if true then break; endif wend end");
         Parser parser = new Parser(lexer);
         Map<String, Function> functions = parser.parseFunctions();
-        IVisitor typeChecker = new TypeChecker();
-        Context context = new InterpreterContext(functions);
+        IVisitor typeChecker = new SemanticAnalyzer();
+        Context context = new LexicalContext(functions);
         functions.entrySet().stream().forEach(stringFunctionEntry -> {
             context.setCurrentFunction(stringFunctionEntry.getValue());
             stringFunctionEntry.getValue().accept(typeChecker, context);
@@ -488,8 +488,8 @@ public class ProgramTest {
         lexer = new Lexer("function void add(int x, int y) if true then break; endif end");
         parser = new Parser(lexer);
         functions = parser.parseFunctions();
-        IVisitor typeChecker2 = new TypeChecker();
-        Context context2 = new InterpreterContext(functions);
+        IVisitor typeChecker2 = new SemanticAnalyzer();
+        Context context2 = new LexicalContext(functions);
         expectedException.expect(RuntimeException.class);
         functions.entrySet().stream().forEach(stringFunctionEntry -> {
             context2.setCurrentFunction(stringFunctionEntry.getValue());
@@ -502,8 +502,8 @@ public class ProgramTest {
         Lexer lexer = new Lexer("function void add(int x, int y) print \"sdaad\" && 20;print !\"sadas\"; print \"sa\"* 2; print \"sad\" + 10; end");
         Parser parser = new Parser(lexer);
         Map<String, Function> functions = parser.parseFunctions();
-        IVisitor typeChecker = new TypeChecker();
-        Context context = new InterpreterContext(functions);
+        IVisitor typeChecker = new SemanticAnalyzer();
+        Context context = new LexicalContext(functions);
         expectedException.expect(RuntimeException.class);
         functions.entrySet().stream().forEach(stringFunctionEntry -> {
             context.setCurrentFunction(stringFunctionEntry.getValue());
@@ -516,8 +516,8 @@ public class ProgramTest {
         Lexer lexer = new Lexer("function void add(int x, int y) print \"sdaad\" && 20;print !\"sadas\"; print \"sa\"* 2; print \"sad\" + 10; end");
         Parser parser = new Parser(lexer);
         Module module = parser.parseModule();
-        IVisitor typeChecker = new TypeChecker();
-        Context context = new InterpreterContext();
+        IVisitor typeChecker = new SemanticAnalyzer();
+        Context context = new LexicalContext();
         expectedException.expect(RuntimeException.class);
         module.accept(typeChecker, context);
     }
@@ -529,7 +529,7 @@ public class ProgramTest {
         Parser parser = new Parser(lexer);
         Module module = parser.parseModule();
         IVisitor interpreter = new Interpreter();
-        Context context = new InterpreterContext();
+        Context context = new LexicalContext();
         module.accept(interpreter, context);
     }
 
