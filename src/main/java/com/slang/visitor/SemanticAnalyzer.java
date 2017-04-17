@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Created by Sarath on 06/04/2017.
  */
-public class TypeChecker implements IVisitor{
+public class SemanticAnalyzer implements IVisitor{
 
     @Override
     public SymbolInfo visit(NumericExpression expression, Context context) {
@@ -22,14 +22,8 @@ public class TypeChecker implements IVisitor{
     public SymbolInfo visit(UnaryExpression expression, Context context) {
         SymbolInfo symbolInfo = expression.getLeftExpression().accept(this, context);
         Type dataType = symbolInfo.getDataType();
-        switch (dataType) {
-            case INTEGER:
-            case LONG:
-            case FLOAT:
-            case DOUBLE:
-                break;
-                default:
-                    throw new RuntimeException("Unary operator " + expression.getOperator() + " is not allowed on datatype " + dataType);
+        if (!(dataType == Type.INTEGER || dataType == Type.LONG || dataType == Type.FLOAT || dataType == Type.DOUBLE)) {
+            throw new RuntimeException("Unary operator " + expression.getOperator() + " is not allowed on datatype " + dataType);
         }
         return symbolInfo;
     }
@@ -149,7 +143,7 @@ public class TypeChecker implements IVisitor{
             throw new RuntimeException("Conditional expressions in if should be of type boolean");
         }
 
-        Context ifContext = new InterpreterContext(context);
+        Context ifContext = new LexicalContext(context);
         ifContext.setCurrentBlock(ifStatement);
 
         if(null != ifStatement.getTrueBody()) {
@@ -198,7 +192,7 @@ public class TypeChecker implements IVisitor{
         }
 
         for(Statement statement : whileStatement.getBody()) {
-            Context whileContext = new InterpreterContext(context);
+            Context whileContext = new LexicalContext(context);
             whileContext.setCurrentBlock(whileStatement);
             if(ReturnStatement.class.isAssignableFrom(statement.getClass())) {
                 ReturnStatement returnStatement = ReturnStatement.class.cast(statement);
@@ -223,7 +217,7 @@ public class TypeChecker implements IVisitor{
 
     @Override
     public SymbolInfo visit(Function function, Context context) {
-        Context functionContext = new InterpreterContext(context.getFunctionTable());
+        Context functionContext = new LexicalContext(context.getFunctionTable());
 
         functionContext.setCurrentFunction(function);
 
@@ -306,7 +300,7 @@ public class TypeChecker implements IVisitor{
 
     @Override
     public SymbolInfo visit(Module module, Context context) {
-        Context moduleContext = new InterpreterContext(module.getFunctionsMap());
+        Context moduleContext = new LexicalContext(module.getFunctionsMap());
         module.getFunctionsMap().entrySet().stream().forEach(stringFunctionEntry -> {
             stringFunctionEntry.getValue().accept(this, moduleContext);
         });

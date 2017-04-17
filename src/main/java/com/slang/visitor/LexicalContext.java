@@ -11,18 +11,18 @@ import java.util.Map;
 /**
  * Created by sarath on 20/3/17.
  */
-public class InterpreterContext extends Context {
+public class LexicalContext extends Context {
 
     protected Context parentContext = null;
     protected Map<String, Function> functionTable;
     protected Function currentFunction;
     protected Statement currentBlock; //Can be 'if' or 'while'
 
-    public InterpreterContext(Map<String, Function> functions) {
+    public LexicalContext(Map<String, Function> functions) {
         this.functionTable = functions;
     }
 
-    public InterpreterContext(Context parentContext, Map<String, Function> functionTable) {
+    public LexicalContext(Context parentContext, Map<String, Function> functionTable) {
         this.parentContext = parentContext;
         this.functionTable = functionTable;
     }
@@ -34,11 +34,11 @@ public class InterpreterContext extends Context {
 
     private Map<String, SymbolInfo> symbolTable = new HashMap<>();
 
-    public InterpreterContext(Context parentContext) {
+    public LexicalContext(Context parentContext) {
         this.parentContext = parentContext;
     }
 
-    public InterpreterContext() {
+    public LexicalContext() {
         super();
     }
 

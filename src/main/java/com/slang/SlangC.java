@@ -4,14 +4,11 @@ package com.slang;
 import com.slang.ast.Module;
 import com.slang.lexer.Lexer;
 import com.slang.parser.Parser;
-import com.slang.visitor.Context;
 import com.slang.visitor.Interpreter;
-import com.slang.visitor.InterpreterContext;
-import com.slang.visitor.TypeChecker;
+import com.slang.visitor.LexicalContext;
+import com.slang.visitor.SemanticAnalyzer;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 
@@ -32,7 +29,7 @@ public class SlangC {
         Lexer lexer = new Lexer(moduleString);
         Parser parser = new Parser(lexer);
         Module module = parser.parseModule();
-        module.accept(new TypeChecker(), new InterpreterContext());
-        module.accept(new Interpreter(), new InterpreterContext());
+        module.accept(new SemanticAnalyzer(), new LexicalContext());
+        module.accept(new Interpreter(), new LexicalContext());
     }
 }
