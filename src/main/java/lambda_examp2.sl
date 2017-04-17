@@ -6,7 +6,8 @@ function void main()
 
     var number = num();
 
-    println number();
+    var n = number();
+    println n;
 
     hello();
 
@@ -23,13 +24,15 @@ function (int,int)->int adder()
 end
 
 function ()->int num()
-    return lambda int ()
+    var re = lambda int ()
                 return 1;
             endlambda
+    return re;
 end
 
 function ()->void hello()
-    return lambda void ()
+    var re = lambda void ()
                 println "Hello";
             endlambda
+    return re;
 end

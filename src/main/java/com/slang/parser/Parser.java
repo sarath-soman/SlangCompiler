@@ -4,10 +4,7 @@ import com.slang.Type;
 import com.slang.ast.*;
 import com.slang.lexer.Lexer;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by sarath on 16/3/17.
@@ -95,7 +92,20 @@ public class Parser {
         }
         lexer.expect(Token.END);
 
-        Function function = new Function(name, returnType, formalArguments, functionBody);
+        //Build lambda type information
+        StringBuilder sb = new StringBuilder();
+        sb.append("(");
+        int i = 0;
+        int formalArgSize = formalArguments.entrySet().size();
+        for(Map.Entry<String, Type> formalArgEntry : formalArguments.entrySet()) {
+            sb.append(formalArgEntry.getValue().getTypeName());
+            if(i++ != formalArgSize -1) {
+                sb.append(",");
+            }
+        }
+        sb.append(")->");
+        sb.append(returnType.getTypeName());
+        Function function = new Function(name, returnType, formalArguments, functionBody, new Type(sb.toString()));
         lexer.eat();
         return function;
 
@@ -131,14 +141,17 @@ public class Parser {
                 if (lexer.getCurrentToken() != Token.COMMA) {
                     break;
                 }
+                sb.append(",");
                 lexer.eat();
             }
             lexer.expect(Token.CPAR);
             sb.append(")");
             lexer.eat();
             lexer.expect(Token.SUB);
+            sb.append("-");
             lexer.eat();
             lexer.expect(Token.GT);
+            sb.append(">");
             lexer.eat();
             Type lambdaReturnType = parseReturnType();
             sb.append(lambdaReturnType.getTypeName());
@@ -333,7 +346,22 @@ public class Parser {
         }
         lexer.expect(Token.ENDLAMBDA);
 
-        Function function = new Function("lambda$"+ (++lambdaCount), returnType, formalArguments, functionBody);
+        //Build lambda type information
+        StringBuilder sb = new StringBuilder();
+        sb.append("(");
+        int i = 0;
+        int formalArgSize = formalArguments.entrySet().size();
+        for(Map.Entry<String, Type> formalArgEntry : formalArguments.entrySet()) {
+            sb.append(formalArgEntry.getValue().getTypeName());
+            if(i++ != formalArgSize -1) {
+                sb.append(",");
+            }
+        }
+        sb.append(")->");
+        sb.append(returnType.getTypeName());
+
+        Function function = new Function("lambda$"+ (++lambdaCount), returnType, formalArguments,
+                functionBody, new Type(sb.toString()));
         lexer.eat();
         return new LambdaExpression(function);
 

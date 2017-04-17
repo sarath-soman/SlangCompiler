@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 /**
  * Created by sarath on 19/3/17.
  */
-public class Type {
+public class Type{
 
     public static final Type STRING = new Type("STRING");
     public static final Type FLOAT = new Type("FLOAT");

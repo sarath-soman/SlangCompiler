@@ -87,7 +87,7 @@ public class SemanticAnalyzer implements IVisitor{
         function.setCapturedVariables(new LinkedHashMap<>(context.getSymbolTable()));
         function.accept(this, context);
 
-        return SymbolInfo.builder().withDataType(Type.FUNCTION).withFunctionValue(function).build();
+        return SymbolInfo.builder().withDataType(function.getFunctionType()).withFunctionValue(function).build();
     }
 
     @Override
@@ -239,7 +239,7 @@ public class SemanticAnalyzer implements IVisitor{
                 ReturnStatement returnStatement = ReturnStatement.class.cast(statement);
                 SymbolInfo returnInfo = returnStatement.accept(this, functionContext);
                 Function currentFunction = functionContext.getCurrentFunction();
-                if(currentFunction.getReturnType() != returnInfo.getDataType()) {
+                if(TypeCheckerHelper.isNotEqual(currentFunction.getReturnType(),returnInfo.getDataType())) {
                     throw new RuntimeException("Return type doesn't (" + currentFunction.getReturnType() + ") match function return type ( " + returnInfo.getDataType() + ")");
                 }
                 //TODO remove unused code - rewrite AST
