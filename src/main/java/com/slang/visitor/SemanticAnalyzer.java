@@ -2,6 +2,7 @@ package com.slang.visitor;
 
 import com.slang.SymbolInfo;
 import com.slang.Type;
+import com.slang.TypeCategory;
 import com.slang.ast.*;
 
 import java.util.Iterator;
@@ -117,7 +118,7 @@ public class SemanticAnalyzer implements IVisitor{
         if(null == variableInfo) {
             throw new RuntimeException("Cannot assign to an undefined type");
         } else if(null == variableInfo.getDataType()) {
-            if(rhsExpInfo.getDataType() == Type.FUNCTION) {
+            if(rhsExpInfo.getDataType().getTypeCategory() == TypeCategory.FUNCTION) {
                 variableInfo.setFunctionValue(rhsExpInfo.getFunctionValue());
             }
             variableInfo.setDataType(rhsExpInfo.getDataType());
@@ -261,7 +262,7 @@ public class SemanticAnalyzer implements IVisitor{
 
         if(null == function) {
             SymbolInfo functionValue = context.getSymbolInfo(functionInvokeExpression.getFunctionName());
-            if(null == functionValue || functionValue.getDataType() != Type.FUNCTION) {
+            if(null == functionValue || functionValue.getDataType().getTypeCategory() != TypeCategory.FUNCTION) {
                 throw new RuntimeException("Undefined function ex " + functionInvokeExpression.getFunctionName());
             }
 

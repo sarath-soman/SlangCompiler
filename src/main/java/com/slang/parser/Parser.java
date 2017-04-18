@@ -1,6 +1,7 @@
 package com.slang.parser;
 
 import com.slang.Type;
+import com.slang.TypeCategory;
 import com.slang.ast.*;
 import com.slang.lexer.Lexer;
 
@@ -105,7 +106,7 @@ public class Parser {
         }
         sb.append(")->");
         sb.append(returnType.getTypeName());
-        Function function = new Function(name, returnType, formalArguments, functionBody, new Type(sb.toString()));
+        Function function = new Function(name, returnType, formalArguments, functionBody, new Type(sb.toString(), TypeCategory.FUNCTION));
         lexer.eat();
         return function;
 
@@ -155,7 +156,7 @@ public class Parser {
             lexer.eat();
             Type lambdaReturnType = parseReturnType();
             sb.append(lambdaReturnType.getTypeName());
-            return new Type(sb.toString());
+            return new Type(sb.toString(), TypeCategory.FUNCTION);
         } else {
             throw new RuntimeException("Return type cannot be " + lexer.getCurrentToken());
         }
@@ -361,7 +362,7 @@ public class Parser {
         sb.append(returnType.getTypeName());
 
         Function function = new Function("lambda$"+ (++lambdaCount), returnType, formalArguments,
-                functionBody, new Type(sb.toString()));
+                functionBody, new Type(sb.toString(), TypeCategory.FUNCTION));
         lexer.eat();
         return new LambdaExpression(function);
 

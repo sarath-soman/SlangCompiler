@@ -2,6 +2,7 @@ package com.slang.visitor;
 
 import com.slang.SymbolInfo;
 import com.slang.Type;
+import com.slang.TypeCategory;
 import com.slang.ast.*;
 
 import java.util.*;
@@ -113,7 +114,7 @@ public class Interpreter implements IVisitor {
         //TODO tree walk and find the correct variable to capture
         final Function function = lambdaExpression.getFunction().clone();
         function.setCapturedVariables(new LinkedHashMap<>(context.getSymbolTable()));
-        return SymbolInfo.builder().withFunctionValue(function).withDataType(Type.FUNCTION).build();
+        return SymbolInfo.builder().withFunctionValue(function).withDataType(function.getFunctionType()).build();
     }
 
     private SymbolInfo typeCheckAndApplyRelationalExpression(SymbolInfo leftExpVal, SymbolInfo rightExpVal, Token operator) {
@@ -384,7 +385,7 @@ public class Interpreter implements IVisitor {
                 lhsInfo.setStringValue(rhsInfo.getStringValue());
             } else if (Type.BOOL.equals(rhsInfo.getDataType())) {
                 lhsInfo.setBoolValue(rhsInfo.getBoolValue());
-            } else if (Type.FUNCTION.equals(rhsInfo.getDataType())) {
+            } else if (TypeCategory.FUNCTION.equals(rhsInfo.getDataType().getTypeCategory())) {
                 lhsInfo.setFunctionValue(rhsInfo.getFunctionValue());
             }
         } else if(null != lhsType && null == rhsType) {
@@ -525,7 +526,7 @@ public class Interpreter implements IVisitor {
                 throw new RuntimeException("Undefined function : " + functionInvokeExpression.getFunctionName());
             }
 
-            if(Type.FUNCTION != lambdaSymbol.getDataType()) {
+            if(TypeCategory.FUNCTION != lambdaSymbol.getDataType().getTypeCategory()) {
                 throw new RuntimeException(functionInvokeExpression.getFunctionName() + " is not a function type");
             }
 

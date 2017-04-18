@@ -7,22 +7,20 @@ import java.util.LinkedHashMap;
  */
 public class Type{
 
-    public static final Type STRING = new Type("STRING");
-    public static final Type FLOAT = new Type("FLOAT");
-    public static final Type INTEGER = new Type("INTEGER");
-    public static final Type DOUBLE = new Type("DOUBLE");
-    public static final Type BOOL = new Type("BOOL");
-    public static final Type LONG = new Type("LONG");
-    public static final Type VOID = new Type("VOID");
-    public static final Type FUNCTION = new Type();
+    public static final Type STRING = new Type("STRING", TypeCategory.PRIMITIVE);
+    public static final Type FLOAT = new Type("FLOAT", TypeCategory.PRIMITIVE);
+    public static final Type INTEGER = new Type("INTEGER", TypeCategory.PRIMITIVE);
+    public static final Type DOUBLE = new Type("DOUBLE", TypeCategory.PRIMITIVE);
+    public static final Type BOOL = new Type("BOOL", TypeCategory.PRIMITIVE);
+    public static final Type LONG = new Type("LONG", TypeCategory.PRIMITIVE);
+    public static final Type VOID = new Type("VOID", TypeCategory.PRIMITIVE);
 
     private String typeName;
+    private TypeCategory typeCategory;
 
-    public Type() {
-    }
-
-    public Type(String typeName) {
+    public Type(String typeName, TypeCategory typeCategory) {
         this.typeName = typeName;
+        this.typeCategory = typeCategory;
     }
 
     public void setTypeName(String typeName) {
@@ -31,6 +29,10 @@ public class Type{
 
     public String getTypeName() {
         return typeName;
+    }
+
+    public TypeCategory getTypeCategory() {
+        return typeCategory;
     }
 
     @Override
