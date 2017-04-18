@@ -4,10 +4,7 @@ import com.slang.Type;
 import com.slang.ast.*;
 import com.slang.lexer.Lexer;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by sarath on 16/3/17.
@@ -45,32 +42,7 @@ public class Parser {
         }
         lexer.expect(Token.FUNCTION);
         lexer.eat();
-        Type returnType = null;
-        switch (lexer.getCurrentToken()) {
-            case VOID:
-                returnType = Type.VOID;
-                break;
-            case INT:
-                returnType = Type.INTEGER;
-                break;
-            case LONG:
-                returnType = Type.LONG;
-                break;
-            case FLOAT:
-                returnType = Type.FLOAT;
-                break;
-            case DOUBLE:
-                returnType = Type.DOUBLE;
-                break;
-            case BOOL:
-                returnType = Type.BOOL;
-                break;
-            case STRING:
-                returnType = Type.STRING;
-                break;
-            default:
-                throw new RuntimeException("Return type cannot be " + lexer.getCurrentToken());
-        }
+        Type returnType = parseReturnType();
 
         lexer.eat();
         if (lexer.getCurrentToken() != Token.VAR_NAME) {
@@ -120,10 +92,73 @@ public class Parser {
         }
         lexer.expect(Token.END);
 
-        Function function = new Function(name, returnType, formalArguments, functionBody);
+        //Build lambda type information
+        StringBuilder sb = new StringBuilder();
+        sb.append("(");
+        int i = 0;
+        int formalArgSize = formalArguments.entrySet().size();
+        for(Map.Entry<String, Type> formalArgEntry : formalArguments.entrySet()) {
+            sb.append(formalArgEntry.getValue().getTypeName());
+            if(i++ != formalArgSize -1) {
+                sb.append(",");
+            }
+        }
+        sb.append(")->");
+        sb.append(returnType.getTypeName());
+        Function function = new Function(name, returnType, formalArguments, functionBody, new Type(sb.toString()));
         lexer.eat();
         return function;
 
+    }
+
+    private Type parseReturnType() {
+        switch (lexer.getCurrentToken()) {
+            case VOID:
+                return Type.VOID;
+            case INT:
+                return Type.INTEGER;
+            case LONG:
+                return Type.LONG;
+            case FLOAT:
+                return Type.FLOAT;
+            case DOUBLE:
+                return Type.DOUBLE;
+            case BOOL:
+                return Type.BOOL;
+            case STRING:
+                return Type.STRING;
+        }
+
+        if (lexer.getCurrentToken() == Token.OPAR) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("(");
+            lexer.eat();
+            Type type = null;
+            while(lexer.getCurrentToken() != Token.CPAR) {
+                type = parseReturnType();
+                sb.append(type.getTypeName());
+                lexer.eat();
+                if (lexer.getCurrentToken() != Token.COMMA) {
+                    break;
+                }
+                sb.append(",");
+                lexer.eat();
+            }
+            lexer.expect(Token.CPAR);
+            sb.append(")");
+            lexer.eat();
+            lexer.expect(Token.SUB);
+            sb.append("-");
+            lexer.eat();
+            lexer.expect(Token.GT);
+            sb.append(">");
+            lexer.eat();
+            Type lambdaReturnType = parseReturnType();
+            sb.append(lambdaReturnType.getTypeName());
+            return new Type(sb.toString());
+        } else {
+            throw new RuntimeException("Return type cannot be " + lexer.getCurrentToken());
+        }
     }
 
     public List<Statement> parseStatements() {
@@ -311,7 +346,22 @@ public class Parser {
         }
         lexer.expect(Token.ENDLAMBDA);
 
-        Function function = new Function("lambda$"+ (++lambdaCount), returnType, formalArguments, functionBody);
+        //Build lambda type information
+        StringBuilder sb = new StringBuilder();
+        sb.append("(");
+        int i = 0;
+        int formalArgSize = formalArguments.entrySet().size();
+        for(Map.Entry<String, Type> formalArgEntry : formalArguments.entrySet()) {
+            sb.append(formalArgEntry.getValue().getTypeName());
+            if(i++ != formalArgSize -1) {
+                sb.append(",");
+            }
+        }
+        sb.append(")->");
+        sb.append(returnType.getTypeName());
+
+        Function function = new Function("lambda$"+ (++lambdaCount), returnType, formalArguments,
+                functionBody, new Type(sb.toString()));
         lexer.eat();
         return new LambdaExpression(function);
 
@@ -498,17 +548,16 @@ public class Parser {
 
         switch (token) {
             case NUM:
-                switch (lexer.getNumType()) {
-                    case DOUBLE:
-                        return new NumericExpression(lexer.getDoubleNum());
-                    case FLOAT:
-                        return new NumericExpression(lexer.getFloatNum());
-                    case LONG:
-                        return new NumericExpression(lexer.getLongNum());
-                    case INTEGER:
-                        return new NumericExpression(lexer.getIntegerNum());
-                    default:
-                        throw new RuntimeException("Unsupported Data type");
+                if(lexer.getNumType() == Type.DOUBLE) {
+                    return new NumericExpression(lexer.getDoubleNum());
+                } else if(lexer.getNumType() == Type.FLOAT) {
+                    return new NumericExpression(lexer.getFloatNum());
+                } else if(lexer.getNumType() == Type.LONG) {
+                    return new NumericExpression(lexer.getLongNum());
+                } else if(lexer.getNumType() == Type.INTEGER) {
+                    return new NumericExpression(lexer.getIntegerNum());
+                } else {
+                    throw new RuntimeException("Unsupported Data type");
                 }
             case ADD:
                 return parseFactor();

@@ -49,44 +49,39 @@ public class Lexer {
                     StringBuilder numberBuilder = new StringBuilder();
                     Type dataType = readNum(numberBuilder);
 
-                    switch (dataType) {
-                        case DOUBLE:
-                            try {
-                                doubleNum = Double.valueOf(numberBuilder.toString());
-                                numType = Type.DOUBLE;
-                            } catch (NumberFormatException ex) {
-                                throw new RuntimeException(numberBuilder.toString() + " cannot be converted to a number in slang");
-                            }
-                            break;
-                        case FLOAT:
-                            try {
-                                floatNum = Float.valueOf(numberBuilder.toString());
-                                numType = Type.FLOAT;
-                            } catch (NumberFormatException ex) {
-                                throw new RuntimeException(numberBuilder.toString() + " cannot be converted to a number in slang");
-                            }
-                            break;
-                        case LONG:
+                    if (dataType == Type.DOUBLE) {
+                        try {
+                            doubleNum = Double.valueOf(numberBuilder.toString());
+                            numType = Type.DOUBLE;
+                        } catch (NumberFormatException ex) {
+                            throw new RuntimeException(numberBuilder.toString() + " cannot be converted to a number in slang");
+                        }
+                    } else if (dataType == Type.FLOAT) {
+                        try {
+                            floatNum = Float.valueOf(numberBuilder.toString());
+                            numType = Type.FLOAT;
+                        } catch (NumberFormatException ex) {
+                            throw new RuntimeException(numberBuilder.toString() + " cannot be converted to a number in slang");
+                        }
+                    } else if(dataType == Type.LONG) {
+                        try {
+                            longNum = Long.valueOf(numberBuilder.toString());
+                            numType = Type.LONG;
+                        } catch (NumberFormatException ex) {
+                            throw new RuntimeException(numberBuilder.toString() + " cannot be converted to a number in slang");
+                        }
+                    } else if(dataType == Type.INTEGER) {
+                        try {
+                            integerNum = Integer.valueOf(numberBuilder.toString());
+                            numType = Type.INTEGER;
+                        } catch (NumberFormatException e) {
                             try {
                                 longNum = Long.valueOf(numberBuilder.toString());
                                 numType = Type.LONG;
                             } catch (NumberFormatException ex) {
                                 throw new RuntimeException(numberBuilder.toString() + " cannot be converted to a number in slang");
                             }
-                            break ;
-                        case INTEGER:
-                            try {
-                                integerNum = Integer.valueOf(numberBuilder.toString());
-                                numType = Type.INTEGER;
-                            } catch (NumberFormatException e) {
-                                try {
-                                    longNum = Long.valueOf(numberBuilder.toString());
-                                    numType = Type.LONG;
-                                } catch (NumberFormatException ex) {
-                                    throw new RuntimeException(numberBuilder.toString() + " cannot be converted to a number in slang");
-                                }
-                            }
-                            break ;
+                        }
                     }
 
                     previousToken = currentToken;
