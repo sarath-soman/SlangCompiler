@@ -11,6 +11,8 @@ function void main()
 
     hello();
 
+    doAdder(add);
+
 end
 
 function (int,int)->int adder()
@@ -32,6 +34,14 @@ end
 
 function ()->void hello()
     var re = lambda void ()
+                println "Hello";
+            endlambda
+    return re;
+end
+
+function ()->void doAdder((int,int)->int ad)
+    var re = lambda void ()
+                var x = ad(10, 10);
                 println "Hello";
             endlambda
     return re;

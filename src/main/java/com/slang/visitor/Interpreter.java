@@ -542,6 +542,7 @@ public class Interpreter implements IVisitor {
                 .collect(Collectors.toList());
 
         if(actualParams.size() != function.getFormalArguments().entrySet().size()) {
+            System.out.println(functionInvokeExpression.getFunctionName());
             throw new RuntimeException("Formal and actual param size doesn't match");
         }
 
@@ -557,7 +558,7 @@ public class Interpreter implements IVisitor {
 
         int i = 0;
         for (Map.Entry<String, Type> formalParam : function.getFormalArguments().entrySet()) {
-            if (actualParams.get(i).getDataType() != formalParam.getValue()) {
+            if (!actualParams.get(i).getDataType().equals(formalParam.getValue())) {
                 throw new RuntimeException("Actual and formal params data getType is not matching");
             }
 

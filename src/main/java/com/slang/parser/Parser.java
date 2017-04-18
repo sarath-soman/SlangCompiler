@@ -43,7 +43,7 @@ public class Parser {
         }
         lexer.expect(Token.FUNCTION);
         lexer.eat();
-        Type returnType = parseReturnType();
+        Type returnType = parseType();
 
         lexer.eat();
         if (lexer.getCurrentToken() != Token.VAR_NAME) {
@@ -57,7 +57,7 @@ public class Parser {
 
         lexer.eat();
         while (lexer.getCurrentToken() != Token.CPAR) {
-            Type varType = getType(lexer.getCurrentToken());
+            Type varType = parseType();
             lexer.eat();
             if (lexer.getCurrentToken() != Token.VAR_NAME) {
                 throw new RuntimeException("Formal parameter name expected");
@@ -112,7 +112,7 @@ public class Parser {
 
     }
 
-    private Type parseReturnType() {
+    private Type parseType() {
         switch (lexer.getCurrentToken()) {
             case VOID:
                 return Type.VOID;
@@ -136,7 +136,7 @@ public class Parser {
             lexer.eat();
             Type type = null;
             while(lexer.getCurrentToken() != Token.CPAR) {
-                type = parseReturnType();
+                type = parseType();
                 sb.append(type.getTypeName());
                 lexer.eat();
                 if (lexer.getCurrentToken() != Token.COMMA) {
@@ -154,7 +154,7 @@ public class Parser {
             lexer.expect(Token.GT);
             sb.append(">");
             lexer.eat();
-            Type lambdaReturnType = parseReturnType();
+            Type lambdaReturnType = parseType();
             sb.append(lambdaReturnType.getTypeName());
             return new Type(sb.toString(), TypeCategory.FUNCTION);
         } else {
@@ -277,32 +277,7 @@ public class Parser {
 
     private Expression parseLambdaExpression() {
         lexer.eat();
-        Type returnType = null;
-        switch (lexer.getCurrentToken()) {
-            case VOID:
-                returnType = Type.VOID;
-                break;
-            case INT:
-                returnType = Type.INTEGER;
-                break;
-            case LONG:
-                returnType = Type.LONG;
-                break;
-            case FLOAT:
-                returnType = Type.FLOAT;
-                break;
-            case DOUBLE:
-                returnType = Type.DOUBLE;
-                break;
-            case BOOL:
-                returnType = Type.BOOL;
-                break;
-            case STRING:
-                returnType = Type.STRING;
-                break;
-            default:
-                throw new RuntimeException("Return getType cannot be " + lexer.getCurrentToken());
-        }
+        Type returnType = parseType();
 
         lexer.eat();
         lexer.expect(Token.OPAR);
@@ -311,7 +286,7 @@ public class Parser {
 
         lexer.eat();
         while (lexer.getCurrentToken() != Token.CPAR) {
-            Type varType = getType(lexer.getCurrentToken());
+            Type varType = parseType();
             lexer.eat();
             if (lexer.getCurrentToken() != Token.VAR_NAME) {
                 throw new RuntimeException("Formal parameter name expected");
