@@ -204,7 +204,7 @@ public class Lexer {
                         variableName = keyword;
                         currentToken = Token.VAR_NAME;
                     } else if(Token.VAR == tempToken) {
-                        //Handling reserved type on variable name
+                        //Handling reserved getType on variable name
                         variableName = keyword;
                         currentToken = Token.VAR;
                     } else {

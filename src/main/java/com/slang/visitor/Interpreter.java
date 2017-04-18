@@ -23,7 +23,7 @@ public class Interpreter implements IVisitor {
         } else if (Type.INTEGER.equals(expression.getDataType())) {
             return new SymbolInfo(expression.getIntegerValue());
         } else {
-            throw new RuntimeException("Unsupported data type");
+            throw new RuntimeException("Unsupported data getType");
         }
     }
 
@@ -32,7 +32,7 @@ public class Interpreter implements IVisitor {
         if(Token.SUB != expression.getOperator()) {
             if (!(Type.DOUBLE.equals(leftExpVal.getDataType()) || Type.FLOAT.equals(leftExpVal.getDataType())
                     || Type.LONG.equals(leftExpVal.getDataType()) || Type.INTEGER.equals(leftExpVal.getDataType()))) {
-                throw new RuntimeException("Unsupported data type : " + leftExpVal.getDataType());
+                throw new RuntimeException("Unsupported data getType : " + leftExpVal.getDataType());
             }
             return leftExpVal;
         }
@@ -47,7 +47,7 @@ public class Interpreter implements IVisitor {
         } else if(Type.INTEGER.equals(leftExpVal.getDataType())) {
             return new SymbolInfo(leftExpVal.getIntegerValue() * -1);
         } else {
-            throw new RuntimeException("Unsupported data type : " + leftExpVal.getDataType());
+            throw new RuntimeException("Unsupported data getType : " + leftExpVal.getDataType());
         }
     }
 
@@ -114,7 +114,7 @@ public class Interpreter implements IVisitor {
         //TODO tree walk and find the correct variable to capture
         final Function function = lambdaExpression.getFunction().clone();
         function.setCapturedVariables(new LinkedHashMap<>(context.getSymbolTable()));
-        return SymbolInfo.builder().withFunctionValue(function).withDataType(function.getFunctionType()).build();
+        return SymbolInfo.builder().withFunctionValue(function).withDataType(function.getType()).build();
     }
 
     private SymbolInfo typeCheckAndApplyRelationalExpression(SymbolInfo leftExpVal, SymbolInfo rightExpVal, Token operator) {
@@ -436,7 +436,7 @@ public class Interpreter implements IVisitor {
     public SymbolInfo visit(IfStatement ifStatement, Context context) {
         SymbolInfo symbolInfo = ifStatement.getBooleanExpression().accept(this, context);
         if(Type.BOOL != symbolInfo.getDataType()) {
-            throw new RuntimeException("If condition expression should be of type boolean");
+            throw new RuntimeException("If condition expression should be of getType boolean");
         }
 
         Context ifContext = new LexicalContext(context);
@@ -474,7 +474,7 @@ public class Interpreter implements IVisitor {
         SymbolInfo symbolInfo = whileStatement.getExpression().accept(this, context);
 
         if(Type.BOOL != symbolInfo.getDataType()) {
-            throw new RuntimeException("While condition expression should be of type boolean");
+            throw new RuntimeException("While condition expression should be of getType boolean");
         }
 
         slangWhile:
@@ -527,7 +527,7 @@ public class Interpreter implements IVisitor {
             }
 
             if(TypeCategory.FUNCTION != lambdaSymbol.getDataType().getTypeCategory()) {
-                throw new RuntimeException(functionInvokeExpression.getFunctionName() + " is not a function type");
+                throw new RuntimeException(functionInvokeExpression.getFunctionName() + " is not a function getType");
             }
 
             function = lambdaSymbol.getFunctionValue();
@@ -558,7 +558,7 @@ public class Interpreter implements IVisitor {
         int i = 0;
         for (Map.Entry<String, Type> formalParam : function.getFormalArguments().entrySet()) {
             if (actualParams.get(i).getDataType() != formalParam.getValue()) {
-                throw new RuntimeException("Actual and formal params data type is not matching");
+                throw new RuntimeException("Actual and formal params data getType is not matching");
             }
 
             functionContext.addToSymbolTable(formalParam.getKey(), actualParams.get(i));
@@ -569,8 +569,8 @@ public class Interpreter implements IVisitor {
         for(Statement statement : function.getBody()) {
             statement.accept(this, functionContext);
             SymbolInfo returnInfo = functionContext.getSymbolInfo("return");
-            if(null != returnInfo && (function.getReturnType() != returnInfo.getDataType())) {
-                throw new RuntimeException("Return type doesn't match the function definition");
+            if(null != returnInfo && !(function.getReturnType().equals(returnInfo.getDataType()))) {
+                throw new RuntimeException("Return getType doesn't match the function definition");
             }
             if(null != returnInfo) {
                 foundReturn = true;

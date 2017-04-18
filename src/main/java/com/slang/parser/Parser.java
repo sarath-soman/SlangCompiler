@@ -87,13 +87,13 @@ public class Parser {
         } while (lexer.getCurrentToken() != Token.END);
 
         if (Type.VOID != returnType && !foundReturn) {
-            throw new RuntimeException("Return type expected");
+            throw new RuntimeException("Return getType expected");
         } else if (Type.VOID == returnType && !foundReturn) {
             functionBody.add(new ReturnStatement(new VoidExpression()));
         }
         lexer.expect(Token.END);
 
-        //Build lambda type information
+        //Build lambda getType information
         StringBuilder sb = new StringBuilder();
         sb.append("(");
         int i = 0;
@@ -158,7 +158,7 @@ public class Parser {
             sb.append(lambdaReturnType.getTypeName());
             return new Type(sb.toString(), TypeCategory.FUNCTION);
         } else {
-            throw new RuntimeException("Return type cannot be " + lexer.getCurrentToken());
+            throw new RuntimeException("Return getType cannot be " + lexer.getCurrentToken());
         }
     }
 
@@ -301,7 +301,7 @@ public class Parser {
                 returnType = Type.STRING;
                 break;
             default:
-                throw new RuntimeException("Return type cannot be " + lexer.getCurrentToken());
+                throw new RuntimeException("Return getType cannot be " + lexer.getCurrentToken());
         }
 
         lexer.eat();
@@ -341,13 +341,13 @@ public class Parser {
         } while (lexer.getCurrentToken() != Token.ENDLAMBDA);
 
         if (Type.VOID != returnType && !foundReturn) {
-            throw new RuntimeException("Return type expected");
+            throw new RuntimeException("Return getType expected");
         } else if (Type.VOID == returnType && !foundReturn) {
             functionBody.add(new ReturnStatement(new VoidExpression()));
         }
         lexer.expect(Token.ENDLAMBDA);
 
-        //Build lambda type information
+        //Build lambda getType information
         StringBuilder sb = new StringBuilder();
         sb.append("(");
         int i = 0;
@@ -491,7 +491,7 @@ public class Parser {
             case BOOL:
                 return Type.BOOL;
             default:
-                throw new RuntimeException("Formal param type cannot be " + lexer.getCurrentToken());
+                throw new RuntimeException("Formal param getType cannot be " + lexer.getCurrentToken());
         }
     }
 
@@ -558,7 +558,7 @@ public class Parser {
                 } else if(lexer.getNumType() == Type.INTEGER) {
                     return new NumericExpression(lexer.getIntegerNum());
                 } else {
-                    throw new RuntimeException("Unsupported Data type");
+                    throw new RuntimeException("Unsupported Data getType");
                 }
             case ADD:
                 return parseFactor();

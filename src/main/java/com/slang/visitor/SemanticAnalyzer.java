@@ -75,20 +75,20 @@ public class SemanticAnalyzer implements IVisitor{
     public SymbolInfo visit(NotExpression notExpression, Context context) {
         SymbolInfo symbolInfo = notExpression.getExpression().accept(this, context);
         if(symbolInfo.getDataType() != Type.BOOL) {
-            throw new RuntimeException("Unsupported type " + symbolInfo.getDataType() + " on not operator ");
+            throw new RuntimeException("Unsupported getType " + symbolInfo.getDataType() + " on not operator ");
         }
         return SymbolInfo.builder().withDataType(Type.BOOL).build();
     }
 
     @Override
     public SymbolInfo visit(LambdaExpression lambdaExpression, Context context) {
-        //TODO type check lambda expression
+        //TODO getType check lambda expression
         //TODO tree walk and find the correct variable to capture
         final Function function = lambdaExpression.getFunction().clone();
         function.setCapturedVariables(new LinkedHashMap<>(context.getSymbolTable()));
         function.accept(this, context);
 
-        return SymbolInfo.builder().withDataType(function.getFunctionType()).withFunctionValue(function).build();
+        return SymbolInfo.builder().withDataType(function.getType()).withFunctionValue(function).build();
     }
 
     @Override
@@ -116,15 +116,17 @@ public class SemanticAnalyzer implements IVisitor{
         SymbolInfo rhsExpInfo = variableAssignmentStatement.getExpression().accept(this, context);
 
         if(null == variableInfo) {
-            throw new RuntimeException("Cannot assign to an undefined type");
+            throw new RuntimeException("Cannot assign to an undefined getType");
         } else if(null == variableInfo.getDataType()) {
-            if(rhsExpInfo.getDataType().getTypeCategory() == TypeCategory.FUNCTION) {
-                variableInfo.setFunctionValue(rhsExpInfo.getFunctionValue());
-            }
-            variableInfo.setDataType(rhsExpInfo.getDataType());
+            context.addToSymbolTable(variableAssignmentStatement.getVariableName(), rhsExpInfo);
+//            System.out.println(rhsExpInfo);
+//            if(rhsExpInfo.getDataType().getTypeCategory() == TypeCategory.FUNCTION) {
+//                variableInfo.setFunctionValue(rhsExpInfo.getFunctionValue());
+//            }
+//            variableInfo.setDataType(rhsExpInfo.getDataType());
             return null;
         } else if(variableInfo.getDataType() != rhsExpInfo.getDataType()) {
-            throw new RuntimeException("Variable type (" + variableInfo.getDataType() + ") doesn't match the rhs exp type(" + rhsExpInfo.getDataType() + ")");
+            throw new RuntimeException("Variable getType (" + variableInfo.getDataType() + ") doesn't match the rhs exp getType(" + rhsExpInfo.getDataType() + ")");
         }
 
         return null;
@@ -141,7 +143,7 @@ public class SemanticAnalyzer implements IVisitor{
     public SymbolInfo visit(IfStatement ifStatement, Context context) {
         SymbolInfo ifConditionInfo = ifStatement.getBooleanExpression().accept(this, context);
         if(ifConditionInfo.getDataType() != Type.BOOL) {
-            throw new RuntimeException("Conditional expressions in if should be of type boolean");
+            throw new RuntimeException("Conditional expressions in if should be of getType boolean");
         }
 
         Context ifContext = new LexicalContext(context);
@@ -156,7 +158,7 @@ public class SemanticAnalyzer implements IVisitor{
                     SymbolInfo returnInfo = returnStatement.accept(this, context);
                     Function currentFunction = context.getCurrentFunction();
                     if(currentFunction.getReturnType() != returnInfo.getDataType()) {
-                        throw new RuntimeException("Return type doesn't (" + currentFunction.getReturnType() + ") match function return type ( " + returnInfo.getDataType() + ")");
+                        throw new RuntimeException("Return getType doesn't (" + currentFunction.getReturnType() + ") match function return getType ( " + returnInfo.getDataType() + ")");
                     }
                     //TODO remove unused code - rewrite AST
                     continue;
@@ -174,7 +176,7 @@ public class SemanticAnalyzer implements IVisitor{
                     SymbolInfo returnInfo = returnStatement.accept(this, ifContext);
                     Function currentFunction = context.getCurrentFunction();
                     if(currentFunction.getReturnType() != returnInfo.getDataType()) {
-                        throw new RuntimeException("Return type doesn't (" + currentFunction.getReturnType() + ") match function return type ( " + returnInfo.getDataType() + ")");
+                        throw new RuntimeException("Return getType doesn't (" + currentFunction.getReturnType() + ") match function return getType ( " + returnInfo.getDataType() + ")");
                     }
                     //TODO remove unused code - rewrite AST
                     continue;
@@ -189,7 +191,7 @@ public class SemanticAnalyzer implements IVisitor{
     public SymbolInfo visit(WhileStatement whileStatement, Context context) {
         SymbolInfo conditionInfo = whileStatement.getExpression().accept(this, context);
         if (conditionInfo.getDataType() != Type.BOOL) {
-            throw new RuntimeException("Conditional expressions in while should be of type boolean");
+            throw new RuntimeException("Conditional expressions in while should be of getType boolean");
         }
 
         for(Statement statement : whileStatement.getBody()) {
@@ -200,7 +202,7 @@ public class SemanticAnalyzer implements IVisitor{
                 SymbolInfo returnInfo = returnStatement.accept(this, whileContext);
                 Function currentFunction = context.getCurrentFunction();
                 if(currentFunction.getReturnType() != returnInfo.getDataType()) {
-                    throw new RuntimeException("Return type doesn't (" + currentFunction.getReturnType() + ") match function return type ( " + returnInfo.getDataType() + ")");
+                    throw new RuntimeException("Return getType doesn't (" + currentFunction.getReturnType() + ") match function return getType ( " + returnInfo.getDataType() + ")");
                 }
                 //TODO remove unused code - rewrite AST
                 continue;
@@ -241,7 +243,7 @@ public class SemanticAnalyzer implements IVisitor{
                 SymbolInfo returnInfo = returnStatement.accept(this, functionContext);
                 Function currentFunction = functionContext.getCurrentFunction();
                 if(TypeCheckerHelper.isNotEqual(currentFunction.getReturnType(),returnInfo.getDataType())) {
-                    throw new RuntimeException("Return type doesn't (" + currentFunction.getReturnType() + ") match function return type ( " + returnInfo.getDataType() + ")");
+                    throw new RuntimeException("Return getType doesn't (" + currentFunction.getReturnType() + ") match function return getType ( " + returnInfo.getDataType() + ")");
                 }
                 //TODO remove unused code - rewrite AST
                 continue;
@@ -282,7 +284,7 @@ public class SemanticAnalyzer implements IVisitor{
             SymbolInfo expressionInfo = expression.accept(this, context);
             Type formalParamtype = formalParamEntryIterator.next().getValue();
             if(formalParamtype != expressionInfo.getDataType()) {
-                throw new RuntimeException("Formal and actual param type mismatch");
+                throw new RuntimeException("Formal and actual param getType mismatch");
             }
 
         }

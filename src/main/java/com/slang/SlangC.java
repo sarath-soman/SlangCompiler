@@ -30,7 +30,7 @@ public class SlangC {
         Parser parser = new Parser(lexer);
         Module module = parser.parseModule();
         System.out.println(module);
-        module.accept(new SemanticAnalyzer(), new LexicalContext());
+//        module.accept(new SemanticAnalyzer(), new LexicalContext());
         module.accept(new Interpreter(), new LexicalContext());
     }
 }

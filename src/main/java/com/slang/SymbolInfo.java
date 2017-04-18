@@ -53,7 +53,7 @@ public class SymbolInfo {
 
     public SymbolInfo(Function functionValue) {
         this.functionValue = functionValue;
-        dataType = functionValue.getFunctionType();
+        dataType = functionValue.getType();
     }
 
     public SymbolInfo() {
@@ -152,9 +152,9 @@ public class SymbolInfo {
     }
 
     public void setFunctionValue(Function functionValue) {
-        if (null == dataType || functionValue.getFunctionType() == dataType) {
+        if (null == dataType || functionValue.getType() == dataType) {
             this.functionValue = functionValue;
-            dataType = functionValue.getFunctionType();
+            dataType = functionValue.getType();
         } else {
             throw new RuntimeException("Type mismatch on assigning the value");
         }
