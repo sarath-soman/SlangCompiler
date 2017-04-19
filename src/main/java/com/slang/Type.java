@@ -1,6 +1,7 @@
 package com.slang;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * Created by sarath on 19/3/17.
@@ -18,9 +19,20 @@ public class Type{
     private final String typeName;
     private final TypeCategory typeCategory;
 
+    //function type - formal params and return type
+    private List<Type> fnFormalParamTypes;
+    private Type fnReturnType;
+
     public Type(String typeName, TypeCategory typeCategory) {
         this.typeName = typeName;
         this.typeCategory = typeCategory;
+    }
+
+    public Type(String typeName, TypeCategory typeCategory, List<Type> fnFormalParamTypes, Type fnReturnType) {
+        this.typeName = typeName;
+        this.typeCategory = typeCategory;
+        this.fnFormalParamTypes = fnFormalParamTypes;
+        this.fnReturnType = fnReturnType;
     }
 
     public String getTypeName() {
@@ -31,11 +43,21 @@ public class Type{
         return typeCategory;
     }
 
+    public List<Type> getFnFormalParamTypes() {
+        return fnFormalParamTypes;
+    }
+
+    public Type getFnReturnType() {
+        return fnReturnType;
+    }
+
     @Override
     public String toString() {
         return "Type{" +
                 "typeName='" + typeName + '\'' +
                 ", typeCategory=" + typeCategory +
+                ", fnFormalParamTypes=" + fnFormalParamTypes +
+                ", fnReturnType=" + fnReturnType +
                 '}';
     }
 

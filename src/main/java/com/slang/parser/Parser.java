@@ -56,8 +56,10 @@ public class Parser {
         LinkedHashMap<String, Type> formalArguments = new LinkedHashMap<>();
 
         lexer.eat();
+        List<Type> fnFormalParamTypes = new ArrayList<>();
         while (lexer.getCurrentToken() != Token.CPAR) {
             Type varType = parseType();
+            fnFormalParamTypes.add(varType);
             lexer.eat();
             if (lexer.getCurrentToken() != Token.VAR_NAME) {
                 throw new RuntimeException("Formal parameter name expected");
@@ -106,7 +108,8 @@ public class Parser {
         }
         sb.append(")->");
         sb.append(returnType.getTypeName());
-        Function function = new Function(name, returnType, formalArguments, functionBody, new Type(sb.toString(), TypeCategory.FUNCTION));
+        Function function = new Function(name, returnType, formalArguments, functionBody,
+                new Type(sb.toString(), TypeCategory.FUNCTION, fnFormalParamTypes, returnType));
         lexer.eat();
         return function;
 
@@ -134,9 +137,10 @@ public class Parser {
             StringBuilder sb = new StringBuilder();
             sb.append("(");
             lexer.eat();
-            Type type = null;
+            List<Type> fnFormalParamTypes = new ArrayList<>();
             while(lexer.getCurrentToken() != Token.CPAR) {
-                type = parseType();
+                Type type  = parseType();
+                fnFormalParamTypes.add(type);
                 sb.append(type.getTypeName());
                 lexer.eat();
                 if (lexer.getCurrentToken() != Token.COMMA) {
@@ -156,7 +160,7 @@ public class Parser {
             lexer.eat();
             Type lambdaReturnType = parseType();
             sb.append(lambdaReturnType.getTypeName());
-            return new Type(sb.toString(), TypeCategory.FUNCTION);
+            return new Type(sb.toString(), TypeCategory.FUNCTION, fnFormalParamTypes, lambdaReturnType);
         } else {
             throw new RuntimeException("Return getType cannot be " + lexer.getCurrentToken());
         }
@@ -285,8 +289,10 @@ public class Parser {
         LinkedHashMap<String, Type> formalArguments = new LinkedHashMap<>();
 
         lexer.eat();
+        List<Type> fnFormalParamTypes = new ArrayList<>();
         while (lexer.getCurrentToken() != Token.CPAR) {
             Type varType = parseType();
+            fnFormalParamTypes.add(varType);
             lexer.eat();
             if (lexer.getCurrentToken() != Token.VAR_NAME) {
                 throw new RuntimeException("Formal parameter name expected");
@@ -337,7 +343,7 @@ public class Parser {
         sb.append(returnType.getTypeName());
 
         Function function = new Function("lambda$"+ (++lambdaCount), returnType, formalArguments,
-                functionBody, new Type(sb.toString(), TypeCategory.FUNCTION));
+                functionBody, new Type(sb.toString(), TypeCategory.FUNCTION, fnFormalParamTypes, returnType));
         lexer.eat();
         return new LambdaExpression(function);
 

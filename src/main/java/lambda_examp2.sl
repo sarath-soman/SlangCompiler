@@ -11,7 +11,8 @@ function void main()
 
     hello();
 
-    doAdder(add);
+    var d = doAdder(add);
+    d();
 
 end
 

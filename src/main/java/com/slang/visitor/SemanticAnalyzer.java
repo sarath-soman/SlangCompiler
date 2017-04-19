@@ -268,27 +268,42 @@ public class SemanticAnalyzer implements IVisitor{
                 throw new RuntimeException("Undefined function ex " + functionInvokeExpression.getFunctionName());
             }
 
-            function = functionValue.getFunctionValue();
-        }
+            Type functionType = functionValue.getDataType();
 
-        if(null == function) {
-            throw new RuntimeException("Undefined function " + functionInvokeExpression.getFunctionName());
-        }
-
-        if(function.getFormalArguments().entrySet().size() != functionInvokeExpression.getActualFunctionArguments().size()) {
-            throw new RuntimeException("Formal and actual param size doesn't match");
-        }
-
-        Iterator<Map.Entry<String, Type>> formalParamEntryIterator = function.getFormalArguments().entrySet().iterator();
-        for(Expression expression : functionInvokeExpression.getActualFunctionArguments()) {
-            SymbolInfo expressionInfo = expression.accept(this, context);
-            Type formalParamtype = formalParamEntryIterator.next().getValue();
-            if(formalParamtype != expressionInfo.getDataType()) {
-                throw new RuntimeException("Formal and actual param getType mismatch");
+            if(functionType.getFnFormalParamTypes().size() != functionInvokeExpression.getActualFunctionArguments().size()) {
+                throw new RuntimeException("Formal and actual param size doesn't match");
             }
 
+            Iterator<Type> formalParamEntryIterator = functionType.getFnFormalParamTypes().iterator();
+            for(Expression expression : functionInvokeExpression.getActualFunctionArguments()) {
+                SymbolInfo expressionInfo = expression.accept(this, context);
+                Type formalParamtype = formalParamEntryIterator.next();
+                if(formalParamtype != expressionInfo.getDataType()) {
+                    throw new RuntimeException("Formal and actual param getType mismatch");
+                }
+
+            }
+
+            return SymbolInfo.builder().withDataType(functionType.getFnReturnType()).build();
+        } else {
+
+            if(function.getFormalArguments().entrySet().size() != functionInvokeExpression.getActualFunctionArguments().size()) {
+                throw new RuntimeException("Formal and actual param size doesn't match");
+            }
+
+            Iterator<Map.Entry<String, Type>> formalParamEntryIterator = function.getFormalArguments().entrySet().iterator();
+            for(Expression expression : functionInvokeExpression.getActualFunctionArguments()) {
+                SymbolInfo expressionInfo = expression.accept(this, context);
+                Type formalParamtype = formalParamEntryIterator.next().getValue();
+                if(!formalParamtype.equals(expressionInfo.getDataType())) {
+                    throw new RuntimeException("Formal and actual param getType mismatch");
+                }
+
+            }
+
+            return SymbolInfo.builder().withDataType(function.getReturnType()).build();
         }
-        return SymbolInfo.builder().withDataType(function.getReturnType()).build();
+
     }
 
     @Override
