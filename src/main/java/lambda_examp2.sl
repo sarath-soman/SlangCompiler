@@ -9,9 +9,10 @@ function void main()
     var n = number();
     println n;
 
-    hello();
+    var hell = hello();
+    hell();
 
-    var d = doAdder(add);
+    var d = doAdder(add, hell);
     d();
 
 end
@@ -40,10 +41,11 @@ function ()->void hello()
     return re;
 end
 
-function ()->void doAdder((int,int)->int ad)
+function ()->void doAdder((int,int)->int ad, ()->void vd)
     var re = lambda void ()
                 var x = ad(10, 10);
-                println "Hello";
+                vd();
+                println "Hello world!";
             endlambda
     return re;
 end
