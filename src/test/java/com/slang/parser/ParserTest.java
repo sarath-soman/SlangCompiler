@@ -205,6 +205,7 @@ public class ParserTest {
                 .forEach(statement -> {
                     statement.accept(visitor, context);
                 });
+        System.out.println(context);
     }
 
 }

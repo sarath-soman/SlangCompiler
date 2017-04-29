@@ -125,7 +125,7 @@ public class SemanticAnalyzer implements IVisitor{
 //            }
 //            variableInfo.setDataType(rhsExpInfo.getDataType());
             return null;
-        } else if(variableInfo.getDataType() != rhsExpInfo.getDataType()) {
+        } else if(!variableInfo.getDataType().getTypeName().equals(rhsExpInfo.getDataType().getTypeName())) {
             throw new RuntimeException("Variable getType (" + variableInfo.getDataType() + ") doesn't match the rhs exp getType(" + rhsExpInfo.getDataType() + ")");
         }
 

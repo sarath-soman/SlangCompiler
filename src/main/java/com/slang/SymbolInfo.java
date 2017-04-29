@@ -1,6 +1,7 @@
 package com.slang;
 
 import com.slang.ast.Function;
+import com.slang.ast.SObject;
 
 /**
  * Created by sarath on 19/3/17.
@@ -15,6 +16,8 @@ public class SymbolInfo {
     private Long longValue;
     private Boolean boolValue;
     private Function functionValue;
+    private SObject sObjectValue;
+
     private Type dataType;
 
     public SymbolInfo(String stringValue) {
@@ -56,6 +59,11 @@ public class SymbolInfo {
         dataType = functionValue.getType();
     }
 
+    public SymbolInfo(SObject sObjectValue) {
+        this.sObjectValue = sObjectValue;
+        dataType = sObjectValue.getType();
+    }
+
     public SymbolInfo() {
 
     }
@@ -95,6 +103,10 @@ public class SymbolInfo {
 
     public Function getFunctionValue() {
         return functionValue;
+    }
+
+    public SObject getSObjectValue() {
+        return sObjectValue;
     }
 
     public void setStringValue(String stringValue) {
@@ -152,9 +164,18 @@ public class SymbolInfo {
     }
 
     public void setFunctionValue(Function functionValue) {
-        if (null == dataType || functionValue.getType() == dataType) {
+        if (null == dataType || functionValue.getType().getTypeName().equals(dataType.getTypeName())) {
             this.functionValue = functionValue;
             dataType = functionValue.getType();
+        } else {
+            throw new RuntimeException("Type mismatch on assigning the value");
+        }
+    }
+
+    public void setSObjectValue(SObject sObjectValue) {
+        if (null == dataType || sObjectValue.getType().getTypeName().equals(dataType.getTypeName())) {
+            this.sObjectValue = sObjectValue;
+            dataType = sObjectValue.getType();
         } else {
             throw new RuntimeException("Type mismatch on assigning the value");
         }
@@ -168,6 +189,7 @@ public class SymbolInfo {
         longValue = null;
         boolValue = null;
         functionValue = null;
+        sObjectValue = null;
     }
 
     @Override
@@ -181,6 +203,7 @@ public class SymbolInfo {
                 ", longValue=" + longValue +
                 ", boolValue=" + boolValue +
                 ", functionValue=" + functionValue +
+                ", sObjectValue=" + sObjectValue +
                 ", dataType=" + dataType +
                 '}';
     }
@@ -236,8 +259,13 @@ public class SymbolInfo {
             return this;
         }
 
-        public Builder withFunctionValue(Function boolValue) {
-            symbolInfo.functionValue = boolValue;
+        public Builder withFunctionValue(Function functionValue) {
+            symbolInfo.functionValue = functionValue;
+            return this;
+        }
+
+        public Builder withSObjectValue(SObject sObjectValue) {
+            symbolInfo.sObjectValue = sObjectValue;
             return this;
         }
 

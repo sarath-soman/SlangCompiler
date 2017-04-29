@@ -12,6 +12,10 @@ function void main()
     var hell = hello();
     hell();
 
+    hell = lambda void ()
+               println "Hello lambda";
+           endlambda
+
     var d = doAdder(add, hell);
     d();
 

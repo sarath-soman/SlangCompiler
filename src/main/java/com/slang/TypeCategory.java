@@ -7,6 +7,6 @@ public enum TypeCategory {
 
     PRIMITIVE,
     FUNCTION,
-    USERDEFINED;
+    USERDEFINED, OBJECT;
 
 }

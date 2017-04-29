@@ -371,6 +371,8 @@ public class Interpreter implements IVisitor {
                     VariableExpression.class.cast(variableAssignmentStatement.getExpression()).getVariableName());
         }
         Type rhsType = rhsInfo.getDataType();
+        System.out.println(lhsType);
+        System.out.println(rhsType);
         if(null == lhsType && null != rhsType) {
             //when lhs is declared and rhs has value
             if (Type.FLOAT.equals(rhsInfo.getDataType())) {
@@ -417,7 +419,18 @@ public class Interpreter implements IVisitor {
                 lhsInfo.setBoolValue(rhsInfo.getBoolValue());
             } else if(lhsType == Type.STRING && rhsType == Type.STRING) {
                 lhsInfo.setStringValue(rhsInfo.getStringValue());
+            } else if(lhsType.getTypeCategory().equals(rhsType.getTypeCategory())) {
+                if(lhsType.getTypeCategory().equals(TypeCategory.FUNCTION)
+                        && lhsType.getTypeName().equals(rhsType.getTypeName())) {
+                    lhsInfo.setFunctionValue(rhsInfo.getFunctionValue());
+                } else if(lhsType.getTypeCategory().equals(TypeCategory.OBJECT)
+                        && lhsType.getTypeName().equals(rhsType.getTypeName())) {
+                    lhsInfo.setSObjectValue(rhsInfo.getSObjectValue());
+                } else {
+                    throw new RuntimeException("Unsupported types lhs : " + lhsType + ", rhs : " + rhsType);
+                }
             } else {
+                System.out.println("asasasas");
                 throw new RuntimeException("Unsupported types lhs : " + lhsType + ", rhs : " + rhsType);
             }
 

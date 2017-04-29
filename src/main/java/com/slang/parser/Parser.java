@@ -238,17 +238,21 @@ public class Parser {
                 return new FunctionInvokeStatement((FunctionInvokeExpression) parseFunctionInvocationExpression());
             //variable assignment
             } else if (lexer.getCurrentToken() == Token.EQ) {
-                Expression expression = parseExpression();
-
-                //Function invocation and assignment together
-                if(lexer.getPreviousToken() == Token.VAR_NAME && lexer.getCurrentToken() == Token.OPAR) {
-                    return new VariableAssignmentStatement(varName, parseFunctionInvocationExpression());
-                } else {
-                    VariableAssignmentStatement variableAssignmentStatement = new VariableAssignmentStatement(varName, expression);
-                    lexer.expect(Token.SEMICLN);
-                    lexer.eat();
-                    return variableAssignmentStatement;
+                try {
+                    Expression expression = parseExpression();
+                    //Function invocation and assignment together
+                    if(lexer.getPreviousToken() == Token.VAR_NAME && lexer.getCurrentToken() == Token.OPAR) {
+                        return new VariableAssignmentStatement(varName, parseFunctionInvocationExpression());
+                    } else {
+                        VariableAssignmentStatement variableAssignmentStatement = new VariableAssignmentStatement(varName, expression);
+                        lexer.expect(Token.SEMICLN);
+                        lexer.eat();
+                        return variableAssignmentStatement;
+                    }
+                } catch (RuntimeException ex) {
+                    return new VariableAssignmentStatement(varName, parseLambdaExpression());
                 }
+
             }
 
             throw new RuntimeException("Illega token " + lexer.getCurrentToken());
