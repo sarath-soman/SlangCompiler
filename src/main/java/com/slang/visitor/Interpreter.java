@@ -371,8 +371,6 @@ public class Interpreter implements IVisitor {
                     VariableExpression.class.cast(variableAssignmentStatement.getExpression()).getVariableName());
         }
         Type rhsType = rhsInfo.getDataType();
-        System.out.println(lhsType);
-        System.out.println(rhsType);
         if(null == lhsType && null != rhsType) {
             //when lhs is declared and rhs has value
             if (Type.FLOAT.equals(rhsInfo.getDataType())) {
@@ -430,7 +428,6 @@ public class Interpreter implements IVisitor {
                     throw new RuntimeException("Unsupported types lhs : " + lhsType + ", rhs : " + rhsType);
                 }
             } else {
-                System.out.println("asasasas");
                 throw new RuntimeException("Unsupported types lhs : " + lhsType + ", rhs : " + rhsType);
             }
 

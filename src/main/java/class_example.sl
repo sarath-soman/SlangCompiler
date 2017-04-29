@@ -13,7 +13,7 @@ function void main()
 
 end
 
-function void printContact(contact)
+function void printContact(Contact contact)
     println(contact.name);
     println(contact.num);
 end

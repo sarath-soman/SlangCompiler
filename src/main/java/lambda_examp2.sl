@@ -48,6 +48,9 @@ end
 function ()->void doAdder((int,int)->int ad, ()->void vd)
     var re = lambda void ()
                 var x = ad(10, 10);
+                print "sum: ";
+                print x;
+                println "";
                 vd();
                 println "Hello world!";
             endlambda
