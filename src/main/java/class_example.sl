@@ -1,7 +1,7 @@
-type Contact
+class Contact
     int num;
     string name;
-endtype
+endclass
 
 function void main()
     var contact = new Contact();

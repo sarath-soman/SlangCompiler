@@ -52,6 +52,17 @@ public class SemanticAnalyzer implements IVisitor{
     }
 
     @Override
+    public SymbolInfo visit(ObjectMemberVariableExpression objectMemberVariableExpression, Context context) {
+        SymbolInfo objectInfo = context.getSymbolInfo(objectMemberVariableExpression.getMemberName());
+        if (null == objectInfo) {
+            throw new RuntimeException("Object " + objectMemberVariableExpression.getObjectName() + " is undefined.");
+        }
+
+        SymbolInfo memberInfo = objectInfo.getSObjectValue().getField(objectMemberVariableExpression.getMemberName());
+        return memberInfo;
+    }
+
+    @Override
     public SymbolInfo visit(RelationalExpression relationalExpression, Context context) {
         SymbolInfo lhsInfo = relationalExpression.getLeftExpression().accept(this, context);
         SymbolInfo rhsInfo = relationalExpression.getRightExpression().accept(this, context);

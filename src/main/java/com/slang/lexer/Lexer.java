@@ -191,6 +191,11 @@ public class Lexer {
                     currentToken = Token.COMMA;
                     index++;
                     break moduleStream;
+                case '.':
+                    previousToken = currentToken;
+                    currentToken = Token.DOT;
+                    index++;
+                    break moduleStream;
                 case '"':
                     stringLiteral  = readString();
                     previousToken = currentToken;
@@ -335,10 +340,25 @@ public class Lexer {
         return !isEndOfModule();
     }
 
-    public void expect(Token num) {
-        if(num != currentToken) {
-            throw new RuntimeException("Error Token found is "+ currentToken+", Expected token :" + num);
+    public void expect(Token token) {
+        if(token != currentToken) {
+            throw new RuntimeException("Error Token found is "+ currentToken+", Expected token :" + token);
         }
+    }
+
+    public boolean isNextToken(Token token) {
+        int tempIndex = index;
+        Token tempCurrentToken = currentToken;
+        Token tempPreviousToken = previousToken;
+
+        this.eat();
+
+        boolean flag = token.equals(currentToken);
+        currentToken = tempCurrentToken;
+        previousToken = tempPreviousToken;
+        index = tempIndex;
+
+        return flag;
     }
 
     public Token getPreviousToken() {

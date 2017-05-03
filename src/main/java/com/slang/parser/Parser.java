@@ -558,7 +558,14 @@ public class Parser {
             case STRLTRL:
                 return new StringLiteral(lexer.getStringLiteral());
             case VAR_NAME:
-                return new VariableExpression(lexer.getVariableName());
+                String variableName = lexer.getVariableName();
+                if(lexer.isNextToken(Token.DOT)) {
+                    lexer.eat();
+                    lexer.eat();
+                    return new ObjectMemberVariableExpression(variableName, lexer.getVariableName());
+                } else {
+                    return new VariableExpression(variableName);
+                }
             case TRUE:
                 return new BooleanExpression(true);
             case FALSE:

@@ -14,6 +14,7 @@ public interface IVisitor {
     SymbolInfo visit(StringLiteral stringLiteral, Context context);
     SymbolInfo visit(BooleanExpression booleanExpression, Context context);
     SymbolInfo visit(VariableExpression variableExpression, Context context);
+    SymbolInfo visit(ObjectMemberVariableExpression objectMemberVariableExpression, Context context);
     SymbolInfo visit(RelationalExpression relationalExpression, Context context);
     SymbolInfo visit(LogicalExpression logicalExpression, Context context);
     SymbolInfo visit(NotExpression notExpression, Context context);

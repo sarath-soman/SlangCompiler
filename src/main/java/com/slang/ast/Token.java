@@ -56,10 +56,12 @@ public enum Token {
 
     VOID,
     FUNCTION,
+    END,
     RETURN,
     BREAK,
     COMMA,
     LAMBDA,
     ENDLAMBDA,
-    END,
+    CLASS,
+    ENDCLASS, DOT,
 }
