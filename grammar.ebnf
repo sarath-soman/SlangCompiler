@@ -1,0 +1,108 @@
+(* Slang grammar derived from com.slang.lexer.Lexer and com.slang.parser.Parser *)
+
+Program        = { FunctionDecl } ;
+
+FunctionDecl   = "function" Type Identifier "(" [ FormalParam { "," FormalParam } ] ")"
+                 { Statement }
+                 "end" ;
+
+FormalParam    = Type Identifier ;
+
+Type           = "void"
+               | "int" | "long" | "float" | "double" | "boolean" | "string"
+               | "(" [ Type { "," Type } ] ")" "->" Type ;   (* function type *)
+
+Statement      = PrintStmt
+               | PrintlnStmt
+               | VarDecl
+               | VarDeclAssignExpr
+               | VarDeclAssignCall
+               | VarDeclAssignLambda
+               | AssignExpr
+               | AssignCall
+               | AssignLambda
+               | IfStmt
+               | WhileStmt
+               | BreakStmt
+               | ReturnStmt
+               | FunctionCallStmt ;
+
+PrintStmt      = "print"   Expression ";" ;
+PrintlnStmt    = "println" Expression ";" ;
+
+VarDecl        = "var" Identifier ";" ;
+VarDeclAssignExpr
+               = "var" Identifier "=" Expression ";" ;
+VarDeclAssignCall
+               = "var" Identifier "=" Identifier "(" [ Arg { "," Arg } ] ")" ";" ;
+VarDeclAssignLambda
+               = "var" Identifier "=" LambdaExpr ;
+
+AssignExpr     = Identifier "=" Expression ";" ;
+AssignCall     = Identifier "=" Identifier "(" [ Arg { "," Arg } ] ")" ";" ;
+AssignLambda   = Identifier "=" LambdaExpr ;
+
+LambdaExpr     = "lambda" Type "(" [ FormalParam { "," FormalParam } ] ")"
+                 { Statement }
+                 "endlambda" ;
+
+FunctionCallStmt
+               = Identifier "(" [ Arg { "," Arg } ] ")" ";" ;
+
+Arg            = Expression ;
+
+IfStmt         = "if" Expression "then"
+                 { Statement }
+                 [ "else" { Statement } ]
+                 "endif" ;
+
+WhileStmt      = "while" Expression
+                 { Statement }
+                 "wend" ;
+
+BreakStmt      = "break" ";" ;
+
+ReturnStmt     = "return" ";"
+               | "return" Expression ";"
+               | "return" Identifier "(" [ Arg { "," Arg } ] ")" ";" ;
+
+Expression     = RelationalExpr { ( "&&" | "||" ) RelationalExpr } ;
+
+RelationalExpr = ArithmeticExpr { ( "==" | "<" | "<=" | ">" | ">=" ) ArithmeticExpr } ;
+
+ArithmeticExpr = Term { ( "+" | "-" ) Term } ;
+
+Term           = Factor { ( "*" | "/" ) Factor } ;
+
+Factor         = Number
+               | StringLiteral
+               | Identifier
+               | "true" | "false"
+               | "(" Expression ")"
+               | "!" Factor
+               | "+" Factor
+               | "-" Factor ;
+
+Identifier     = Letter { Letter | Digit } ;   (* keywords reserved, '_' not allowed *)
+
+Number         = Integer
+               | Integer "." Digit { Digit } "f"   (* float *)
+               | Integer "." Digit { Digit }       (* double *)
+               | Integer "l" ;                      (* long *)
+
+Integer        = Digit { Digit } ;
+
+StringLiteral  = '"' { any-char-except-quote } '"' ;
+
+Letter         = 'A'..'Z' | 'a'..'z' ;
+Digit          = '0'..'9' ;
+
+(* Notes:
+   - Function calls require a trailing ';' (both as statements and when used as RHS in assignments/returns).
+   - Lambda assignments end at 'endlambda' with no trailing ';'.
+   - The arrow in function types is lexed as '-' followed by '>' tokens: "->".
+   - Operator precedence: unary (!, +, -) > multiplicative (*, /) > additive (+, -) > relational > logical (&&, ||).
+   - The lexer does not produce '!='; only '==', '<', '<=', '>', '>=' are available.
+*)
+
+
